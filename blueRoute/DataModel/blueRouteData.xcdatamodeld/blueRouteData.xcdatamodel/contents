@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Message" representedClassName="Message" syncable="YES" codeGenerationType="class">
+        <attribute name="content" attributeType="String" defaultValueString="message"/>
+        <attribute name="senderIsSelf" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="timestamp" attributeType="Date" defaultDateTimeInterval="690953880" usesScalarValueType="NO"/>
+        <relationship name="chat" maxCount="1" deletionRule="No Action" destinationEntity="User"/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
+        <attribute name="displayName" optional="YES" attributeType="String"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isSelf" attributeType="Boolean" usesScalarValueType="NO"/>
+        <attribute name="latestMessage" optional="YES" attributeType="String" defaultValueString="Message"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="No Action" destinationEntity="Message"/>
+    </entity>
+</model>

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A3A7E5E294018A20060680B /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3A7E5D294018A20060680B /* ChatService.swift */; };
+		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
+		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
 		3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74723A291D885500C5000D /* blueRouteApp.swift */; };
 		3A74723D291D885500C5000D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74723C291D885500C5000D /* ContentView.swift */; };
 		3A74723F291D885600C5000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A74723E291D885600C5000D /* Assets.xcassets */; };
@@ -14,6 +17,54 @@
 		3A74724C291D885600C5000D /* blueRouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74724B291D885600C5000D /* blueRouteTests.swift */; };
 		3A747256291D885600C5000D /* blueRouteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747255291D885600C5000D /* blueRouteUITests.swift */; };
 		3A747258291D885600C5000D /* blueRouteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747257291D885600C5000D /* blueRouteUITestsLaunchTests.swift */; };
+		3A747267291D889200C5000D /* blueRoute.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3A747265291D889200C5000D /* blueRoute.xcdatamodeld */; };
+		3A747269291D88E300C5000D /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747268291D88E300C5000D /* DataController.swift */; };
+		3A74726C291D8F2B00C5000D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74726B291D8F2B00C5000D /* OnboardingView.swift */; };
+		3A747277291DF90900C5000D /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747276291DF90900C5000D /* Device.swift */; };
+		3A7472902925D9A200C5000D /* Avatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74728F2925D9A200C5000D /* Avatar.swift */; };
+		3A7472922925DD3000C5000D /* ChatTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472912925DD3000C5000D /* ChatTile.swift */; };
+		3A74729829270D3B00C5000D /* ContentMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74729729270D3B00C5000D /* ContentMessageView.swift */; };
+		3A74729C2927164200C5000D /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74729B2927164200C5000D /* MessageView.swift */; };
+		3A74729E292719B600C5000D /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74729D292719B600C5000D /* ChatView.swift */; };
+		3A7472B1292946A700C5000D /* Karla-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472AC292946A700C5000D /* Karla-Italic.ttf */; };
+		3A7472B3292946A700C5000D /* KarlaRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472AE292946A700C5000D /* KarlaRegular.ttf */; };
+		3A7472B4292946A700C5000D /* Karla-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472AF292946A700C5000D /* Karla-BoldItalic.ttf */; };
+		3A7472B5292946A700C5000D /* KarlaBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472B0292946A700C5000D /* KarlaBold.ttf */; };
+		3A7472CB292946AF00C5000D /* Lato-HeavyItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472B7292946AF00C5000D /* Lato-HeavyItalic.ttf */; };
+		3A7472CC292946AF00C5000D /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472B8292946AF00C5000D /* Lato-Italic.ttf */; };
+		3A7472CD292946AF00C5000D /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472B9292946AF00C5000D /* Lato-LightItalic.ttf */; };
+		3A7472CE292946AF00C5000D /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BA292946AF00C5000D /* Lato-Thin.ttf */; };
+		3A7472CF292946AF00C5000D /* LatoBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BB292946AF00C5000D /* LatoBold.ttf */; };
+		3A7472D0292946AF00C5000D /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BC292946AF00C5000D /* Lato-Black.ttf */; };
+		3A7472D1292946AF00C5000D /* Lato-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BD292946AF00C5000D /* Lato-SemiboldItalic.ttf */; };
+		3A7472D2292946AF00C5000D /* Lato-HairlineItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BE292946AF00C5000D /* Lato-HairlineItalic.ttf */; };
+		3A7472D3292946AF00C5000D /* LatoRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472BF292946AF00C5000D /* LatoRegular.ttf */; };
+		3A7472D4292946AF00C5000D /* Lato-Hairline.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C0292946AF00C5000D /* Lato-Hairline.ttf */; };
+		3A7472D5292946AF00C5000D /* Lato-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C1292946AF00C5000D /* Lato-BlackItalic.ttf */; };
+		3A7472D6292946AF00C5000D /* Lato-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C2292946AF00C5000D /* Lato-Semibold.ttf */; };
+		3A7472D7292946AF00C5000D /* Lato-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C3292946AF00C5000D /* Lato-MediumItalic.ttf */; };
+		3A7472D9292946AF00C5000D /* Lato-Heavy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C5292946AF00C5000D /* Lato-Heavy.ttf */; };
+		3A7472DB292946AF00C5000D /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C7292946AF00C5000D /* Lato-BoldItalic.ttf */; };
+		3A7472DC292946AF00C5000D /* LatoLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C8292946AF00C5000D /* LatoLight.ttf */; };
+		3A7472DD292946AF00C5000D /* Lato-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472C9292946AF00C5000D /* Lato-Medium.ttf */; };
+		3A7472DE292946AF00C5000D /* Lato-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7472CA292946AF00C5000D /* Lato-ThinItalic.ttf */; };
+		3A7472E6292960A100C5000D /* MainPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472E5292960A100C5000D /* MainPage.swift */; };
+		3A7472E82929619200C5000D /* ConversationsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472E72929619200C5000D /* ConversationsViews.swift */; };
+		3A7472EA2929629E00C5000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472E92929629E00C5000D /* EmptyStateView.swift */; };
+		3A7472EC2929683500C5000D /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472EB2929683500C5000D /* DiscoverView.swift */; };
+		3A7472EE29296AF100C5000D /* LoadingIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472ED29296AF100C5000D /* LoadingIcon.swift */; };
+		3A7472F12929777600C5000D /* BluetoothCentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472F02929777600C5000D /* BluetoothCentral.swift */; };
+		3A7472F32929794C00C5000D /* bluetoothConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472F22929794C00C5000D /* bluetoothConstants.swift */; };
+		3A7472F5292A052D00C5000D /* BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472F4292A052D00C5000D /* BluetoothPeripheral.swift */; };
+		3A7E96592931577B003E8975 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E96582931577B003E8975 /* SettingsView.swift */; };
+		3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965B2931CF33003E8975 /* DeviceGraph.swift */; };
+		3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965D2932848F003E8975 /* LinkedList.swift */; };
+		3A7E9661293284ED003E8975 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E9660293284ED003E8975 /* Queue.swift */; };
+		3AAF936A293ACC5100A43794 /* DeviceGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF9369293ACC5100A43794 /* DeviceGraphView.swift */; };
+		3AAF936C293ACCC800A43794 /* EdgeShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF936B293ACCC800A43794 /* EdgeShape.swift */; };
+		3AAF936E293ACD1E00A43794 /* VertexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF936D293ACD1E00A43794 /* VertexView.swift */; };
+		3AAF93CC293BC7F300A43794 /* AvailabilityTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */; };
+		3AAF93D2293C667800A43794 /* ChatStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF93D1293C667800A43794 /* ChatStorage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +85,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3A3A7E5D294018A20060680B /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
+		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
+		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
 		3A747237291D885500C5000D /* blueRoute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = blueRoute.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A74723A291D885500C5000D /* blueRouteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = blueRouteApp.swift; sourceTree = "<group>"; };
 		3A74723C291D885500C5000D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +98,54 @@
 		3A747251291D885600C5000D /* blueRouteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = blueRouteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A747255291D885600C5000D /* blueRouteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = blueRouteUITests.swift; sourceTree = "<group>"; };
 		3A747257291D885600C5000D /* blueRouteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = blueRouteUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		3A747266291D889200C5000D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		3A747268291D88E300C5000D /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		3A74726B291D8F2B00C5000D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		3A747276291DF90900C5000D /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		3A74728F2925D9A200C5000D /* Avatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Avatar.swift; sourceTree = "<group>"; };
+		3A7472912925DD3000C5000D /* ChatTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTile.swift; sourceTree = "<group>"; };
+		3A74729729270D3B00C5000D /* ContentMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMessageView.swift; sourceTree = "<group>"; };
+		3A74729B2927164200C5000D /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
+		3A74729D292719B600C5000D /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		3A7472AC292946A700C5000D /* Karla-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Karla-Italic.ttf"; sourceTree = "<group>"; };
+		3A7472AE292946A700C5000D /* KarlaRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KarlaRegular.ttf; sourceTree = "<group>"; };
+		3A7472AF292946A700C5000D /* Karla-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Karla-BoldItalic.ttf"; sourceTree = "<group>"; };
+		3A7472B0292946A700C5000D /* KarlaBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KarlaBold.ttf; sourceTree = "<group>"; };
+		3A7472B7292946AF00C5000D /* Lato-HeavyItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-HeavyItalic.ttf"; sourceTree = "<group>"; };
+		3A7472B8292946AF00C5000D /* Lato-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Italic.ttf"; sourceTree = "<group>"; };
+		3A7472B9292946AF00C5000D /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
+		3A7472BA292946AF00C5000D /* Lato-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Thin.ttf"; sourceTree = "<group>"; };
+		3A7472BB292946AF00C5000D /* LatoBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LatoBold.ttf; sourceTree = "<group>"; };
+		3A7472BC292946AF00C5000D /* Lato-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Black.ttf"; sourceTree = "<group>"; };
+		3A7472BD292946AF00C5000D /* Lato-SemiboldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-SemiboldItalic.ttf"; sourceTree = "<group>"; };
+		3A7472BE292946AF00C5000D /* Lato-HairlineItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-HairlineItalic.ttf"; sourceTree = "<group>"; };
+		3A7472BF292946AF00C5000D /* LatoRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LatoRegular.ttf; sourceTree = "<group>"; };
+		3A7472C0292946AF00C5000D /* Lato-Hairline.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Hairline.ttf"; sourceTree = "<group>"; };
+		3A7472C1292946AF00C5000D /* Lato-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BlackItalic.ttf"; sourceTree = "<group>"; };
+		3A7472C2292946AF00C5000D /* Lato-Semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Semibold.ttf"; sourceTree = "<group>"; };
+		3A7472C3292946AF00C5000D /* Lato-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-MediumItalic.ttf"; sourceTree = "<group>"; };
+		3A7472C5292946AF00C5000D /* Lato-Heavy.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Heavy.ttf"; sourceTree = "<group>"; };
+		3A7472C7292946AF00C5000D /* Lato-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BoldItalic.ttf"; sourceTree = "<group>"; };
+		3A7472C8292946AF00C5000D /* LatoLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LatoLight.ttf; sourceTree = "<group>"; };
+		3A7472C9292946AF00C5000D /* Lato-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Medium.ttf"; sourceTree = "<group>"; };
+		3A7472CA292946AF00C5000D /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
+		3A7472E5292960A100C5000D /* MainPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPage.swift; sourceTree = "<group>"; };
+		3A7472E72929619200C5000D /* ConversationsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViews.swift; sourceTree = "<group>"; };
+		3A7472E92929629E00C5000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		3A7472EB2929683500C5000D /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		3A7472ED29296AF100C5000D /* LoadingIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIcon.swift; sourceTree = "<group>"; };
+		3A7472F02929777600C5000D /* BluetoothCentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothCentral.swift; sourceTree = "<group>"; };
+		3A7472F22929794C00C5000D /* bluetoothConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bluetoothConstants.swift; sourceTree = "<group>"; };
+		3A7472F4292A052D00C5000D /* BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheral.swift; sourceTree = "<group>"; };
+		3A7E96582931577B003E8975 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		3A7E965B2931CF33003E8975 /* DeviceGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGraph.swift; sourceTree = "<group>"; };
+		3A7E965D2932848F003E8975 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
+		3A7E9660293284ED003E8975 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		3AAF9369293ACC5100A43794 /* DeviceGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGraphView.swift; sourceTree = "<group>"; };
+		3AAF936B293ACCC800A43794 /* EdgeShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeShape.swift; sourceTree = "<group>"; };
+		3AAF936D293ACD1E00A43794 /* VertexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VertexView.swift; sourceTree = "<group>"; };
+		3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityTagView.swift; sourceTree = "<group>"; };
+		3AAF93D1293C667800A43794 /* ChatStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +173,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A3A7E5B294008C70060680B /* BluetoothServices */ = {
+			isa = PBXGroup;
+			children = (
+				3A554C41292F3F760063A2FA /* Utilities */,
+				3A7472F02929777600C5000D /* BluetoothCentral.swift */,
+				3A7472F4292A052D00C5000D /* BluetoothPeripheral.swift */,
+				3A554C3F292DB9340063A2FA /* BluetoothController.swift */,
+			);
+			path = BluetoothServices;
+			sourceTree = "<group>";
+		};
+		3A554C41292F3F760063A2FA /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472F22929794C00C5000D /* bluetoothConstants.swift */,
+				3A747276291DF90900C5000D /* Device.swift */,
+				3A554C42292F3F960063A2FA /* BTMessage.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		3A74722E291D885500C5000D = {
 			isa = PBXGroup;
 			children = (
@@ -94,9 +217,12 @@
 		3A747239291D885500C5000D /* blueRoute */ = {
 			isa = PBXGroup;
 			children = (
+				3A7472EF2929775E00C5000D /* Services */,
+				3A74726A291D8BCA00C5000D /* Views */,
+				3A747264291D886700C5000D /* DataModel */,
 				3A74723A291D885500C5000D /* blueRouteApp.swift */,
 				3A74723C291D885500C5000D /* ContentView.swift */,
-				3A74723E291D885600C5000D /* Assets.xcassets */,
+				3A7472A92929468C00C5000D /* Assets */,
 				3A747240291D885600C5000D /* Preview Content */,
 			);
 			path = blueRoute;
@@ -125,6 +251,145 @@
 				3A747257291D885600C5000D /* blueRouteUITestsLaunchTests.swift */,
 			);
 			path = blueRouteUITests;
+			sourceTree = "<group>";
+		};
+		3A747264291D886700C5000D /* DataModel */ = {
+			isa = PBXGroup;
+			children = (
+				3A747265291D889200C5000D /* blueRoute.xcdatamodeld */,
+				3A747268291D88E300C5000D /* DataController.swift */,
+				3AAF93D1293C667800A43794 /* ChatStorage.swift */,
+			);
+			path = DataModel;
+			sourceTree = "<group>";
+		};
+		3A74726A291D8BCA00C5000D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3AAF9368293ACC3500A43794 /* DeviceGraph */,
+				3A74729629270D1A00C5000D /* ChatView */,
+				3A74728E2925D97E00C5000D /* Util */,
+				3A74726B291D8F2B00C5000D /* OnboardingView.swift */,
+				3A7472E5292960A100C5000D /* MainPage.swift */,
+				3A7472E72929619200C5000D /* ConversationsViews.swift */,
+				3A7472EB2929683500C5000D /* DiscoverView.swift */,
+				3A7E96582931577B003E8975 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3A74728E2925D97E00C5000D /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				3A74728F2925D9A200C5000D /* Avatar.swift */,
+				3A7472E92929629E00C5000D /* EmptyStateView.swift */,
+				3A7472ED29296AF100C5000D /* LoadingIcon.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		3A74729629270D1A00C5000D /* ChatView */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472912925DD3000C5000D /* ChatTile.swift */,
+				3A74729729270D3B00C5000D /* ContentMessageView.swift */,
+				3A74729B2927164200C5000D /* MessageView.swift */,
+				3A74729D292719B600C5000D /* ChatView.swift */,
+				3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */,
+			);
+			path = ChatView;
+			sourceTree = "<group>";
+		};
+		3A7472A92929468C00C5000D /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472AA2929469700C5000D /* Fonts */,
+				3A74723E291D885600C5000D /* Assets.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		3A7472AA2929469700C5000D /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472B6292946AF00C5000D /* Lato */,
+				3A7472AB292946A700C5000D /* karla */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		3A7472AB292946A700C5000D /* karla */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472AC292946A700C5000D /* Karla-Italic.ttf */,
+				3A7472AE292946A700C5000D /* KarlaRegular.ttf */,
+				3A7472AF292946A700C5000D /* Karla-BoldItalic.ttf */,
+				3A7472B0292946A700C5000D /* KarlaBold.ttf */,
+			);
+			path = karla;
+			sourceTree = "<group>";
+		};
+		3A7472B6292946AF00C5000D /* Lato */ = {
+			isa = PBXGroup;
+			children = (
+				3A7472B7292946AF00C5000D /* Lato-HeavyItalic.ttf */,
+				3A7472B8292946AF00C5000D /* Lato-Italic.ttf */,
+				3A7472B9292946AF00C5000D /* Lato-LightItalic.ttf */,
+				3A7472BA292946AF00C5000D /* Lato-Thin.ttf */,
+				3A7472BB292946AF00C5000D /* LatoBold.ttf */,
+				3A7472BC292946AF00C5000D /* Lato-Black.ttf */,
+				3A7472BD292946AF00C5000D /* Lato-SemiboldItalic.ttf */,
+				3A7472BE292946AF00C5000D /* Lato-HairlineItalic.ttf */,
+				3A7472BF292946AF00C5000D /* LatoRegular.ttf */,
+				3A7472C0292946AF00C5000D /* Lato-Hairline.ttf */,
+				3A7472C1292946AF00C5000D /* Lato-BlackItalic.ttf */,
+				3A7472C2292946AF00C5000D /* Lato-Semibold.ttf */,
+				3A7472C3292946AF00C5000D /* Lato-MediumItalic.ttf */,
+				3A7472C5292946AF00C5000D /* Lato-Heavy.ttf */,
+				3A7472C7292946AF00C5000D /* Lato-BoldItalic.ttf */,
+				3A7472C8292946AF00C5000D /* LatoLight.ttf */,
+				3A7472C9292946AF00C5000D /* Lato-Medium.ttf */,
+				3A7472CA292946AF00C5000D /* Lato-ThinItalic.ttf */,
+			);
+			path = Lato;
+			sourceTree = "<group>";
+		};
+		3A7472EF2929775E00C5000D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3A3A7E5B294008C70060680B /* BluetoothServices */,
+				3A7E965A2931CF09003E8975 /* GraphService */,
+				3A3A7E5D294018A20060680B /* ChatService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		3A7E965A2931CF09003E8975 /* GraphService */ = {
+			isa = PBXGroup;
+			children = (
+				3A7E965F293284CD003E8975 /* Data Structures */,
+				3A7E965B2931CF33003E8975 /* DeviceGraph.swift */,
+			);
+			path = GraphService;
+			sourceTree = "<group>";
+		};
+		3A7E965F293284CD003E8975 /* Data Structures */ = {
+			isa = PBXGroup;
+			children = (
+				3A7E965D2932848F003E8975 /* LinkedList.swift */,
+				3A7E9660293284ED003E8975 /* Queue.swift */,
+			);
+			path = "Data Structures";
+			sourceTree = "<group>";
+		};
+		3AAF9368293ACC3500A43794 /* DeviceGraph */ = {
+			isa = PBXGroup;
+			children = (
+				3AAF9369293ACC5100A43794 /* DeviceGraphView.swift */,
+				3AAF936B293ACCC800A43794 /* EdgeShape.swift */,
+				3AAF936D293ACD1E00A43794 /* VertexView.swift */,
+			);
+			path = DeviceGraph;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -231,8 +496,30 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A7472D5292946AF00C5000D /* Lato-BlackItalic.ttf in Resources */,
+				3A7472DE292946AF00C5000D /* Lato-ThinItalic.ttf in Resources */,
+				3A7472DC292946AF00C5000D /* LatoLight.ttf in Resources */,
+				3A7472D0292946AF00C5000D /* Lato-Black.ttf in Resources */,
+				3A7472CD292946AF00C5000D /* Lato-LightItalic.ttf in Resources */,
+				3A7472D2292946AF00C5000D /* Lato-HairlineItalic.ttf in Resources */,
+				3A7472DB292946AF00C5000D /* Lato-BoldItalic.ttf in Resources */,
+				3A7472CE292946AF00C5000D /* Lato-Thin.ttf in Resources */,
+				3A7472D6292946AF00C5000D /* Lato-Semibold.ttf in Resources */,
+				3A7472CC292946AF00C5000D /* Lato-Italic.ttf in Resources */,
+				3A7472D1292946AF00C5000D /* Lato-SemiboldItalic.ttf in Resources */,
+				3A7472CB292946AF00C5000D /* Lato-HeavyItalic.ttf in Resources */,
+				3A7472CF292946AF00C5000D /* LatoBold.ttf in Resources */,
+				3A7472DD292946AF00C5000D /* Lato-Medium.ttf in Resources */,
 				3A747242291D885600C5000D /* Preview Assets.xcassets in Resources */,
+				3A7472B5292946A700C5000D /* KarlaBold.ttf in Resources */,
+				3A7472B4292946A700C5000D /* Karla-BoldItalic.ttf in Resources */,
+				3A7472B1292946A700C5000D /* Karla-Italic.ttf in Resources */,
+				3A7472D9292946AF00C5000D /* Lato-Heavy.ttf in Resources */,
+				3A7472D4292946AF00C5000D /* Lato-Hairline.ttf in Resources */,
 				3A74723F291D885600C5000D /* Assets.xcassets in Resources */,
+				3A7472D7292946AF00C5000D /* Lato-MediumItalic.ttf in Resources */,
+				3A7472B3292946A700C5000D /* KarlaRegular.ttf in Resources */,
+				3A7472D3292946AF00C5000D /* LatoRegular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,8 +544,37 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A7472F5292A052D00C5000D /* BluetoothPeripheral.swift in Sources */,
 				3A74723D291D885500C5000D /* ContentView.swift in Sources */,
+				3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */,
+				3AAF936A293ACC5100A43794 /* DeviceGraphView.swift in Sources */,
+				3A74729E292719B600C5000D /* ChatView.swift in Sources */,
+				3AAF93CC293BC7F300A43794 /* AvailabilityTagView.swift in Sources */,
+				3A7472922925DD3000C5000D /* ChatTile.swift in Sources */,
+				3A74729C2927164200C5000D /* MessageView.swift in Sources */,
+				3A7472EC2929683500C5000D /* DiscoverView.swift in Sources */,
+				3A7472EE29296AF100C5000D /* LoadingIcon.swift in Sources */,
+				3A7472F12929777600C5000D /* BluetoothCentral.swift in Sources */,
+				3AAF93D2293C667800A43794 /* ChatStorage.swift in Sources */,
+				3A7E96592931577B003E8975 /* SettingsView.swift in Sources */,
+				3A7472EA2929629E00C5000D /* EmptyStateView.swift in Sources */,
+				3A7472E82929619200C5000D /* ConversationsViews.swift in Sources */,
+				3A7472E6292960A100C5000D /* MainPage.swift in Sources */,
+				3A747269291D88E300C5000D /* DataController.swift in Sources */,
+				3AAF936C293ACCC800A43794 /* EdgeShape.swift in Sources */,
+				3AAF936E293ACD1E00A43794 /* VertexView.swift in Sources */,
 				3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */,
+				3A7E9661293284ED003E8975 /* Queue.swift in Sources */,
+				3A3A7E5E294018A20060680B /* ChatService.swift in Sources */,
+				3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */,
+				3A74726C291D8F2B00C5000D /* OnboardingView.swift in Sources */,
+				3A7472902925D9A200C5000D /* Avatar.swift in Sources */,
+				3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */,
+				3A747277291DF90900C5000D /* Device.swift in Sources */,
+				3A74729829270D3B00C5000D /* ContentMessageView.swift in Sources */,
+				3A7472F32929794C00C5000D /* bluetoothConstants.swift in Sources */,
+				3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */,
+				3A747267291D889200C5000D /* blueRoute.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,9 +736,12 @@
 				DEVELOPMENT_TEAM = 429ULDR6SS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = blueRoute/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Our app uses bluetooth to find, connect and transfer data between different devices";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -449,9 +768,12 @@
 				DEVELOPMENT_TEAM = 429ULDR6SS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = blueRoute/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Our app uses bluetooth to find, connect and transfer data between different devices";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -583,6 +905,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3A747265291D889200C5000D /* blueRoute.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3A747266291D889200C5000D /* Model.xcdatamodel */,
+			);
+			currentVersion = 3A747266291D889200C5000D /* Model.xcdatamodel */;
+			path = blueRoute.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 3A74722F291D885500C5000D /* Project object */;
 }
