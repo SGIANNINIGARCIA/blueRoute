@@ -10,22 +10,24 @@ import SwiftUI
 @main
 struct blueRouteApp: App {
     @StateObject private var dataController: DataController;
-    @StateObject var chatsStorage: ChatsStorage;
+    @StateObject var bluetoothController: BluetoothController;
     
     init() {
+        
+        // Initiate data controller to pass it to the bluetoothManager
         let dataController = DataController()
         self._dataController = StateObject(wrappedValue: dataController);
         
-        
-        let chats = ChatsStorage(managedObjectContext: dataController.container.viewContext)
-        self._chatsStorage = StateObject(wrappedValue: chats);
+        // Initiate bluetoothManager and pass core data context and data manager
+        let bluetoothController = BluetoothController(dataController: dataController, context: dataController.container.viewContext)
+        self._bluetoothController = StateObject(wrappedValue: bluetoothController);
     }
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, dataController.container.viewContext)
+                .environmentObject(bluetoothController)
                 .environmentObject(dataController)
-                .environmentObject(chatsStorage)
                 
         }
     }

@@ -121,11 +121,6 @@ extension DataController {
         return user;
     }
     
-    public func delete(user: User, context: NSManagedObjectContext) {
-        context.delete(user)
-        
-        save(context: context)
-    }
     
     
 }

@@ -22,9 +22,7 @@ import CoreBluetooth
 class BluetoothCentralManager: NSObject {
     
     // Full Name containing the displayName provided by user during onboarding + unique ID
-    public var name:String = "unknown" {
-        didSet { startScanning() }
-    }
+    public var name:String = "unknown";
     
     // Delegate object handling shared resources and exposing the central manager to the UI
     weak var bluetoothController: BluetoothController!
@@ -299,4 +297,19 @@ extension BluetoothCentralManager {
            }
            return nil
        }
+}
+
+
+
+// Controller + Bluetooth Central
+extension BluetoothController {
+    
+    public func startDiscovery() {
+        self.central?.startScanning()
+    }
+    
+    public func stopDiscovery() {
+        self.central?.stopScanning()
+    }
+    
 }

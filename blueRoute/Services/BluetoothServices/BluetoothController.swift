@@ -21,10 +21,12 @@ class BluetoothController: ObservableObject {
     // Full name (displayName + unique ID)
     var name: String?
     
-    init() {
+    init(dataController: DataController, context: NSManagedObjectContext) {
+        self.dataController = dataController;
+        self.managedObjContext = context;
     }
     
-    public func setUp(name: String, dataController: DataController, context: NSManagedObjectContext) -> Void {
+    public func setUp(name: String) -> Void {
         self.name = name;
         // instantiating the peripheral manager which wont start broadcasting immediately
         // but will wait until we provide an username
@@ -32,9 +34,6 @@ class BluetoothController: ObservableObject {
         // instantiating the central manager which wont start discovering immediately
         // but will wait until we provide an username
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
-        
-        self.dataController = dataController;
-        self.managedObjContext = context;
     }
     
     // Returns true if the device is reachable, else false.

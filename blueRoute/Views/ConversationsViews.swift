@@ -11,8 +11,7 @@ struct ConversationsView: View {
     
     @Environment(\.managedObjectContext) var managedObjContext;
     @EnvironmentObject var dataController: DataController;
-    @EnvironmentObject var bluetoothController: BluetoothController;
-    @EnvironmentObject var chatsStorage: ChatsStorage;
+    @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "isSelf == %@", NSNumber(false))) private var chats: FetchedResults<User>
     
     var body: some View {
         NavigationView {
@@ -25,7 +24,7 @@ struct ConversationsView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(chatsStorage.chats) { chat in
+                    ForEach(chats) { chat in
                         NavigationLink {
                             ChatView(displayName: chat.displayName!, id: chat.identifier!)
                         } label: {
@@ -35,7 +34,7 @@ struct ConversationsView: View {
                     }
                     .onDelete(perform: removeConversation)
                 }
-                .emptyState(chatsStorage.chats.isEmpty) {
+                .emptyState(chats.isEmpty) {
                       Text("No active conversations   :(")
                         .font(.title3)
                         .foregroundColor(Color.secondary)
@@ -48,11 +47,10 @@ struct ConversationsView: View {
 
     func removeConversation(at offsets: IndexSet) {
         for index in offsets {
-            let toBeDeleted = chatsStorage.chats[index]
+            let toBeDeleted = chats[index]
             managedObjContext.delete(toBeDeleted)
         }
         dataController.save(context: managedObjContext)
-        
     }
 }
 

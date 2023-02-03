@@ -30,22 +30,29 @@ struct DiscoverView: View {
                             Text(user.displayName)
                         }
                     }
-                    
-                    
                     .emptyState(bluetoothController.devices.count == 0) {
-                        
                         HStack {
                             Spacer()
                             LoadingIcon()
                             Spacer()
                         }
-                        
                     }
                     
                 } .navigationTitle("Discover")
                     .toolbar(Visibility.hidden)
                 
             }
+        }
+        
+        // When user opens the discovery page,
+        // prompt the central to start scanning for devices
+        .onAppear {
+            bluetoothController.startDiscovery()
+        }
+        // When user closes the discovery page,
+        // prompt the central to stop scanning for devices
+        .onDisappear {
+            bluetoothController.stopDiscovery()
         }
     }
 }

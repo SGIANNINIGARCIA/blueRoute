@@ -11,6 +11,7 @@ struct OnboardingView: View {
     
     @Environment(\.managedObjectContext) var managedObjContext;
     @EnvironmentObject var dataController: DataController;
+    
     @State var userInput:String = "";
     @State private var animationAmount = 5.0;
     

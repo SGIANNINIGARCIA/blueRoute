@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3A3A7E5E294018A20060680B /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3A7E5D294018A20060680B /* ChatService.swift */; };
 		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
 		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
 		3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74723A291D885500C5000D /* blueRouteApp.swift */; };
@@ -85,7 +84,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3A3A7E5D294018A20060680B /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
 		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
 		3A747237291D885500C5000D /* blueRoute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = blueRoute.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -359,7 +357,6 @@
 			children = (
 				3A3A7E5B294008C70060680B /* BluetoothServices */,
 				3A7E965A2931CF09003E8975 /* GraphService */,
-				3A3A7E5D294018A20060680B /* ChatService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -565,7 +562,6 @@
 				3AAF936E293ACD1E00A43794 /* VertexView.swift in Sources */,
 				3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */,
 				3A7E9661293284ED003E8975 /* Queue.swift in Sources */,
-				3A3A7E5E294018A20060680B /* ChatService.swift in Sources */,
 				3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */,
 				3A74726C291D8F2B00C5000D /* OnboardingView.swift in Sources */,
 				3A7472902925D9A200C5000D /* Avatar.swift in Sources */,
