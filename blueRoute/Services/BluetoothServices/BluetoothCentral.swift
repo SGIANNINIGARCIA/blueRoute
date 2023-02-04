@@ -68,7 +68,7 @@ class BluetoothCentralManager: NSObject {
         print("central: i am scanning for peripherals")
         
         // Call the centralManager to start scanning
-        central.scanForPeripherals(withServices: [BluetoothConstants.chatDiscoveryServiceID],
+        central.scanForPeripherals(withServices: [BluetoothConstants.blueRouteServiceID],
                                           options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
         
     }
@@ -111,7 +111,7 @@ class BluetoothCentralManager: NSObject {
     // Send a message to our connected peripheral once a connection have been stablished
     public func sendData(_ data: Data, peripheral: CBPeripheral) {
         
-        guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.chatDiscoveryServiceID, characteristicId: BluetoothConstants.chatCharacteristicID) else {
+        guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.blueRouteServiceID, characteristicId: BluetoothConstants.chatCharacteristicID) else {
             // Could not find characteristic
             print("could not find a characteristic to write to")
             return;
@@ -168,7 +168,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
         peripheral.delegate = self
 
         // Scan for the chat characteristic we'll use to communicate
-        peripheral.discoverServices([BluetoothConstants.chatDiscoveryServiceID])
+        peripheral.discoverServices([BluetoothConstants.blueRouteServiceID])
     }
     
     // Called when a peripheral has diconnected from this device (acting as a central)
@@ -197,11 +197,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         // It's possible there may be more than one service, so loop through each one to discover
         // the characteristic that we want
         peripheral.services?.forEach { service in
-            peripheral.discoverCharacteristics([BluetoothConstants.chatCharacteristicID], for: service)
-        }
-        
-        peripheral.services?.forEach { service in
-            peripheral.discoverCharacteristics([BluetoothConstants.nameCharacteristicID], for: service)
+            peripheral.discoverCharacteristics([BluetoothConstants.chatCharacteristicID, BluetoothConstants.handshakeCharacteristicID, BluetoothConstants.routingCharacteristicID], for: service)
         }
     }
     
@@ -217,8 +213,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
 
         // Perform a loop in case we received more than one
         service.characteristics?.forEach { characteristic in
-            guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.nameCharacteristicID else { return }
-
+            guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID else { return }
             // Subscribe to this characteristic, so we can be notified when data comes from it
             peripheral.setNotifyValue(true, for: characteristic)
 
@@ -238,7 +233,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
          }
 
          // Ensure this characteristic is the one we configured
-         guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.nameCharacteristicID else { return }
+         guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID else { return }
          
          // Check if it is successfully set as notifying
              if characteristic.isNotifying {

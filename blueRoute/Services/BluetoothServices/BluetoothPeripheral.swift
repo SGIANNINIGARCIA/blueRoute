@@ -24,7 +24,13 @@ class BluetoothPeripheralManager: NSObject {
     weak var bluetoothController: BluetoothController!
     
     // The characteristic used for our chat sessions
-    private var peripheralCharacteristic: CBMutableCharacteristic!
+    private var peripheralChatCharacteristic: CBMutableCharacteristic!
+    
+    // The characteristic used for our chat sessions
+    private var peripheralHandshakeCharacteristic: CBMutableCharacteristic!
+    
+    // The characteristic used for our chat sessions
+    private var peripheralRoutingCharacteristic: CBMutableCharacteristic!
     
     // Make a queue we can run all of the events off
     private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
@@ -60,12 +66,14 @@ class BluetoothPeripheralManager: NSObject {
         // Start advertising with this device's name
         
         peripheral.startAdvertising(
-            [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatDiscoveryServiceID],
+            [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.blueRouteServiceID],
              CBAdvertisementDataLocalNameKey: name])
     }
     
     private func sendData(_ data: Data, central: CBCentral) {
-        guard let characteristic = self.peripheralCharacteristic else { return }
+        
+        // currently only for chat
+        guard let characteristic = self.peripheralChatCharacteristic else { return }
         peripheral.updateValue(data, for: characteristic,
                                 onSubscribedCentrals: [central])
     }
@@ -80,23 +88,34 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         // and characteristics we intend to support
         guard peripheral.state == .poweredOn else { return }
         
-        // Create the characteristic which will be the conduit for our chat data.
-        // Make sure the properties are set to writeable so we can send data upstream
+        // The characteristic which will be the conduit for our chat data.
         // to the central, and notifiable, so we'll receive callbacks when data comes downstream
-        peripheralCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
+        peripheralChatCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
+                                                 properties: [.write, .notify],
+                                                 value: nil,
+                                                 permissions: .writeable)
+        
+        // The characteristic which will be the responsible for initial handshake.
+        peripheralHandshakeCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.handshakeCharacteristicID,
+                                                 properties: [.write, .notify],
+                                                 value: nil,
+                                                 permissions: .writeable)
+        
+        // The characteristic which will be the responsible for receiving data to be routed
+        peripheralRoutingCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.routingCharacteristicID,
                                                  properties: [.write, .notify],
                                                  value: nil,
                                                  permissions: .writeable)
         
         // Create the service that will represent this characteristic
-        let service = CBMutableService(type: BluetoothConstants.chatDiscoveryServiceID, primary: true)
-        service.characteristics = [self.peripheralCharacteristic!]
+        let service = CBMutableService(type: BluetoothConstants.blueRouteServiceID, primary: true)
+        service.characteristics = [self.peripheralChatCharacteristic!, self.peripheralHandshakeCharacteristic, self.peripheralRoutingCharacteristic]
         
         // Register this service to the peripheral so it can now be advertised
         self.peripheral?.add(service)
 
         // Start advertising as a peripheral
-        let advertisementData: [String: Any] = [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatDiscoveryServiceID]]
+        let advertisementData: [String: Any] = [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.blueRouteServiceID]]
         self.peripheral?.startAdvertising(advertisementData)
     }
     
