@@ -49,7 +49,6 @@ class BluetoothCentralManager: NSObject {
         // Create the Bluetooth central
         self.central = CBCentralManager(delegate: self, queue: queue)
         
-        
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         
         // If a device name is provided, assign it to class property
@@ -77,39 +76,11 @@ class BluetoothCentralManager: NSObject {
         central.stopScan()
     }
     
-    // If we connect to a peripheral and finished the initial Handshake,
-    // add the peripheral to the list
-    fileprivate func addToDeviceList(with device: Device) {
-        
-        print("\(name) found \(device.displayName)")
-        // If a device already exists in the list, replace it with this new device
-        if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
-          //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("\(device.displayName)  already existed- updating now")
-            bluetoothController.devices.remove(at: index)
-            bluetoothController.devices.insert(device, at: index)
-            return
-        }
     
-        // If this item didn't exist in the list, append it to the end
-        bluetoothController.devices.append(device)
-       
-    }
-    
-    fileprivate func removeDeviceFromList(with device: CBPeripheral) {
-        
-        print("removing \(device.identifier)")
-        // If a device already exists in the list, replace it with this new device
-        if let index = bluetoothController.devices.firstIndex(where: { $0.peripheral?.identifier == device.identifier }) {
-          //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("\(bluetoothController.devices[index].displayName)  found- removing now")
-            bluetoothController.devices.remove(at: index)
-            return
-        }
-    }
-    
-    // Send a message to our connected peripheral once a connection have been stablished
+    // Write to one of the peripheral Characteristics
     public func sendData(_ data: Data, peripheral: CBPeripheral) {
+        
+        // Currently writing only to chatCharacteristic, but writing to other soon to be implemented
         
         guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.blueRouteServiceID, characteristicId: BluetoothConstants.chatCharacteristicID) else {
             // Could not find characteristic
@@ -173,9 +144,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
     
     // Called when a peripheral has diconnected from this device (acting as a central)
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        
         print("peripheral has disconnected")
-        
     }
     
     
@@ -245,11 +214,34 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
              }
      }
     
+    // The peripheral has written value to one of the characteristics we are subscribed to
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
         // Perform any error handling if one occurred
         if let error = error {
             print("Characteristic value update failed: \(error.localizedDescription)")
             return
+        }
+        
+        // process depending on the characteristic
+        switch(characteristic) {
+        case BluetoothConstants.handshakeCharacteristicID :
+            print("handshake")
+            //process handshake
+            // TO-DO
+        case BluetoothConstants.routingCharacteristicID:
+            print("routing")
+            //process routing
+            //TO-DO
+            
+        case BluetoothConstants.chatCharacteristicID:
+            print("chat")
+            //process chat
+            //TO-DO
+            
+        default:
+            print("default")
+            
         }
 
         // Decode the message string and trigger the callback
@@ -263,18 +255,45 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         }
     }
     
+    // a peripheral has changed the services it advertises
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
-        
-        print("peripheral \(peripheral.identifier) disconnected ")
-        
-        
-        removeDeviceFromList(with: peripheral)
-      //  startScanning()
-            
-            
-        
+        print("peripheral \(peripheral.identifier) has changed it services ")
+        // DO-SOMETHING?
     }
+    
+    // If we connect to a peripheral and finished the initial Handshake,
+    // add the peripheral to the list
+    fileprivate func addToDeviceList(with device: Device) {
+        
+        print("\(name) found \(device.displayName)")
+        // If a device already exists in the list, replace it with this new device
+        if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
+          //  guard bluetoothController.devices[index].id != device.id else { return }
+            print("\(device.displayName)  already existed- updating now")
+            bluetoothController.devices.remove(at: index)
+            bluetoothController.devices.insert(device, at: index)
+            return
+        }
+    
+        // If this item didn't exist in the list, append it to the end
+        bluetoothController.devices.append(device)
+       
+    }
+    
+    fileprivate func removeDeviceFromList(with device: CBPeripheral) {
+        
+        print("removing \(device.identifier)")
+        // If a device already exists in the list, replace it with this new device
+        if let index = bluetoothController.devices.firstIndex(where: { $0.peripheral?.identifier == device.identifier }) {
+          //  guard bluetoothController.devices[index].id != device.id else { return }
+            print("\(bluetoothController.devices[index].displayName)  found- removing now")
+            bluetoothController.devices.remove(at: index)
+            return
+        }
+    }
+    
 }
+
 
 
 // Extension to hold helper functions

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>LatoBold.ttf</string>
+		<string>blueRoute/Assets/Fonts/Lato/LatoLight.ttf</string>
+		<string>blueRoute/Assets/Fonts/Lato/LatoRegular.ttf</string>
+		<string>blueRoute/Assets/Fonts/Lato/Lato-Semibold.ttf</string>
+		<string>blueRoute/Assets/Fonts/Lato/Lato-Black.ttf</string>
+		<string>blueRoute/Assets/Fonts/karla/KarlaRegular.ttf</string>
+		<string>blueRoute/Assets/Fonts/karla/KarlaBold.ttf</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchscreenColors</string>
+		<key>UIImageName</key>
+		<string>blueroutelogosvg</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

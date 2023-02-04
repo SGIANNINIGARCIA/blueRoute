@@ -67,7 +67,7 @@ class BluetoothPeripheralManager: NSObject {
         
         peripheral.startAdvertising(
             [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.blueRouteServiceID],
-             CBAdvertisementDataLocalNameKey: name])
+                CBAdvertisementDataLocalNameKey: self.name])
     }
     
     private func sendData(_ data: Data, central: CBCentral) {
