@@ -22,7 +22,7 @@ import CoreBluetooth
 class BluetoothCentralManager: NSObject {
     
     // Full Name containing the displayName provided by user during onboarding + unique ID
-    public var name:String = "unknown";
+   // public var name:String = "unknown";
     
     // Delegate object handling shared resources and exposing the central manager to the UI
     weak var bluetoothController: BluetoothController!
@@ -52,7 +52,7 @@ class BluetoothCentralManager: NSObject {
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         
         // If a device name is provided, assign it to class property
-        if let name = name { self.name = name }
+        //if let name = name { self.name = name }
     
     }
     
@@ -265,7 +265,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     // add the peripheral to the list
     fileprivate func addToDeviceList(with device: Device) {
         
-        print("\(name) found \(device.displayName)")
+        //print("\(name) found \(device.displayName)")
         // If a device already exists in the list, replace it with this new device
         if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
           //  guard bluetoothController.devices[index].id != device.id else { return }

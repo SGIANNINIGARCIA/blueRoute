@@ -33,6 +33,7 @@ class BluetoothController: ObservableObject {
         self.peripheral = BluetoothPeripheralManager(name: name, bluetoothController: self )
         // instantiating the central manager which wont start discovering immediately
         // but will wait until we provide an username
+        print(name)
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
     }
     
