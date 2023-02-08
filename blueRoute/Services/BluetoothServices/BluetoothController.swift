@@ -33,7 +33,6 @@ class BluetoothController: ObservableObject {
         self.peripheral = BluetoothPeripheralManager(name: name, bluetoothController: self )
         // instantiating the central manager which wont start discovering immediately
         // but will wait until we provide an username
-        print(name)
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
     }
     
@@ -60,7 +59,16 @@ extension BluetoothController {
             return;
         }
         
-        central!.sendData(messageData, peripheral: device.peripheral!)
+        // If the device has no saved reference to a peripheral, send to its central
+        
+        if let peripheralToSentTo = device.peripheral {
+            print("sending message to central")
+            central!.sendData(messageData, peripheral: peripheralToSentTo, characteristic: BluetoothConstants.chatCharacteristicID)
+        } else {
+            print("sending message to peripheral")
+            peripheral!.sendChatMessage(messageData, central: device.central!)
+        }
+
         dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true)
     }
     
@@ -114,7 +122,7 @@ extension BluetoothController {
         
     }
     
-    private func MessageEncoder(message: BTMessage) -> Data? {
+    public func MessageEncoder(message: BTMessage) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

@@ -70,12 +70,22 @@ class BluetoothPeripheralManager: NSObject {
                 CBAdvertisementDataLocalNameKey: self.name])
     }
     
-    private func sendData(_ data: Data, central: CBCentral) {
-        
-        // currently only for chat
+     func sendChatMessage(_ data: Data, central: CBCentral) {
         guard let characteristic = self.peripheralChatCharacteristic else { return }
         peripheral.updateValue(data, for: characteristic,
                                 onSubscribedCentrals: [central])
+    }
+    
+     func sendRoutingData(_ data: Data, central: CBCentral) {
+        guard let characteristic = self.peripheralChatCharacteristic else { return }
+        peripheral.updateValue(data, for: characteristic,
+                                onSubscribedCentrals: [central])
+    }
+    
+    private func sendInitialHandshake(central: CBCentral, characteristic: CBCharacteristic) {
+        let data: Data =  Data(self.name.utf8)
+        self.peripheral?.updateValue(data, for: characteristic as! CBMutableCharacteristic,
+                                       onSubscribedCentrals: [central])
     }
     
 }
@@ -124,12 +134,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                            central: CBCentral,
                            didSubscribeTo characteristic: CBCharacteristic) {
         
-        print("A central has subscribed to the peripheral, initiating handshake")
-        
         // Handshake which sends the central the fullname of the user
-        initialHandshake(central: central, characteristic: characteristic)
-        
-     
+        if(characteristic.uuid == BluetoothConstants.handshakeCharacteristicID) {
+            print("A central has subscribed to the peripheral, initiating handshake")
+            initialHandshake(central: central, characteristic: characteristic)
+        }
     }
     
     func initialHandshake(central: CBCentral, characteristic: CBCharacteristic) {
@@ -142,8 +151,95 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
     // Called when the central has sent a message to this peripheral
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         guard let request = requests.first, let data = request.value else { return }
-
-        // pass received data to the controller for processing
-        bluetoothController.processReceivedData(data: data)
+        
+        switch (requests.first?.characteristic.uuid) {
+            
+        case BluetoothConstants.handshakeCharacteristicID:
+            print("peripheral: central sent handshake data, proccessing now")
+           
+            // PROCCESS CENTRAL HANDSHAKE
+            let name = String(decoding: data, as: UTF8.self)
+            let device = Device(name: name, central: request.central)
+            addToDeviceList(with: device)
+            
+        case BluetoothConstants.chatCharacteristicID:
+            print("peripheral: central sent message for chat, proccess now")
+            bluetoothController.processReceivedData(data: data)
+            
+        case BluetoothConstants.routingCharacteristicID:
+            print("central sent message for routing, proccess now")
+            
+        default:
+            print("peripheral: central send message: did not match a characteristic?")
+            bluetoothController.processReceivedData(data: data)
+        }
+        
+        //bluetoothController.processReceivedData(data: data)
     }
+    
+    func addToDeviceList(with device: Device) {
+        
+       // var newDevice = device;
+        print("peripheral: Adding central reference to devices array")
+        
+        //print("\(name) found \(device.displayName)")
+        
+        for (index, device) in bluetoothController.devices.enumerated() {
+            
+            if(bluetoothController.devices[index].id == device.id) {
+                
+                print("peripheral: \(device.displayName)  already existed- updating now")
+                
+                // if it does,  Add the new reference to the central and exit
+                bluetoothController.devices[index].central = device.central
+                
+                return;
+            }
+        }
+        
+        /*
+        // If a device already exists in the list, replace it with this new device
+        if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
+          //  guard bluetoothController.devices[index].id != device.id else { return }
+            print("peripheral: \(device.displayName)  already existed- updating now")
+            
+            // Since the device passed to this function does not have a reference to a central,
+            // we check if the one stored in the devices array does and save the reference to
+            // the newDevice variable to not lose the reference
+            if(bluetoothController.devices[index].peripheral != nil) {
+                newDevice.peripheral = bluetoothController.devices[index].peripheral
+            }
+            
+            bluetoothController.devices.remove(at: index)
+            bluetoothController.devices.insert(newDevice, at: index)
+            return
+        }
+         */
+    
+        print("peripheral: device did not exist, adding new device with reference to central")
+        
+        // If this item didn't exist in the list, append it to the end
+        bluetoothController.devices.append(device)
+       
+    }
+    
 }
+
+
+// Extension to hold helper functions
+extension BluetoothPeripheralManager {
+    
+    private func getCharacteristic(peripheral: CBPeripheral, serviceId: CBUUID, characteristicId: CBUUID) -> CBCharacteristic? {
+           guard peripheral.state == .connected, let services = peripheral.services else { return nil }
+           for service in services {
+               guard service.uuid == serviceId, let characteristics = service.characteristics else { return nil }
+               for characteristic in characteristics {
+                   if characteristic.uuid == characteristicId {
+                       return characteristic
+                   }
+               }
+           }
+           return nil
+       }
+}
+

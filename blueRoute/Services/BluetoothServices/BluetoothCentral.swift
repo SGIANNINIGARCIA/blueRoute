@@ -22,7 +22,7 @@ import CoreBluetooth
 class BluetoothCentralManager: NSObject {
     
     // Full Name containing the displayName provided by user during onboarding + unique ID
-   // public var name:String = "unknown";
+    public var name:String = "unknown";
     
     // Delegate object handling shared resources and exposing the central manager to the UI
     weak var bluetoothController: BluetoothController!
@@ -52,7 +52,7 @@ class BluetoothCentralManager: NSObject {
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         
         // If a device name is provided, assign it to class property
-        //if let name = name { self.name = name }
+        if let name = name { self.name = name }
     
     }
     
@@ -73,23 +73,23 @@ class BluetoothCentralManager: NSObject {
     }
 
    fileprivate func stopScanning() {
+       print("central has stopped scanning")
         central.stopScan()
     }
     
     
     // Write to one of the peripheral Characteristics
-    public func sendData(_ data: Data, peripheral: CBPeripheral) {
+    public func sendData(_ data: Data, peripheral: CBPeripheral, characteristic: CBUUID) {
         
         // Currently writing only to chatCharacteristic, but writing to other soon to be implemented
         
-        guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.blueRouteServiceID, characteristicId: BluetoothConstants.chatCharacteristicID) else {
+        guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.blueRouteServiceID, characteristicId: characteristic) else {
             // Could not find characteristic
             print("could not find a characteristic to write to")
             return;
         }
         
         peripheral.writeValue(data, for: characteristicToWrite, type: .withResponse)
-        
         print("central: message sent to peripheral")
     }
 }
@@ -106,7 +106,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
         guard central.isScanning == false else { return }
 
         // Call function that triggers central to start scanning
-        startScanning()
+        //startScanning()
     }
     
     // Called when a peripheral is detected
@@ -127,6 +127,11 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
             // Save a reference to the peripheral before connecting
             self.discoveredDevices.append(peripheral)
             
+            /**
+             ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+             **/
+            print("1. central didDiscover peripheral with id: \(peripheral.identifier.uuidString)")
+            
             // Start connection to the peripheral
             central.connect(peripheral, options: nil)
         }
@@ -137,9 +142,16 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
 
         // Configure a delegate for the peripheral
         peripheral.delegate = self
+        
+        /**
+         ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+         **/
+        print("2. central didConnect peripheral with id: \(peripheral.identifier.uuidString)")
 
         // Scan for the chat characteristic we'll use to communicate
         peripheral.discoverServices([BluetoothConstants.blueRouteServiceID])
+        
+        
     }
     
     // Called when a peripheral has diconnected from this device (acting as a central)
@@ -162,6 +174,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             print("Unable to discover service: \(error.localizedDescription)")
             return
         }
+        
+        /**
+         ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+         **/
+        print("3. central didDiscoverServices peripheral with id: \(peripheral.identifier.uuidString)")
 
         // It's possible there may be more than one service, so loop through each one to discover
         // the characteristic that we want
@@ -179,6 +196,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
            // TO DO
             return
         }
+        
+        /**
+         ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+         **/
+        print("4. central didDiscoverCharacteristicFor peripheral with id: \(peripheral.identifier.uuidString)")
 
         // Perform a loop in case we received more than one
         service.characteristics?.forEach { characteristic in
@@ -200,6 +222,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
              print("Characteristic update notification failed: \(error.localizedDescription)")
              return
          }
+         
+         /**
+          ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+          **/
+         print("central didUpdateNotificationStateFor peripheral with id: \(peripheral.identifier.uuidString)")
 
          // Ensure this characteristic is the one we configured
          guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID else { return }
@@ -223,35 +250,50 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             return
         }
         
-        // process depending on the characteristic
-        switch(characteristic) {
+        /**
+         ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
+         **/
+        print("central  didUpdateValueFor peripheral with id: \(peripheral.identifier.uuidString)")
+        
+        /* TESTING CHARACTERISTICS
+        print("wrote to this characteristic UUID: \(characteristic.uuid.uuidString), this is our characteristics: \(BluetoothConstants.chatCharacteristicID.uuidString), \(BluetoothConstants.handshakeCharacteristicID.uuidString), \(BluetoothConstants.routingCharacteristicID.uuidString)")
+         */
+        
+        // process data received depending on the characteristic
+        switch(characteristic.uuid) {
+            
+            // PROCESS THE HANDSHAKE
         case BluetoothConstants.handshakeCharacteristicID :
-            print("handshake")
-            //process handshake
-            // TO-DO
+            print("wrote to handshake")
+            
+            // Decode the data to pull the name and save to list of devices
+            guard let data = characteristic.value else { return }
+            let name = String(decoding: data, as: UTF8.self)
+            let device = Device(name: name, peripheral: peripheral)
+            
+            // Send this central's information so the peripheral can write back
+            // if it doesnt have a connection to our device's peripheral
+            respondToHandshake(peripheral: peripheral)
+            
+            // Add the device to our list
+            DispatchQueue.main.async { [weak self] in
+                self?.addToDeviceList(with: device)
+            }
+            
         case BluetoothConstants.routingCharacteristicID:
-            print("routing")
+            print("wrote to routing")
             //process routing
             //TO-DO
             
         case BluetoothConstants.chatCharacteristicID:
-            print("chat")
+            print("wrote to chat")
             //process chat
-            //TO-DO
+            guard let data = characteristic.value else { return }
+            bluetoothController.processReceivedData(data: data)
             
         default:
             print("default")
             
-        }
-
-        // Decode the message string and trigger the callback
-        guard let data = characteristic.value else { return }
-        let name = String(decoding: data, as: UTF8.self)
-        
-        let device = Device(name: name, peripheral: peripheral)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.addToDeviceList(with: device)
         }
     }
     
@@ -265,19 +307,43 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     // add the peripheral to the list
     fileprivate func addToDeviceList(with device: Device) {
         
-        //print("\(name) found \(device.displayName)")
-        // If a device already exists in the list, replace it with this new device
+       // var newDevice = device;
+        
+        // Loop trhough the array and check if it already has the device
+        for (index, device) in bluetoothController.devices.enumerated() {
+            
+            if(bluetoothController.devices[index].id == device.id) {
+                
+                print("central: \(device.displayName)  already existed- updating now")
+                
+                // if it does,  Add the new reference to the peripheral and exit
+                bluetoothController.devices[index].peripheral = device.peripheral
+                
+                return;
+            }
+        }
+        
+        /*
         if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
           //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("\(device.displayName)  already existed- updating now")
+            print("central: \(device.displayName)  already existed- updating now")
+            
+            // Since the device passed to this function does not have a reference to a central,
+            // we check if the one stored in the devices array does and save the reference to
+            // the newDevice variable to not lose the reference
+            if(bluetoothController.devices[index].central != nil) {
+                newDevice.central = bluetoothController.devices[index].central
+            }
+            
             bluetoothController.devices.remove(at: index)
-            bluetoothController.devices.insert(device, at: index)
+            bluetoothController.devices.insert(newDevice, at: index)
             return
         }
+         */
     
+        print("central: device did not exist, adding new device with reference to peripheral")
         // If this item didn't exist in the list, append it to the end
         bluetoothController.devices.append(device)
-       
     }
     
     fileprivate func removeDeviceFromList(with device: CBPeripheral) {
@@ -291,6 +357,19 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             return
         }
     }
+    
+}
+
+// Extension to process handshake
+extension BluetoothCentralManager {
+    
+    func respondToHandshake(peripheral: CBPeripheral) {
+        print("Central: sending handshake ")
+        let data: Data =  Data(self.name.utf8)
+        sendData(data, peripheral: peripheral, characteristic: BluetoothConstants.handshakeCharacteristicID)
+    }
+    
+    
     
 }
 

@@ -19,14 +19,14 @@ struct BluetoothConstants {
     // specific functions of a service.
     
     // characteristic used to send message destined to the device advertising
-    static let chatCharacteristicID = CBUUID(string: "f0ab5a15-b003-4653-a248-73fd504c1281")
+    static let chatCharacteristicID = CBUUID(string: "1CB104B2-4804-47F8-AC96-80EEF0E2CECF")
     
     // characteristic used on first contact during discovery to exchange device name
     // and other devices nearby
     static let handshakeCharacteristicID = CBUUID(string: "A664834E-26DC-4FD9-A486-71CEF04B4569")
     
     // characteristic used to send message meant to be routed by advertising device
-    static let routingCharacteristicID = CBUUID(string: "A664834E-26DC-4FD9-A486-71CEF04B4569")
+    static let routingCharacteristicID = CBUUID(string: "453FDFF2-EC7A-46CC-A300-617D5459E4F9")
     
     // The peripheral uses a local name to advertise with a custom name.
     // The local name contains the username provided by the user in adition to
