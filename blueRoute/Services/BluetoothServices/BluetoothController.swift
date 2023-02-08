@@ -62,14 +62,26 @@ extension BluetoothController {
         // send the message using the newest reference we saved for the device
         switch device.sendTo {
         case .peripheral:
-            central!.sendData(messageData, peripheral: device.peripheral!, characteristic: BluetoothConstants.chatCharacteristicID)
+            
+           if let peripheral = device.peripheral {
+               central!.sendData(messageData, peripheral: peripheral, characteristic: BluetoothConstants.chatCharacteristicID)
+           } else {
+               fallthrough
+           }
+            
         case .central:
-            peripheral!.sendChatMessage(messageData, central: device.central!)
+            if let central = device.central {
+                peripheral!.sendChatMessage(messageData, central: central)
+            } else {
+                fallthrough
+            }
+            
         default:
             print("unable to send message - could not find a reference to the device")
+            dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true, status: "not sent")
         }
 
-        dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true)
+        dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true, status: "sent")
     }
     
     public func processReceivedData(data: Data) {
@@ -82,7 +94,7 @@ extension BluetoothController {
             return;
         }
         
-        dataController?.saveMessage(message: decodedMessage, context: managedObjContext!, isSelf: false)
+        dataController?.saveMessage(message: decodedMessage, context: managedObjContext!, isSelf: false, status: "received")
     }
     
     // Look up device using the unique ID

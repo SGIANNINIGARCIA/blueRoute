@@ -50,7 +50,7 @@ extension DataController {
         save(context: context)
     }
     
-    public func saveMessage(message: BTMessage, context: NSManagedObjectContext, isSelf: Bool) {
+    public func saveMessage(message: BTMessage, context: NSManagedObjectContext, isSelf: Bool, status: String) {
         
         let messageToSave = Message(context: context)
         var user: User;
@@ -68,6 +68,7 @@ extension DataController {
         messageToSave.content = message.message
         messageToSave.senderIsSelf = isSelf;
         messageToSave.timestamp = Date();
+        messageToSave.status = status;
         
         // change user lastmessage attribute to this new message
         user.latestMessage = message.message;
