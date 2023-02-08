@@ -59,14 +59,14 @@ extension BluetoothController {
             return;
         }
         
-        // If the device has no saved reference to a peripheral, send to its central
-        
-        if let peripheralToSentTo = device.peripheral {
-            print("sending message to central")
-            central!.sendData(messageData, peripheral: peripheralToSentTo, characteristic: BluetoothConstants.chatCharacteristicID)
-        } else {
-            print("sending message to peripheral")
+        // send the message using the newest reference we saved for the device
+        switch device.sendTo {
+        case .peripheral:
+            central!.sendData(messageData, peripheral: device.peripheral!, characteristic: BluetoothConstants.chatCharacteristicID)
+        case .central:
             peripheral!.sendChatMessage(messageData, central: device.central!)
+        default:
+            print("unable to send message - could not find a reference to the device")
         }
 
         dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true)

@@ -36,9 +36,10 @@ class BluetoothCentralManager: NSObject {
     
     
     // Make a queue we can run all of the events off
-    private let queue = DispatchQueue(label: "blueRoute-central.bluetooth-discovery",
+   /* private let queue = DispatchQueue(label: "blueRoute-central.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
                                       autoreleaseFrequency: .workItem, target: nil)
+    */
     
     
     
@@ -47,7 +48,7 @@ class BluetoothCentralManager: NSObject {
         super.init()
         
         // Create the Bluetooth central
-        self.central = CBCentralManager(delegate: self, queue: queue)
+        self.central = CBCentralManager(delegate: self, queue: nil)
         
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         
@@ -255,10 +256,6 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
          **/
         print("central  didUpdateValueFor peripheral with id: \(peripheral.identifier.uuidString)")
         
-        /* TESTING CHARACTERISTICS
-        print("wrote to this characteristic UUID: \(characteristic.uuid.uuidString), this is our characteristics: \(BluetoothConstants.chatCharacteristicID.uuidString), \(BluetoothConstants.handshakeCharacteristicID.uuidString), \(BluetoothConstants.routingCharacteristicID.uuidString)")
-         */
-        
         // process data received depending on the characteristic
         switch(characteristic.uuid) {
             
@@ -276,9 +273,10 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             respondToHandshake(peripheral: peripheral)
             
             // Add the device to our list
-            DispatchQueue.main.async { [weak self] in
-                self?.addToDeviceList(with: device)
-            }
+           // DispatchQueue.main.async { [weak self] in
+               // self?.addToDeviceList(with: device)
+            addToDeviceList(with: device)
+           // }
             
         case BluetoothConstants.routingCharacteristicID:
             print("wrote to routing")
@@ -318,28 +316,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
                 
                 // if it does,  Add the new reference to the peripheral and exit
                 bluetoothController.devices[index].peripheral = device.peripheral
+                bluetoothController.devices[index].sendTo = .peripheral
                 
                 return;
             }
         }
-        
-        /*
-        if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
-          //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("central: \(device.displayName)  already existed- updating now")
-            
-            // Since the device passed to this function does not have a reference to a central,
-            // we check if the one stored in the devices array does and save the reference to
-            // the newDevice variable to not lose the reference
-            if(bluetoothController.devices[index].central != nil) {
-                newDevice.central = bluetoothController.devices[index].central
-            }
-            
-            bluetoothController.devices.remove(at: index)
-            bluetoothController.devices.insert(newDevice, at: index)
-            return
-        }
-         */
     
         print("central: device did not exist, adding new device with reference to peripheral")
         // If this item didn't exist in the list, append it to the end

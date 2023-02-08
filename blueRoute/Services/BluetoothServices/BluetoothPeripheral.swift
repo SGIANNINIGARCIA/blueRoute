@@ -33,14 +33,15 @@ class BluetoothPeripheralManager: NSObject {
     private var peripheralRoutingCharacteristic: CBMutableCharacteristic!
     
     // Make a queue we can run all of the events off
-    private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
+    /*private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
                                       autoreleaseFrequency: .workItem, target: nil)
+     */
     
     init(name: String? = nil, bluetoothController: BluetoothController? = nil) {
         super.init()
         
-        self.peripheral = CBPeripheralManager(delegate: self, queue: queue)
+        self.peripheral = CBPeripheralManager(delegate: self, queue: nil)
         
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         
@@ -192,29 +193,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                 
                 // if it does,  Add the new reference to the central and exit
                 bluetoothController.devices[index].central = device.central
+                bluetoothController.devices[index].sendTo = .central
                 
                 return;
             }
         }
-        
-        /*
-        // If a device already exists in the list, replace it with this new device
-        if let index = bluetoothController.devices.firstIndex(where: { $0.id == device.id }) {
-          //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("peripheral: \(device.displayName)  already existed- updating now")
-            
-            // Since the device passed to this function does not have a reference to a central,
-            // we check if the one stored in the devices array does and save the reference to
-            // the newDevice variable to not lose the reference
-            if(bluetoothController.devices[index].peripheral != nil) {
-                newDevice.peripheral = bluetoothController.devices[index].peripheral
-            }
-            
-            bluetoothController.devices.remove(at: index)
-            bluetoothController.devices.insert(newDevice, at: index)
-            return
-        }
-         */
     
         print("peripheral: device did not exist, adding new device with reference to central")
         
