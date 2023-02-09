@@ -67,3 +67,4 @@ struct Device: Identifiable, Equatable {
         
     }
 }
+

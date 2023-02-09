@@ -34,6 +34,12 @@ class BluetoothCentralManager: NSObject {
     // Temp list for peripherals discovered by the central
     var discoveredDevices = [CBPeripheral]()
     
+    // Property to prevent stop scanning when
+    // not all characteristics have been subscribed to
+    var latestConnectedDevice: LatestDevice?
+    
+    var stopScanningSignal: Bool = false;
+    
     
     // Make a queue we can run all of the events off
    /* private let queue = DispatchQueue(label: "blueRoute-central.bluetooth-discovery",
@@ -76,6 +82,11 @@ class BluetoothCentralManager: NSObject {
    fileprivate func stopScanning() {
        print("central has stopped scanning")
         central.stopScan()
+       self.stopScanningSignal = false;
+    }
+    
+    public func sendStopScanningSignal() {
+        self.stopScanningSignal = true;
     }
     
     
@@ -124,6 +135,12 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
             
             print("central: found a peripheral with name = \(name) \ncentral: Attempting connection to peripheral with name = \(name)")
             
+            // If we received the siganl to stop scanning, dont proceed with
+            // connecting to this peripheral
+            if(stopScanningSignal) {
+                return;
+            }
+            
             // Save a reference to the peripheral before connecting
             self.discoveredDevices.append(peripheral)
             
@@ -147,11 +164,13 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
          ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
          **/
         print("2. central didConnect peripheral with id: \(peripheral.identifier.uuidString)")
+        
+        // set this device as the latestConnectedDevice
+        self.latestConnectedDevice = LatestDevice(id: peripheral.identifier)
 
         // Scan for the chat characteristic we'll use to communicate
         peripheral.discoverServices([BluetoothConstants.blueRouteServiceID])
-        
-        
+    
     }
     
     // Called when a peripheral has diconnected from this device (acting as a central)
@@ -231,9 +250,24 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
          // Ensure this characteristic is the one we configured
          guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID else { return }
          
+         // if this peripheral is the last one our central connected to
+         // append the current characteristic we subscribed to to the
+         // subscribedCharacteristic array
+         if(self.latestConnectedDevice?.id == peripheral.identifier) {
+             self.latestConnectedDevice?.subscribedChars.append(characteristic.uuid)
+         }
+         
          // Check if it is successfully set as notifying
              if characteristic.isNotifying {
                  print("Characteristic notifications have begun.")
+                 
+                 // If we received the siganl to stop scanning and
+                 // we finished subscribing to all it's characteristics
+                 // then we can safely stop scanning
+                 if(latestConnectedDevice?.subscribedChars.count == 3 && self.stopScanningSignal) {
+                     stopScanning()
+                 }
+                 
              } else {
                  print("Characteristic notifications have stopped. Disconnecting.")
                 // CANCEL CONNECTION TO PERIPHERAL
@@ -348,7 +382,7 @@ extension BluetoothController {
     }
     
     public func stopDiscovery() {
-        self.central?.stopScanning()
+        self.central?.sendStopScanningSignal()
     }
     
     public func addDevice(data: Data, peripheral: CBPeripheral) {
@@ -371,5 +405,22 @@ extension BluetoothController {
         // This is a new device, so we must add it to the list
         let newDevice = Device(name: name, peripheral: peripheral)
         self.devices.append(newDevice)
+    }
+}
+
+
+
+/*
+  To prevent the cental from stop scanning while we are still subscribing
+  to a peripheral's characteristic
+ */
+
+struct LatestDevice {
+    
+    let id: UUID;
+    var subscribedChars = [CBUUID]()
+    
+    init(id: UUID) {
+        self.id = id;
     }
 }
