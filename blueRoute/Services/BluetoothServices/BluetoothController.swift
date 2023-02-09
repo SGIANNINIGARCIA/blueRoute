@@ -36,26 +36,17 @@ class BluetoothController: ObservableObject {
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
     }
     
-    // Returns true if the device is reachable, else false.
-    // Used for displaying the current availability of the user in the UI
-    public func isReachable(_ toFind: UUID) -> Bool {
-        return devices.contains { $0.id == toFind };
-    }
-}
-
-extension BluetoothController {
-    
     public func sendMessage(send message: String, to name: String) -> Void {
         
-        let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name)
-        
-        guard let device = findDevice(name: name) else {
-            print("could not find \(name)")
-            return;
-        }
+        let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name, type: .chat)
         
         guard let messageData = MessageEncoder(message: codedMessage) else {
             print("could not enconde message")
+            return;
+        }
+        
+        guard let device = findDevice(name: name) else {
+            print("could not find \(name)")
             return;
         }
         
@@ -78,10 +69,10 @@ extension BluetoothController {
             
         default:
             print("unable to send message - could not find a reference to the device")
-            dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true, status: "not sent")
+            saveMessage(message: codedMessage, isSelf: true, sendStatus: false)
         }
 
-        dataController?.saveMessage(message: codedMessage, context: managedObjContext!, isSelf: true, status: "sent")
+        saveMessage(message: codedMessage, isSelf: true, sendStatus: true)
     }
     
     public func processReceivedData(data: Data) {
@@ -94,22 +85,52 @@ extension BluetoothController {
             return;
         }
         
-        dataController?.saveMessage(message: decodedMessage, context: managedObjContext!, isSelf: false, status: "received")
-    }
-    
-    // Look up device using the unique ID
-    private func findDevice(name: String) -> Device? {
-        
-        let id = BluetoothController.retrieveID(name: name)
-        
-        
-        if let i = devices.firstIndex(where: { $0.id == id }) {
-            return devices[i]
-        } else {
-            return nil;
+        switch decodedMessage.type {
+        case .chat:
+            saveMessage(message: decodedMessage, isSelf: false, sendStatus: true)
+        case .routing:
+            print("message for routing")
         }
+        
     }
     
+    private func saveMessage(message: BTMessage, isSelf: Bool, sendStatus: Bool) {
+        dataController?.saveMessage(message: message, context: managedObjContext!, isSelf: isSelf, sendStatus: sendStatus)
+    }
+}
+
+/*
+ * Functions to handle incoming data
+ */
+
+extension BluetoothController {
+    
+    // Decodes chat message sent to this devices through the chat characteristic
+    public func processIncomingChatMessage(_ data: Data){
+        
+        let receivedData = String(decoding: data, as: UTF8.self)
+        
+        guard let decodedMessage: BTMessage = MessageDecoder(message: receivedData) else {
+            print("unable to decode message")
+            return;
+        }
+        
+        saveMessage(message: decodedMessage, isSelf: false, sendStatus: true)
+    
+    }
+    
+    // TO-DO
+    // Decodes routing message sent to this devices through the routing characteristic
+    // Searches for next node and sends it
+    public func processIncomingRoutingMessage(){}
+    
+}
+
+
+/*
+ * Utility functions for Encoding/Decoding Bluetooth Messages (BTMessage)
+ */
+extension BluetoothController {
     
     private func MessageDecoder(message: String) -> BTMessage? {
         
@@ -147,13 +168,26 @@ extension BluetoothController {
             return nil;
         }
     }
-    
-    
 }
 
 
-// Extension for utility methods
+ /*
+  * Utility methods for device/user look up
+  */
 extension BluetoothController {
+    
+    // Look up device using the unique ID
+    private func findDevice(name: String) -> Device? {
+        
+        let id = BluetoothController.retrieveID(name: name)
+        
+        
+        if let i = devices.firstIndex(where: { $0.id == id }) {
+            return devices[i]
+        } else {
+            return nil;
+        }
+    }
     
     // Returns only the username of the device using the Separator
     public static func retrieveUsername(name: String) -> String {
@@ -171,7 +205,12 @@ extension BluetoothController {
         
         return ID;
     }
-
     
-    
+    // Returns true if the device is reachable, else false.
+    // Used for displaying the current availability of the user in the UI
+    public func isReachable(_ toFind: UUID) -> Bool {
+        return devices.contains { $0.id == toFind };
+    }
 }
+
+

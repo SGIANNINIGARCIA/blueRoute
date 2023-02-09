@@ -82,8 +82,6 @@ class BluetoothCentralManager: NSObject {
     // Write to one of the peripheral Characteristics
     public func sendData(_ data: Data, peripheral: CBPeripheral, characteristic: CBUUID) {
         
-        // Currently writing only to chatCharacteristic, but writing to other soon to be implemented
-        
         guard let characteristicToWrite = getCharacteristic(peripheral: peripheral, serviceId: BluetoothConstants.blueRouteServiceID, characteristicId: characteristic) else {
             // Could not find characteristic
             print("could not find a characteristic to write to")
@@ -105,6 +103,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
         
         // Don't continue if we're already scanning
         guard central.isScanning == false else { return }
+    
 
         // Call function that triggers central to start scanning
         //startScanning()
@@ -262,32 +261,24 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             // PROCESS THE HANDSHAKE
         case BluetoothConstants.handshakeCharacteristicID :
             print("wrote to handshake")
-            
             // Decode the data to pull the name and save to list of devices
             guard let data = characteristic.value else { return }
-            let name = String(decoding: data, as: UTF8.self)
-            let device = Device(name: name, peripheral: peripheral)
+            bluetoothController.addDevice(data: data, peripheral: peripheral)
             
             // Send this central's information so the peripheral can write back
             // if it doesnt have a connection to our device's peripheral
             respondToHandshake(peripheral: peripheral)
             
-            // Add the device to our list
-           // DispatchQueue.main.async { [weak self] in
-               // self?.addToDeviceList(with: device)
-            addToDeviceList(with: device)
-           // }
-            
         case BluetoothConstants.routingCharacteristicID:
             print("wrote to routing")
-            //process routing
-            //TO-DO
+            //guard let data = characteristic.value else { return }
+            bluetoothController.processIncomingRoutingMessage()
             
         case BluetoothConstants.chatCharacteristicID:
             print("wrote to chat")
             //process chat
             guard let data = characteristic.value else { return }
-            bluetoothController.processReceivedData(data: data)
+            bluetoothController.processIncomingChatMessage(data)
             
         default:
             print("default")
@@ -303,29 +294,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     
     // If we connect to a peripheral and finished the initial Handshake,
     // add the peripheral to the list
-    fileprivate func addToDeviceList(with device: Device) {
-        
-       // var newDevice = device;
-        
-        // Loop trhough the array and check if it already has the device
-        for (index, device) in bluetoothController.devices.enumerated() {
-            
-            if(bluetoothController.devices[index].id == device.id) {
-                
-                print("central: \(device.displayName)  already existed- updating now")
-                
-                // if it does,  Add the new reference to the peripheral and exit
-                bluetoothController.devices[index].peripheral = device.peripheral
-                bluetoothController.devices[index].sendTo = .peripheral
-                
-                return;
-            }
-        }
-    
-        print("central: device did not exist, adding new device with reference to peripheral")
-        // If this item didn't exist in the list, append it to the end
-        bluetoothController.devices.append(device)
-    }
+
     
     fileprivate func removeDeviceFromList(with device: CBPeripheral) {
         
@@ -343,15 +312,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
 
 // Extension to process handshake
 extension BluetoothCentralManager {
-    
     func respondToHandshake(peripheral: CBPeripheral) {
         print("Central: sending handshake ")
         let data: Data =  Data(self.name.utf8)
         sendData(data, peripheral: peripheral, characteristic: BluetoothConstants.handshakeCharacteristicID)
     }
-    
-    
-    
 }
 
 
@@ -386,4 +351,25 @@ extension BluetoothController {
         self.central?.stopScanning()
     }
     
+    public func addDevice(data: Data, peripheral: CBPeripheral) {
+        
+        let name = String(decoding: data, as: UTF8.self)
+        let displayName = BluetoothController.retrieveUsername(name: name)
+        let id = BluetoothController.retrieveID(name: name)
+        
+        // Loop trhough the array and check if it already has the device
+        for (index, device) in devices.enumerated() {
+            if(self.devices[index].id == id) {
+                print("central: \(device.displayName)  already existed- updating reference to peripheral now")
+                // if it does,  Add the new reference to the peripheral and exit
+                self.devices[index].changePeripheralReference(peripheral)
+                return;
+            }
+        }
+        
+        print("central: Adding new device with name: \(displayName) to the device array")
+        // This is a new device, so we must add it to the list
+        let newDevice = Device(name: name, peripheral: peripheral)
+        self.devices.append(newDevice)
+    }
 }

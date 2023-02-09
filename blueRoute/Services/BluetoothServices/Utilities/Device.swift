@@ -52,4 +52,18 @@ struct Device: Identifiable, Equatable {
     static func ==(lhs: Device, rhs: Device) -> Bool {
         return lhs.id == rhs.id;
     }
+    
+    mutating func changePeripheralReference(_ newPeripheral: CBPeripheral) {
+        
+        self.peripheral = newPeripheral;
+        self.sendTo = .peripheral;
+        
+    }
+    
+    mutating func changeCentralReference(_ newCentral: CBCentral) {
+        
+        self.central = newCentral;
+        self.sendTo = .central;
+        
+    }
 }
