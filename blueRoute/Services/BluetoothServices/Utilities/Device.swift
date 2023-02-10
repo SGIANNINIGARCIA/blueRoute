@@ -58,6 +58,14 @@ struct Device: Identifiable, Equatable {
         return lhs.id == rhs.id;
     }
     
+    static func ==(lhs: CBPeripheral, rhs: Device) -> Bool {
+        return lhs.identifier == rhs.peripheral?.identifier;
+    }
+    
+    static func ==(lhs: CBCentral, rhs: Device) -> Bool {
+        return lhs.identifier == rhs.central?.identifier;
+    }
+    
     mutating func changePeripheralReference(_ newPeripheral: CBPeripheral) {
         
         self.peripheral = newPeripheral;
@@ -70,6 +78,10 @@ struct Device: Identifiable, Equatable {
         self.central = newCentral;
         self.sendTo = .central;
         
+    }
+    
+    mutating func updateLastConnection() {
+        self.lastConnection = Date()
     }
 }
 

@@ -32,6 +32,9 @@ class BluetoothPeripheralManager: NSObject {
     // The characteristic used for our chat sessions
     private var peripheralRoutingCharacteristic: CBMutableCharacteristic!
     
+    // The characteristic used for pinging devices
+    private var peripheralPingCharacteristic: CBMutableCharacteristic!
+    
     // Make a queue we can run all of the events off
     /*private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
@@ -71,16 +74,24 @@ class BluetoothPeripheralManager: NSObject {
                 CBAdvertisementDataLocalNameKey: self.name])
     }
     
-     func sendChatMessage(_ data: Data, central: CBCentral) {
-        guard let characteristic = self.peripheralChatCharacteristic else { return }
-        peripheral.updateValue(data, for: characteristic,
-                                onSubscribedCentrals: [central])
-    }
-    
-     func sendRoutingData(_ data: Data, central: CBCentral) {
-        guard let characteristic = self.peripheralChatCharacteristic else { return }
-        peripheral.updateValue(data, for: characteristic,
-                                onSubscribedCentrals: [central])
+    func sendData(_ data: Data, central: CBCentral, characteristic: CBUUID) {
+        switch (characteristic) {
+        case BluetoothConstants.chatCharacteristicID:
+            peripheral.updateValue(data, for: self.peripheralChatCharacteristic,
+                                    onSubscribedCentrals: [central])
+        case BluetoothConstants.pingCharacteristicID:
+            peripheral.updateValue(data, for: self.peripheralPingCharacteristic,
+                                    onSubscribedCentrals: [central])
+        case BluetoothConstants.routingCharacteristicID:
+            peripheral.updateValue(data, for: self.peripheralRoutingCharacteristic,
+                                    onSubscribedCentrals: [central])
+        case BluetoothConstants.handshakeCharacteristicID:
+            peripheral.updateValue(data, for: self.peripheralHandshakeCharacteristic,
+                                    onSubscribedCentrals: [central])
+        default:
+            print("peripheral: no matching characteristic")
+       
+        }
     }
     
     private func sendInitialHandshake(central: CBCentral, characteristic: CBCharacteristic) {
@@ -118,9 +129,16 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                                                  value: nil,
                                                  permissions: .writeable)
         
+        //BluetoothConstants.pingCharacteristicID
+        peripheralPingCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.pingCharacteristicID,
+                                                 properties: [.write, .notify],
+                                                 value: nil,
+                                                 permissions: .writeable)
+        
+        
         // Create the service that will represent this characteristic
         let service = CBMutableService(type: BluetoothConstants.blueRouteServiceID, primary: true)
-        service.characteristics = [self.peripheralChatCharacteristic!, self.peripheralHandshakeCharacteristic, self.peripheralRoutingCharacteristic]
+        service.characteristics = [self.peripheralChatCharacteristic!, self.peripheralHandshakeCharacteristic, self.peripheralRoutingCharacteristic, self.peripheralPingCharacteristic]
         
         // Register this service to the peripheral so it can now be advertised
         self.peripheral?.add(service)
@@ -138,7 +156,8 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         // Handshake which sends the central the fullname of the user
         if(characteristic.uuid == BluetoothConstants.handshakeCharacteristicID) {
             print("A central has subscribed to the peripheral, initiating handshake")
-            initialHandshake(central: central, characteristic: characteristic)
+            let data: Data =  Data(self.name.utf8)
+            sendData(data, central: central, characteristic: BluetoothConstants.handshakeCharacteristicID)
         }
     }
     
@@ -163,14 +182,22 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         case BluetoothConstants.chatCharacteristicID:
             print("peripheral: central sent message for chat, proccess now")
             bluetoothController.processIncomingChatMessage(data)
+            bluetoothController.updateLastConnection(request.central)
             
         case BluetoothConstants.routingCharacteristicID:
             print("central sent message for routing, proccess now")
             bluetoothController.processIncomingRoutingMessage()
+            bluetoothController.updateLastConnection(request.central)
+            
+        case BluetoothConstants.pingCharacteristicID:
+            print("central sent ping, proccess now")
+            bluetoothController.processReceivedPing()
+            // process ping
             
         default:
             print("peripheral: central send message: did not match a characteristic?")
             bluetoothController.processIncomingChatMessage(data)
+            bluetoothController.updateLastConnection(request.central)
         }
     }
 }

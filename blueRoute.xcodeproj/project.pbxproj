@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
 		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
+		3A6887492995DE7E00234F97 /* BTPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6887482995DE7E00234F97 /* BTPing.swift */; };
 		3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74723A291D885500C5000D /* blueRouteApp.swift */; };
 		3A74723D291D885500C5000D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74723C291D885500C5000D /* ContentView.swift */; };
 		3A74723F291D885600C5000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A74723E291D885600C5000D /* Assets.xcassets */; };
@@ -86,6 +87,7 @@
 /* Begin PBXFileReference section */
 		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
 		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
+		3A6887482995DE7E00234F97 /* BTPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTPing.swift; sourceTree = "<group>"; };
 		3A747237291D885500C5000D /* blueRoute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = blueRoute.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A74723A291D885500C5000D /* blueRouteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = blueRouteApp.swift; sourceTree = "<group>"; };
 		3A74723C291D885500C5000D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				3A7472F22929794C00C5000D /* bluetoothConstants.swift */,
 				3A747276291DF90900C5000D /* Device.swift */,
 				3A554C42292F3F960063A2FA /* BTMessage.swift */,
+				3A6887482995DE7E00234F97 /* BTPing.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -545,6 +548,7 @@
 				3A74723D291D885500C5000D /* ContentView.swift in Sources */,
 				3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */,
 				3AAF936A293ACC5100A43794 /* DeviceGraphView.swift in Sources */,
+				3A6887492995DE7E00234F97 /* BTPing.swift in Sources */,
 				3A74729E292719B600C5000D /* ChatView.swift in Sources */,
 				3AAF93CC293BC7F300A43794 /* AvailabilityTagView.swift in Sources */,
 				3A7472922925DD3000C5000D /* ChatTile.swift in Sources */,

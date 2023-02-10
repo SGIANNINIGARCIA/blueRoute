@@ -44,7 +44,7 @@ struct ChatView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(minHeight: CGFloat(30))
                     Button("Send") {
-                        bluetoothController.sendMessage(send: typingMessage, to: displayName + BluetoothConstants.NameIdentifierSeparator +    id.uuidString)
+                        bluetoothController.sendChatMessage(send: typingMessage, to: displayName + BluetoothConstants.NameIdentifierSeparator +    id.uuidString)
                         typingMessage = "";
                     }
                 }.frame(minHeight: CGFloat(50)).padding()
