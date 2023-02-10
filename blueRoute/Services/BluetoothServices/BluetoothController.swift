@@ -21,6 +21,9 @@ class BluetoothController: ObservableObject {
     // Full name (displayName + unique ID)
     var name: String?
     
+    private var pingDevicesTimer: Timer?
+    
+    
     init(dataController: DataController, context: NSManagedObjectContext) {
         self.dataController = dataController;
         self.managedObjContext = context;
@@ -34,6 +37,12 @@ class BluetoothController: ObservableObject {
         // instantiating the central manager which wont start discovering immediately
         // but will wait until we provide an username
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
+        
+        self.pingDevicesTimer = Timer.scheduledTimer(timeInterval: 120,
+                                         target: self,
+                                         selector: #selector(pingDevices),
+                                         userInfo: nil,
+                                         repeats: true)
     }
     
     public func sendMessage(send message: String, to name: String) -> Void {
@@ -213,4 +222,14 @@ extension BluetoothController {
     }
 }
 
-
+// Background tasks
+extension BluetoothController {
+    
+    @objc private func pingDevices() {
+            for device in devices {
+                if(Date.now.timeIntervalSince(device.lastConnection!) < BluetoothConstants.LastConnectionInterval) {
+                    // Send Ping
+                }
+            }
+    }
+}

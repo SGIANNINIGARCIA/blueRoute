@@ -42,10 +42,9 @@ class BluetoothCentralManager: NSObject {
     
     
     // Make a queue we can run all of the events off
-   /* private let queue = DispatchQueue(label: "blueRoute-central.bluetooth-discovery",
+    private let queue = DispatchQueue(label: "blueRoute-central.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
                                       autoreleaseFrequency: .workItem, target: nil)
-    */
     
     
     
@@ -54,7 +53,7 @@ class BluetoothCentralManager: NSObject {
         super.init()
         
         // Create the Bluetooth central
-        self.central = CBCentralManager(delegate: self, queue: nil)
+        self.central = CBCentralManager(delegate: self, queue: queue)
         
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         

@@ -34,15 +34,20 @@ struct Device: Identifiable, Equatable {
     // The most recent bluetooth reference
     var sendTo: MostRecentRef?
     
+    // Last connection to keep track of reachability
+    var lastConnection: Date?
+    
     init(name: String = "Unknown", central: CBCentral? = nil, peripheral: CBPeripheral? = nil) {
         self.displayName = BluetoothController.retrieveUsername(name: name)
         self.id = BluetoothController.retrieveID(name: name)
+        self.lastConnection = Date();
         
         if let central = central {
             self.central = central
             self.sendTo = .central
             
         }
+        
         if let peripheral = peripheral {
             self.peripheral = peripheral
             self.sendTo = .peripheral

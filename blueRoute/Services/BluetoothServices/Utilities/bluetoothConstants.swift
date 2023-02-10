@@ -34,5 +34,9 @@ struct BluetoothConstants {
     // the separator allows us to separate the current username from the
     // persistent UUID in the peripheral's local name
     static let NameIdentifierSeparator = "#?id?"
+    
+    // The amount of time in seconds after our last connection to a known device
+    // before sending a ping
+    static let LastConnectionInterval: Double = -180
 
 }
