@@ -39,7 +39,7 @@ class BluetoothController: ObservableObject {
         // but will wait until we provide an username
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
         
-        self.pingDevicesTimer = Timer.scheduledTimer(timeInterval: 120,
+        self.pingDevicesTimer = Timer.scheduledTimer(timeInterval: 30,
                                          target: self,
                                          selector: #selector(checkDevicesLastConnection),
                                          userInfo: nil,
@@ -92,7 +92,7 @@ extension BluetoothController {
         
         let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name, type: .chat)
         
-        guard let messageData = BTMessageEncoder(message: codedMessage) else {
+        guard let messageData = BTMessage.BTMessageEncoder(message: codedMessage) else {
             print("could not enconde message")
             return;
         }
@@ -106,7 +106,7 @@ extension BluetoothController {
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
-        guard let decodedMessage: BTMessage = BTMessageDecoder(message: receivedData) else {
+        guard let decodedMessage: BTMessage = BTMessage.BTMessageDecoder(message: receivedData) else {
             print("unable to decode message")
             return;
         }
@@ -127,17 +127,17 @@ extension BluetoothController {
     
     @objc private func checkDevicesLastConnection() {
         for (index, device) in devices.enumerated() {
-                if(Date.now.timeIntervalSince(device.lastConnection!) > BluetoothConstants.LastConnectionInterval) {
+                if(Date.now.timeIntervalSince(device.lastKnownPing!) > BluetoothConstants.LastConnectionInterval) {
                    // Send a Ping to the device
                     sendInitialPing(device)
                     
                     // Set a timer to check if there was ever a response to the ping
                     let context = ["name": device.fullName]
-                    devices[index].pingTimeOutTimer = Timer.scheduledTimer(timeInterval: 30,
+                    devices[index].setPingTimer(Timer.scheduledTimer(timeInterval: BluetoothConstants.TimeOutInterval,
                                                                            target: self,
                                                                            selector: #selector(pingTimeout),
                                                                            userInfo: context,
-                                                                           repeats: false)
+                                                                           repeats: false))
                     
                     print("sent a ping to \(devices[index].displayName), timer starting")
                 }
@@ -147,7 +147,7 @@ extension BluetoothController {
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
-        guard let decodedBTPing: BTPing = BTPingDecoder(message: receivedData) else {
+        guard let decodedBTPing: BTPing = BTPing.BTPingDecoder(message: receivedData) else {
             print("unable to decode message")
             return;
         }
@@ -181,7 +181,7 @@ extension BluetoothController {
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
         
-        guard let messageData = BTPingEncoder(message: codedMessage) else {
+        guard let messageData = BTPing.BTPingEncoder(message: codedMessage) else {
             print("could not enconde message")
             return;
         }
@@ -194,7 +194,7 @@ extension BluetoothController {
         var pingResponse = pingReceived;
         pingResponse.pingType = .responsePing
         
-        guard let messageData = BTPingEncoder(message: pingResponse) else {
+        guard let messageData = BTPing.BTPingEncoder(message: pingResponse) else {
             print("could not enconde message")
             return;
         }
@@ -209,21 +209,15 @@ extension BluetoothController {
         
         if let indexToRemove = findDeviceIndex(name: name) {
             print("removing device \(devices[indexToRemove].displayName)")
+            
+            // removing central connection first, if there is one
+            if let peripheralToDisconnect = self.devices[indexToRemove].peripheral {
+                self.central?.removePeripheral(peripheralToDisconnect)
+            }
+            
+            // removing from published devices list
             self.devices.remove(at: indexToRemove)
             
-        }
-        
-    }
-    
-    public func updateLastConnection(_ peripheral: CBPeripheral) {
-        for (index, device) in devices.enumerated() {
-            if(peripheral == device) {devices[index].updateLastConnection()}
-        }
-    }
-    
-    public func updateLastConnection(_ central: CBCentral) {
-        for (index, device) in devices.enumerated() {
-            if(central == device) {devices[index].updateLastConnection()}
         }
     }
 }
@@ -278,86 +272,5 @@ extension BluetoothController {
    public func isReachable(_ toFind: UUID) -> Bool {
        return devices.contains { $0.id == toFind };
    }
-}
-
-
-/*
- * Utility functions for Encoding/Decoding Bluetooth Messages
- */
-extension BluetoothController {
-    
-    private func BTMessageDecoder(message: String) -> BTMessage? {
-        
-        //2 - Convert the string to data
-        let messageData = Data(message.utf8)
-
-        //3 - Create a JSONDecoder instance
-        let jsonDecoder = JSONDecoder()
-        
-        //4 - set the keyDecodingStrategy to convertFromSnakeCase on the jsonDecoder instance
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        //5 - Use the jsonDecoder instance to decode the json into a Person object
-        do {
-            let decodedMessage = try jsonDecoder.decode(BTMessage.self, from: messageData)
-            print("Sender -- \(decodedMessage.sender) said: \(decodedMessage.message)")
-            return decodedMessage;
-        } catch {
-            print("Error: \(error.localizedDescription)")
-            return nil;
-        }
-        
-    }
-    
-    private func BTPingDecoder(message: String) -> BTPing? {
-        
-        //2 - Convert the string to data
-        let messageData = Data(message.utf8)
-
-        //3 - Create a JSONDecoder instance
-        let jsonDecoder = JSONDecoder()
-        
-        //4 - set the keyDecodingStrategy to convertFromSnakeCase on the jsonDecoder instance
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        //5 - Use the jsonDecoder instance to decode the json into a Person object
-        do {
-            let decodedMessage = try jsonDecoder.decode(BTPing.self, from: messageData)
-            print("Sender -- \(decodedMessage.pingSender) sent ping")
-            return decodedMessage;
-        } catch {
-            print("Error: \(error.localizedDescription)")
-            return nil;
-        }
-        
-    }
-    
-    public func BTMessageEncoder(message: BTMessage) -> Data? {
-                
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.outputFormatting = .prettyPrinted
-        
-        do {
-            let encodeMessage = try jsonEncoder.encode(message)
-            return encodeMessage;
-        } catch {
-            print(error.localizedDescription)
-            return nil;
-        }
-    }
-    
-    public func BTPingEncoder(message: BTPing) -> Data? {
-                
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.outputFormatting = .prettyPrinted
-        
-        do {
-            let encodeMessage = try jsonEncoder.encode(message)
-            return encodeMessage;
-        } catch {
-            print(error.localizedDescription)
-            return nil;
-        }
-    }
 }
 

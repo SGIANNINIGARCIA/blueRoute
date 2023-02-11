@@ -15,7 +15,6 @@ struct ChatTile: View {
     
     @EnvironmentObject var bluetoothController: BluetoothController;
     
-    
     var body: some View {
         HStack(alignment: .center, spacing: 28.0) {
             Avatar(username: username)

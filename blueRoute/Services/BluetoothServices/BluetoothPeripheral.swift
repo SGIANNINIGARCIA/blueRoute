@@ -166,6 +166,7 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         let data: Data =  Data(self.name.utf8)
         self.peripheral?.updateValue(data, for: characteristic as! CBMutableCharacteristic,
                                        onSubscribedCentrals: [central])
+    
     }
     
     // Called when the central has sent a message to this peripheral
@@ -176,7 +177,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
 
         case BluetoothConstants.handshakeCharacteristicID:
             print("peripheral: central sent handshake data")
-            bluetoothController.addDevice(data: data, central: request.central)
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothController.addDevice(data: data, central: request.central)
+                    }
+            
+            //bluetoothController.addDevice(data: data, central: request.central)
             
         case BluetoothConstants.chatCharacteristicID:
             print("peripheral: central sent message for cha")

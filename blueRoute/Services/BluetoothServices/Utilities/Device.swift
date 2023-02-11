@@ -37,7 +37,7 @@ struct Device: Identifiable, Equatable {
     var sendTo: MostRecentRef?
     
     // Last connection to keep track of reachability
-    var lastConnection: Date?
+    var lastKnownPing: Date?
     
     var pingTimeOutTimer: Timer?
     
@@ -45,7 +45,7 @@ struct Device: Identifiable, Equatable {
         self.displayName = BluetoothController.retrieveUsername(name: name)
         self.id = BluetoothController.retrieveID(name: name)
         self.fullName = name;
-        self.lastConnection = Date();
+        self.lastKnownPing = Date();
         
        
             self.peripheral = peripheral
@@ -57,7 +57,7 @@ struct Device: Identifiable, Equatable {
         self.displayName = BluetoothController.retrieveUsername(name: name)
         self.id = BluetoothController.retrieveID(name: name)
         self.fullName = name;
-        self.lastConnection = Date();
+        self.lastKnownPing = Date();
         
         
        
@@ -93,8 +93,13 @@ struct Device: Identifiable, Equatable {
     }
     
     mutating func updateLastConnection() {
-        self.lastConnection = Date()
+        self.lastKnownPing = Date()
         self.pingTimeOutTimer?.invalidate()
     }
-}
+    
+    mutating func setPingTimer(_ timer: Timer) {
+        self.pingTimeOutTimer = timer;
+        self.lastKnownPing = Date()
+    }
 
+}

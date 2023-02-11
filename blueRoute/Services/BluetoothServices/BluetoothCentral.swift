@@ -176,9 +176,17 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("peripheral has disconnected")
         removeDeviceFromList(with: peripheral)
+        if let index = discoveredDevices.firstIndex(where: {$0.identifier == peripheral.identifier}) {
+            discoveredDevices.remove(at: index)
+        }
     }
     
-    
+    func removePeripheral(_ peripheral: CBPeripheral) {
+        central.cancelPeripheralConnection(peripheral)
+        if let index = discoveredDevices.firstIndex(where: {$0.identifier == peripheral.identifier}) {
+            discoveredDevices.remove(at: index)
+        }
+    }
 }
 
 
@@ -297,7 +305,11 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         case BluetoothConstants.handshakeCharacteristicID :
             print("central: peripheral wrote to handshake")
             // Decode the data to pull the name and save to list of devices
-            bluetoothController.addDevice(data: data, peripheral: peripheral)
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothController.addDevice(data: data, peripheral: peripheral)
+                    }
+            //bluetoothController.addDevice(data: data, peripheral: peripheral)
             
             // Send this central's information so the peripheral can write back
             // if it doesnt have a connection to our device's peripheral
@@ -330,7 +342,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     // a peripheral has changed the services it advertises
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
         print("peripheral \(peripheral.identifier) has changed it services ")
-        // DO-SOMETHING?
+        removePeripheral(peripheral)
     }
     
     // If we connect to a peripheral and finished the initial Handshake,

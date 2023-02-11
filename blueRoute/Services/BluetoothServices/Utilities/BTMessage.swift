@@ -27,3 +27,46 @@ struct BTMessage: Codable {
         case type
     }
 }
+
+// Decode/Encode methods
+extension BTMessage {
+    
+    public static func BTMessageDecoder(message: String) -> BTMessage? {
+        
+        //2 - Convert the string to data
+        let messageData = Data(message.utf8)
+
+        //3 - Create a JSONDecoder instance
+        let jsonDecoder = JSONDecoder()
+        
+        //4 - set the keyDecodingStrategy to convertFromSnakeCase on the jsonDecoder instance
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        //5 - Use the jsonDecoder instance to decode the json into a Person object
+        do {
+            let decodedMessage = try jsonDecoder.decode(BTMessage.self, from: messageData)
+            print("Sender -- \(decodedMessage.sender) said: \(decodedMessage.message)")
+            return decodedMessage;
+        } catch {
+            print("Error: \(error.localizedDescription)")
+            return nil;
+        }
+        
+    }
+    
+    public static func BTMessageEncoder(message: BTMessage) -> Data? {
+                
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.outputFormatting = .prettyPrinted
+        
+        do {
+            let encodeMessage = try jsonEncoder.encode(message)
+            return encodeMessage;
+        } catch {
+            print(error.localizedDescription)
+            return nil;
+        }
+    }
+    
+    
+}
