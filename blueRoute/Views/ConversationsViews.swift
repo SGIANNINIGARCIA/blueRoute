@@ -35,9 +35,11 @@ struct ConversationsView: View {
                     .onDelete(perform: removeConversation)
                 }
                 .emptyState(chats.isEmpty) {
-                      Text("No active conversations   :(")
-                        .font(.title3)
-                        .foregroundColor(Color.secondary)
+                    VStack{
+                        Text("No active conversations   :(")
+                          .font(.title3)
+                          .foregroundColor(Color.secondary)
+                    }
                     }
                 .navigationTitle("Conversations")
                 .toolbar(Visibility.hidden)

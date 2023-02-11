@@ -175,29 +175,24 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         switch (requests.first?.characteristic.uuid) {
 
         case BluetoothConstants.handshakeCharacteristicID:
-            print("peripheral: central sent handshake data, proccessing now")
-            // PROCCESS CENTRAL HANDSHAKE
+            print("peripheral: central sent handshake data")
             bluetoothController.addDevice(data: data, central: request.central)
             
         case BluetoothConstants.chatCharacteristicID:
-            print("peripheral: central sent message for chat, proccess now")
+            print("peripheral: central sent message for cha")
             bluetoothController.processIncomingChatMessage(data)
-            bluetoothController.updateLastConnection(request.central)
             
         case BluetoothConstants.routingCharacteristicID:
-            print("central sent message for routing, proccess now")
+            print("peripheral: central sent message for routing")
             bluetoothController.processIncomingRoutingMessage()
-            bluetoothController.updateLastConnection(request.central)
             
         case BluetoothConstants.pingCharacteristicID:
-            print("central sent ping, proccess now")
-            bluetoothController.processReceivedPing()
-            // process ping
+            print("peripheral: central sent ping")
+            bluetoothController.processReceivedPing(data)
             
         default:
             print("peripheral: central send message: did not match a characteristic?")
             bluetoothController.processIncomingChatMessage(data)
-            bluetoothController.updateLastConnection(request.central)
         }
     }
 }

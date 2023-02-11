@@ -42,6 +42,9 @@ struct BluetoothConstants {
     
     // The amount of time in seconds after our last connection to a known device
     // before sending a ping
-    static let LastConnectionInterval: Double = -180
+    static let LastConnectionInterval: Double = 60
+    
+    // Time to wait after sending a ping to trigger pingTimeout and remove device
+    static let TimeOutInterval: Double = 30
 
 }

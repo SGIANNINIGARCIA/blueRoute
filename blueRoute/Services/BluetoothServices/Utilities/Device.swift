@@ -31,27 +31,39 @@ struct Device: Identifiable, Equatable {
     // The ID to conform to identifiable
     let id: UUID;
     
+    let fullName: String;
+    
     // The most recent bluetooth reference
     var sendTo: MostRecentRef?
     
     // Last connection to keep track of reachability
     var lastConnection: Date?
     
-    init(name: String = "Unknown", central: CBCentral? = nil, peripheral: CBPeripheral? = nil) {
+    var pingTimeOutTimer: Timer?
+    
+    init(name: String = "Unknown", peripheral: CBPeripheral) {
         self.displayName = BluetoothController.retrieveUsername(name: name)
         self.id = BluetoothController.retrieveID(name: name)
+        self.fullName = name;
         self.lastConnection = Date();
         
-        if let central = central {
+       
+            self.peripheral = peripheral
+            self.sendTo = .peripheral
+        
+    }
+    
+    init(name: String = "Unknown", central: CBCentral) {
+        self.displayName = BluetoothController.retrieveUsername(name: name)
+        self.id = BluetoothController.retrieveID(name: name)
+        self.fullName = name;
+        self.lastConnection = Date();
+        
+        
+       
             self.central = central
             self.sendTo = .central
             
-        }
-        
-        if let peripheral = peripheral {
-            self.peripheral = peripheral
-            self.sendTo = .peripheral
-        }
     }
     
     static func ==(lhs: Device, rhs: Device) -> Bool {
@@ -82,6 +94,7 @@ struct Device: Identifiable, Equatable {
     
     mutating func updateLastConnection() {
         self.lastConnection = Date()
+        self.pingTimeOutTimer?.invalidate()
     }
 }
 

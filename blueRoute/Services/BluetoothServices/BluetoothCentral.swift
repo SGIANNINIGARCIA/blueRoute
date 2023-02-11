@@ -175,6 +175,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
     // Called when a peripheral has diconnected from this device (acting as a central)
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("peripheral has disconnected")
+        removeDeviceFromList(with: peripheral)
     }
     
     
@@ -287,15 +288,15 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
          ** TESTING IF PERIPHERAL IDENTIFIER CHANGES
          **/
         print("central  didUpdateValueFor peripheral with id: \(peripheral.identifier.uuidString)")
+        guard let data = characteristic.value else { return }
         
         // process data received depending on the characteristic
         switch(characteristic.uuid) {
             
             // PROCESS THE HANDSHAKE
         case BluetoothConstants.handshakeCharacteristicID :
-            print("wrote to handshake")
+            print("central: peripheral wrote to handshake")
             // Decode the data to pull the name and save to list of devices
-            guard let data = characteristic.value else { return }
             bluetoothController.addDevice(data: data, peripheral: peripheral)
             
             // Send this central's information so the peripheral can write back
@@ -303,32 +304,24 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             respondToHandshake(peripheral: peripheral)
             
         case BluetoothConstants.routingCharacteristicID:
-            print("wrote to routing")
+            print("central: peripheral wrote to routing")
             //guard let data = characteristic.value else { return }
             bluetoothController.processIncomingRoutingMessage()
-            // Update the last connection of the device
-            bluetoothController.updateLastConnection(peripheral)
             
         case BluetoothConstants.chatCharacteristicID:
-            print("wrote to chat")
+            print("central: peripheral wrote to chat")
             //process chat
-            guard let data = characteristic.value else { return }
             bluetoothController.processIncomingChatMessage(data)
-            // Update the last connection of the device
-            bluetoothController.updateLastConnection(peripheral)
             
             
         case BluetoothConstants.pingCharacteristicID:
-            print("ping received")
+            print("central: peripheral sent a ping")
             //process ping
-            bluetoothController.processReceivedPing()
-           // guard let data = characteristic.value else { return }
-            // send ping back?
+            bluetoothController.processReceivedPing(data)
            
             
         default:
             print("default")
-            bluetoothController.updateLastConnection(peripheral)
             
             
         }
@@ -351,6 +344,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         if let index = bluetoothController.devices.firstIndex(where: { $0.peripheral?.identifier == device.identifier }) {
           //  guard bluetoothController.devices[index].id != device.id else { return }
             print("\(bluetoothController.devices[index].displayName)  found- removing now")
+            bluetoothController.devices[index].pingTimeOutTimer?.invalidate()
             bluetoothController.devices.remove(at: index)
             return
         }

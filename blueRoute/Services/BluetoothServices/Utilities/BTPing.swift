@@ -14,13 +14,13 @@ enum PingType: String, Codable {
 struct BTPing: Codable {
     
     var pingType: PingType;
-    var sender: String;
-    var receiver: String;
+    var pingSender: String;
+    var pingReceiver: String;
     
     enum CodingKeys: String, CodingKey {
         case pingType
-        case sender
-        case receiver
+        case pingSender
+        case pingReceiver
     }
     
     
