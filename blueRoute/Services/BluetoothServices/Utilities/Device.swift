@@ -66,6 +66,12 @@ struct Device: Identifiable, Equatable {
             
     }
     
+    init(name: String = "Unknown") {
+        self.displayName = BluetoothController.retrieveUsername(name: name)
+        self.id = BluetoothController.retrieveID(name: name)
+        self.fullName = name;            
+    }
+    
     static func ==(lhs: Device, rhs: Device) -> Bool {
         return lhs.id == rhs.id;
     }

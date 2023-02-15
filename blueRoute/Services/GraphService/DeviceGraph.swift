@@ -21,9 +21,13 @@ struct Vertex: Hashable, Equatable {
     }
 }
 
-struct Edge {
+struct Edge: Hashable {
     let source: Vertex;
     let destination: Vertex;
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(source.username)
+    }
 }
 
 protocol DeviceGraph {
@@ -32,11 +36,18 @@ protocol DeviceGraph {
     func edges(from source: Vertex) -> [Edge]
 }
 
-class AdjacencyList: DeviceGraph {
+class AdjacencyList: DeviceGraph, ObservableObject  {
     
-    private var adjacencies: [Vertex: [Edge]] = [:]
+    @Published public var adjacencies: [Vertex: [Edge]] = [:]
+    var selfVertex: Vertex?
     
     init() {}
+    
+    func setSelf(username: String) -> Vertex {
+        self.selfVertex = createVertex(username: username)
+        
+        return self.selfVertex!;
+    }
     
     func createVertex(username: String) -> Vertex {
         
@@ -56,6 +67,16 @@ class AdjacencyList: DeviceGraph {
     func edges(from source: Vertex) -> [Edge] {
         
         return adjacencies[source] ?? []
+        
+    }
+    
+    func printVertices() -> [String] {
+      var toBeRe = [String]()
+        for (vertex, _) in adjacencies {
+            toBeRe.append(vertex.username)
+        }
+        
+        return toBeRe;
         
     }
 }
@@ -105,5 +126,130 @@ extension AdjacencyList {
 }
 
 
-
-
+extension AdjacencyList {
+    
+    public func updateList(with user: String, userList: [String]) -> Vertex{
+        
+        if let userVertex = findVertex(user) {
+            // Since this is a 2 degree list, if the device receive a new-
+            // user/userlist, it came froma new connection we made,
+            // so it is assumed we have a direct connection to this new
+            // user, hence we need to add it to our edge list
+            addEdge(between: self.selfVertex!, and: userVertex)
+            let newEdges = buildEdgeList(source: userVertex, userList: userList)
+            
+            adjacencies[userVertex] = newEdges;
+            
+            return userVertex;
+        } else {
+            let newUserVertex = createVertex(username: user)
+            // Since this is a 2 degree list, if the device receive a new-
+            // user/userlist, it came froma new connection we made,
+            // so it is assumed we have a direct connection to this new
+            // user, hence we need to add it to our edge list
+            addEdge(between: self.selfVertex!, and: newUserVertex)
+            let newEdges = buildEdgeList(source: newUserVertex, userList: userList)
+            adjacencies[newUserVertex] = newEdges
+            
+            return newUserVertex;
+        }
+    }
+    
+    public func buildEdgeList(source: Vertex, userList: [String]) -> [Edge] {
+        var edgeList = [Edge]();
+        
+        for name in userList {
+            if let userVertex = findVertex(name) {
+                
+                edgeList.append(Edge(source: source, destination: userVertex))
+            } else {
+                let newUserVertex = createVertex(username: name)
+                edgeList.append(Edge(source: source, destination: newUserVertex))
+            }
+        }
+        
+        return edgeList;
+    }
+    
+    
+    
+    public func findVertex(_ name: String) -> Vertex? {
+        // Get the index, if there is one
+        let vertexIndex = adjacencies.firstIndex(where: { $0.key.username == name })
+        
+        // return the vertex at that index, if vertexIndex is not nil
+        if let index = vertexIndex {
+            return adjacencies[index].key
+        } else {
+            return nil;
+        }
+    }
+    
+    public func removeConnection(_ name: String) -> String {
+        
+        var test = ""
+        
+        // 1. find the vertex we want to remove
+        guard let vertexToRemove = findVertex(name) else {
+            print("unable to find vertex to remove")
+            return test + "unable to find vertex";
+        }
+        
+        removeEdge(remove: vertexToRemove, from: self.selfVertex!)
+        
+        return test + removeVertex(name)
+        
+        
+    }
+    
+    
+    public func removeVertex(_ name: String) -> String {
+        
+        var test = ""
+        
+        // 1. find the vertex we want to remove
+        guard let vertexToRemove = findVertex(name) else {
+            print("unable to find vertex to remove")
+            return test + "unable to find vertex";
+        }
+        
+        // 3. check if there is a path to it without our edge
+        if isReachable(vertexToRemove) {
+            return test + "\(vertexToRemove.username) is reachable, wont remove";
+        } else {
+            
+            test = test + "\(vertexToRemove.username) is not reachable"
+            // 4. save all the vertices it is connected to for later
+            let connectedEdges = self.adjacencies[vertexToRemove]
+            
+            // 5. remove the vertex
+            if let index = self.adjacencies.firstIndex(where: {$0.key.username == vertexToRemove.username}) {
+                test = test + " | removing \(vertexToRemove.username) vertex from list"
+                self.adjacencies.remove(at: index)
+            }
+            
+            for element in connectedEdges ?? [] {
+                test = test + removeVertex(element.destination.username)
+            }
+        }
+        
+        return test;
+    }
+    
+    public func removeEdge(remove edgeToRemove: Vertex, from source: Vertex) {
+        self.adjacencies[source]?.removeAll(where: {$0.destination.username == edgeToRemove.username})
+    }
+    
+    public func isReachable(_ destination: Vertex) -> Bool {
+        if let temp = bfs(from: destination, to: selfVertex!) {
+            if(temp.count > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        return false;
+        
+    }
+}
