@@ -10,7 +10,6 @@ import SwiftUI
 struct test: View {
     
     @ObservedObject var AdjMatrix = AdjacencyList()
-    var tempo = "false";
     
     init() {
         
@@ -20,7 +19,7 @@ struct test: View {
         // handshake with natalia, natalia passes her list as well
         // add natalia and her list
         var natalia = (self.AdjMatrix.updateList(with: "Natalia", userList: ["Tamara", "Jose", "Clara"]))
-        var bryan = (self.AdjMatrix.updateList(with: "Bryan", userList: ["Jose", "Vincent", "May", "Natalia", "Attican"]))
+        var bryan = (self.AdjMatrix.updateList(with: "Bryan", userList: ["Jose", "Vincent","Natalia", "May"]))
         var attican = (self.AdjMatrix.updateList(with: "Attican", userList: ["May"]))
         var gianfranco = (self.AdjMatrix.updateList(with: "Gianfranco", userList: ["Mimma", "Arturo"]))
         
@@ -32,19 +31,6 @@ struct test: View {
         self.AdjMatrix.addEdge(between: arturo, and: carlos)
         self.AdjMatrix.addEdge(between: carlos, and: roberto)
         self.AdjMatrix.addEdge(between: carlos, and: rebecca)
-        
-       tempo = self.AdjMatrix.removeConnection("Attican")
-       /*
-        for ver in self.AdjMatrix.bfs(from: self.AdjMatrix.selfVertex!, to: self.AdjMatrix.findVertex("Attican")!)! {
-            tempo = tempo + ver.source.username
-        }
-        */
-        
-        
-        
-        
-    
-        
     }
     
     
@@ -58,7 +44,6 @@ struct test: View {
                     }
                 }
             }
-            Text("\(tempo)")
         }
     }
 }

@@ -135,6 +135,7 @@ extension AdjacencyList {
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
+            print("found the user \(userVertex.username)")
             addEdge(between: self.selfVertex!, and: userVertex)
             let newEdges = buildEdgeList(source: userVertex, userList: userList)
             
@@ -147,6 +148,7 @@ extension AdjacencyList {
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
+            print("new user \(newUserVertex.username)")
             addEdge(between: self.selfVertex!, and: newUserVertex)
             let newEdges = buildEdgeList(source: newUserVertex, userList: userList)
             adjacencies[newUserVertex] = newEdges
@@ -160,10 +162,11 @@ extension AdjacencyList {
         
         for name in userList {
             if let userVertex = findVertex(name) {
-                
+                print("user exists \(userVertex.username) - appending to \(source.username)")
                 edgeList.append(Edge(source: source, destination: userVertex))
             } else {
                 let newUserVertex = createVertex(username: name)
+                print("user does NOT exist \(newUserVertex.username) - appending to \(source.username)")
                 edgeList.append(Edge(source: source, destination: newUserVertex))
             }
         }
@@ -185,55 +188,49 @@ extension AdjacencyList {
         }
     }
     
-    public func removeConnection(_ name: String) -> String {
+    public func removeConnection(_ name: String){
         
         var test = ""
         
         // 1. find the vertex we want to remove
         guard let vertexToRemove = findVertex(name) else {
             print("unable to find vertex to remove")
-            return test + "unable to find vertex";
+            return;
         }
+        
+        print("found \(vertexToRemove.username) - remove edge from self")
         
         removeEdge(remove: vertexToRemove, from: self.selfVertex!)
         
-        return test + removeVertex(name)
+        removeVertex(name)
         
         
     }
     
     
-    public func removeVertex(_ name: String) -> String {
+    public func removeVertex(_ name: String) {
         
-        var test = ""
         
         // 1. find the vertex we want to remove
         guard let vertexToRemove = findVertex(name) else {
             print("unable to find vertex to remove")
-            return test + "unable to find vertex";
+            return;
         }
         
         // 3. check if there is a path to it without our edge
-        if isReachable(vertexToRemove) {
-            return test + "\(vertexToRemove.username) is reachable, wont remove";
-        } else {
-            
-            test = test + "\(vertexToRemove.username) is not reachable"
+        if !isReachable(vertexToRemove) {
             // 4. save all the vertices it is connected to for later
             let connectedEdges = self.adjacencies[vertexToRemove]
             
             // 5. remove the vertex
             if let index = self.adjacencies.firstIndex(where: {$0.key.username == vertexToRemove.username}) {
-                test = test + " | removing \(vertexToRemove.username) vertex from list"
                 self.adjacencies.remove(at: index)
             }
             
-            for element in connectedEdges ?? [] {
-                test = test + removeVertex(element.destination.username)
+            for element in connectedEdges ?? [] { removeVertex(element.destination.username)
             }
         }
         
-        return test;
     }
     
     public func removeEdge(remove edgeToRemove: Vertex, from source: Vertex) {
@@ -241,14 +238,13 @@ extension AdjacencyList {
     }
     
     public func isReachable(_ destination: Vertex) -> Bool {
-        if let temp = bfs(from: destination, to: selfVertex!) {
+        if let temp = bfs(from: selfVertex!, to: destination) {
             if(temp.count > 0) {
                 return true;
             } else {
                 return false;
             }
         }
-        
         return false;
         
     }
