@@ -135,43 +135,59 @@ extension AdjacencyList {
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
-            print("found the user \(userVertex.username)")
+            
+            // if we already have an edge to this user, then we just rebuild the list
+            if let _ = self.adjacencies[selfVertex!]?.contains(where: {$0.destination.username == userVertex.username}) {
+                buildEdgeList(source: userVertex, userList: userList)
+                return userVertex;
+            }
+            
             addEdge(between: self.selfVertex!, and: userVertex)
-            let newEdges = buildEdgeList(source: userVertex, userList: userList)
-            
-            adjacencies[userVertex] = newEdges;
-            
+            buildEdgeList(source: userVertex, userList: userList)
             return userVertex;
+            
         } else {
             let newUserVertex = createVertex(username: user)
             // Since this is a 2 degree list, if the device receive a new-
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
-            print("new user \(newUserVertex.username)")
             addEdge(between: self.selfVertex!, and: newUserVertex)
-            let newEdges = buildEdgeList(source: newUserVertex, userList: userList)
-            adjacencies[newUserVertex] = newEdges
+            buildEdgeList(source: newUserVertex, userList: userList)
             
             return newUserVertex;
         }
     }
     
-    public func buildEdgeList(source: Vertex, userList: [String]) -> [Edge] {
-        var edgeList = [Edge]();
-        
-        for name in userList {
-            if let userVertex = findVertex(name) {
-                print("user exists \(userVertex.username) - appending to \(source.username)")
-                edgeList.append(Edge(source: source, destination: userVertex))
-            } else {
-                let newUserVertex = createVertex(username: name)
-                print("user does NOT exist \(newUserVertex.username) - appending to \(source.username)")
-                edgeList.append(Edge(source: source, destination: newUserVertex))
-            }
+    public func buildEdgeList(source: Vertex, userList: [String]) {
+        guard let existingEdges: [Edge] = self.adjacencies[source] else {
+            // Vertex does not have an edge list in our adj list
+            return;
         }
         
-        return edgeList;
+        for name in userList {
+            
+            // If the user is already part of our adj list
+            // then we use the existing reference
+            if let userVertex = findVertex(name) {
+                
+                // We then check if there is already an edge for this
+                // user in the source's adj list
+                if (existingEdges.contains(where: {$0.destination.username == name})) {
+                    // The edge is already in this source adj list
+                    // so we can skip this itiretaion
+                    continue;
+                }
+                
+                // The edge is not on the list, so we add it
+                addEdge(between: source, and: userVertex)
+            } else {
+                // The user is not part of our adj list, so we create a new vertex
+                let newUserVertex = createVertex(username: name)
+                // Since this is a new vertex, we can assume the edge does not exist
+                addEdge(between: source, and: newUserVertex)
+            }
+        }
     }
     
     
@@ -190,8 +206,6 @@ extension AdjacencyList {
     
     public func removeConnection(_ name: String){
         
-        var test = ""
-        
         // 1. find the vertex we want to remove
         guard let vertexToRemove = findVertex(name) else {
             print("unable to find vertex to remove")
@@ -200,34 +214,30 @@ extension AdjacencyList {
         
         print("found \(vertexToRemove.username) - remove edge from self")
         
+        // Remove the edge where source is self and dest is the user to be removed
         removeEdge(remove: vertexToRemove, from: self.selfVertex!)
         
-        removeVertex(name)
-        
-        
+        // Remove the vertex if there is no path to it
+        // after we removed our edge to it
+        if !isReachable(vertexToRemove) {
+            removeVertex(vertexToRemove)
+        }
     }
     
     
-    public func removeVertex(_ name: String) {
-        
-        
-        // 1. find the vertex we want to remove
-        guard let vertexToRemove = findVertex(name) else {
-            print("unable to find vertex to remove")
-            return;
-        }
-        
-        // 3. check if there is a path to it without our edge
+    public func removeVertex(_ vertexToRemove: Vertex) {
+                
+        // 1. check if there is a path to it without our edge
         if !isReachable(vertexToRemove) {
-            // 4. save all the vertices it is connected to for later
+            // 2. save all the vertices it is connected to for later
             let connectedEdges = self.adjacencies[vertexToRemove]
             
-            // 5. remove the vertex
+            // 3. remove the vertex
             if let index = self.adjacencies.firstIndex(where: {$0.key.username == vertexToRemove.username}) {
                 self.adjacencies.remove(at: index)
             }
-            
-            for element in connectedEdges ?? [] { removeVertex(element.destination.username)
+            // 4. repeat the process with all the destination vertices
+            for element in connectedEdges ?? [] { removeVertex(element.destination)
             }
         }
         
