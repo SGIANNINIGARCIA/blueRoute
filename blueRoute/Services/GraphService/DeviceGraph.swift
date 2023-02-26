@@ -20,7 +20,7 @@ struct Vertex: Hashable, Equatable {
         hasher.combine(username)
     }
 }
-
+ 
 struct Edge: Hashable {
     let source: Vertex;
     let destination: Vertex;
@@ -160,31 +160,41 @@ extension AdjacencyList {
     }
     
     public func buildEdgeList(source: Vertex, userList: [String]) {
+        
+        // 1. retrieve the existing edges
         guard let existingEdges: [Edge] = self.adjacencies[source] else {
             // Vertex does not have an edge list in our adj list
             return;
         }
         
+        // 2. Remove outdated edges
+        // If the list has an edge not on the new list passed by the device, then
+        // we must remove the existing edge and pass it to removeVertex to check if
+        // the resulting change creates a subset and remove it
+        for existingEdge in existingEdges {
+            if (!userList.contains(where: {$0 == existingEdge.destination.username})) {
+                removeEdge(remove: existingEdge.destination, from: source)
+                removeVertex(existingEdge.destination)
+            }
+        }
+        
+        // 3. itireate through the updated/new list
         for name in userList {
-            
-            // If the user is already part of our adj list
-            // then we use the existing reference
+
+            // 4. check if the vertex already exist and use the reference
             if let userVertex = findVertex(name) {
                 
-                // We then check if there is already an edge for this
-                // user in the source's adj list
+                // 5. check if the edge already exists and skip if it does / no change
                 if (existingEdges.contains(where: {$0.destination.username == name})) {
-                    // The edge is already in this source adj list
-                    // so we can skip this itiretaion
                     continue;
                 }
                 
-                // The edge is not on the list, so we add it
+                // 5. The edge is not on the list, so we add it
                 addEdge(between: source, and: userVertex)
             } else {
-                // The user is not part of our adj list, so we create a new vertex
+                // 6. New Vertex, so we must create it
                 let newUserVertex = createVertex(username: name)
-                // Since this is a new vertex, we can assume the edge does not exist
+                // 7. Append the edge
                 addEdge(between: source, and: newUserVertex)
             }
         }
