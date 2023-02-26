@@ -15,9 +15,7 @@ enum MostRecentRef {
 
 
 // Devices available through bluetooth
-struct Device: Identifiable, Equatable {
-    
-    
+struct Vertex: Identifiable, Equatable, Hashable {
     
     // The peripheral object associated with the device
     var peripheral: CBPeripheral?
@@ -31,6 +29,7 @@ struct Device: Identifiable, Equatable {
     // The ID to conform to identifiable
     let id: UUID;
     
+    // The name containing displayName and id
     let fullName: String;
     
     // The most recent bluetooth reference
@@ -72,16 +71,20 @@ struct Device: Identifiable, Equatable {
         self.fullName = name;            
     }
     
-    static func ==(lhs: Device, rhs: Device) -> Bool {
+    static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
         return lhs.id == rhs.id;
     }
     
-    static func ==(lhs: CBPeripheral, rhs: Device) -> Bool {
+    static func ==(lhs: CBPeripheral, rhs: Vertex) -> Bool {
         return lhs.identifier == rhs.peripheral?.identifier;
     }
     
-    static func ==(lhs: CBCentral, rhs: Device) -> Bool {
+    static func ==(lhs: CBCentral, rhs: Vertex) -> Bool {
         return lhs.identifier == rhs.central?.identifier;
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     mutating func changePeripheralReference(_ newPeripheral: CBPeripheral) {

@@ -9,12 +9,15 @@ import Foundation
 import CoreBluetooth
 import CoreData
 
+typealias Device = Vertex;
+
 class BluetoothController: ObservableObject {
     
     // Variables holding our bluetooth managers
     @Published var peripheral: BluetoothPeripheralManager?
     @Published var central: BluetoothCentralManager?
     @Published var devices = [Device]();
+    @Published var adjList = AdjacencyList();
     var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
     
@@ -178,8 +181,10 @@ extension BluetoothController {
             return;
         }
         
+        var adjList = AdjacencyList.processForExchange(adjList.adjacencies)
+        
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
-        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
+        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
         
         guard let messageData = BTPing.BTPingEncoder(message: codedMessage) else {
             print("could not enconde message")

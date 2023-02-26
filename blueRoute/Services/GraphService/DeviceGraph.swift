@@ -7,31 +7,17 @@
 
 import Foundation
 
-struct Vertex: Hashable, Equatable {
-    let username: String;
-    
-    // Defining Equatable function in case we add other variables in the future (CBPeripheral?)
-    static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
-        return lhs.username == rhs.username
-    }
-    
-    // Defining Hashable function in case we add other variables in the future (CBPeripheral?)
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(username)
-    }
-}
- 
 struct Edge: Hashable {
     let source: Vertex;
     let destination: Vertex;
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(source.username)
+        hasher.combine(source.id)
     }
 }
 
 protocol DeviceGraph {
-    func createVertex(username: String) -> Vertex
+    func createVertex(name: String) -> Vertex
     func addEdge(between source: Vertex, and destination: Vertex)
     func edges(from source: Vertex) -> [Edge]
 }
@@ -43,15 +29,15 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     
     init() {}
     
-    func setSelf(username: String) -> Vertex {
-        self.selfVertex = createVertex(username: username)
+    func setSelf(name: String) -> Vertex {
+        self.selfVertex = createVertex(name: name)
         
         return self.selfVertex!;
     }
     
-    func createVertex(username: String) -> Vertex {
+    func createVertex(name: String) -> Vertex {
         
-        let newVertex = Vertex(username: username)
+        let newVertex = Vertex(name: name)
         adjacencies[newVertex] = []
         return newVertex;
             
@@ -73,7 +59,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     func printVertices() -> [String] {
       var toBeRe = [String]()
         for (vertex, _) in adjacencies {
-            toBeRe.append(vertex.username)
+            toBeRe.append(vertex.displayName)
         }
         
         return toBeRe;
@@ -137,7 +123,7 @@ extension AdjacencyList {
             // user, hence we need to add it to our edge list
             
             // if we already have an edge to this user, then we just rebuild the list
-            if let _ = self.adjacencies[selfVertex!]?.contains(where: {$0.destination.username == userVertex.username}) {
+            if let _ = self.adjacencies[selfVertex!]?.contains(where: {$0.destination.id == userVertex.id}) {
                 buildEdgeList(source: userVertex, userList: userList)
                 return userVertex;
             }
@@ -147,7 +133,7 @@ extension AdjacencyList {
             return userVertex;
             
         } else {
-            let newUserVertex = createVertex(username: user)
+            let newUserVertex = createVertex(name: user)
             // Since this is a 2 degree list, if the device receive a new-
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
@@ -172,7 +158,7 @@ extension AdjacencyList {
         // we must remove the existing edge and pass it to removeVertex to check if
         // the resulting change creates a subset and remove it
         for existingEdge in existingEdges {
-            if (!userList.contains(where: {$0 == existingEdge.destination.username})) {
+            if (!userList.contains(where: {$0 == existingEdge.destination.fullName})) {
                 removeEdge(remove: existingEdge.destination, from: source)
                 removeVertex(existingEdge.destination)
             }
@@ -185,7 +171,7 @@ extension AdjacencyList {
             if let userVertex = findVertex(name) {
                 
                 // 5. check if the edge already exists and skip if it does / no change
-                if (existingEdges.contains(where: {$0.destination.username == name})) {
+                if (existingEdges.contains(where: {$0.destination.fullName == name})) {
                     continue;
                 }
                 
@@ -193,7 +179,7 @@ extension AdjacencyList {
                 addEdge(between: source, and: userVertex)
             } else {
                 // 6. New Vertex, so we must create it
-                let newUserVertex = createVertex(username: name)
+                let newUserVertex = createVertex(name: name)
                 // 7. Append the edge
                 addEdge(between: source, and: newUserVertex)
             }
@@ -204,7 +190,7 @@ extension AdjacencyList {
     
     public func findVertex(_ name: String) -> Vertex? {
         // Get the index, if there is one
-        let vertexIndex = adjacencies.firstIndex(where: { $0.key.username == name })
+        let vertexIndex = adjacencies.firstIndex(where: { $0.key.fullName == name })
         
         // return the vertex at that index, if vertexIndex is not nil
         if let index = vertexIndex {
@@ -222,7 +208,7 @@ extension AdjacencyList {
             return;
         }
         
-        print("found \(vertexToRemove.username) - remove edge from self")
+        print("found \(vertexToRemove.displayName) - remove edge from self")
         
         // Remove the edge where source is self and dest is the user to be removed
         removeEdge(remove: vertexToRemove, from: self.selfVertex!)
@@ -243,7 +229,7 @@ extension AdjacencyList {
             let connectedEdges = self.adjacencies[vertexToRemove]
             
             // 3. remove the vertex
-            if let index = self.adjacencies.firstIndex(where: {$0.key.username == vertexToRemove.username}) {
+            if let index = self.adjacencies.firstIndex(where: {$0.key.fullName == vertexToRemove.fullName}) {
                 self.adjacencies.remove(at: index)
             }
             // 4. repeat the process with all the destination vertices
@@ -254,7 +240,7 @@ extension AdjacencyList {
     }
     
     public func removeEdge(remove edgeToRemove: Vertex, from source: Vertex) {
-        self.adjacencies[source]?.removeAll(where: {$0.destination.username == edgeToRemove.username})
+        self.adjacencies[source]?.removeAll(where: {$0.destination.fullName == edgeToRemove.fullName})
     }
     
     public func isReachable(_ destination: Vertex) -> Bool {
@@ -267,5 +253,25 @@ extension AdjacencyList {
         }
         return false;
         
+    }
+}
+
+extension DeviceGraph {
+    
+    public static func processForExchange(_ adjecency: [Vertex: [Edge]]) -> [String: [String]] {
+        
+        var processedList = [String: [String]]();
+        
+        for (key, values) in adjecency {
+            var edges = [String]()
+            
+            for edge in values {
+                edges.append(edge.destination.displayName)
+            }
+            
+            processedList[key.displayName] = edges;
+        }
+        
+        return processedList;
     }
 }

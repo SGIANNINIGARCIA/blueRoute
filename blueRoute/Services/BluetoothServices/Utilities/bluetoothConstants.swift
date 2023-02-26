@@ -34,7 +34,7 @@ struct BluetoothConstants {
     static let qtyCharacteristics = 4;
     
     // The peripheral uses a local name to advertise with a custom name.
-    // The local name contains the username provided by the user in adition to
+    // The local name contains the username provided by the user in adittion to
     // a UUID used for persisting chats when the username changes,
     // the separator allows us to separate the current username from the
     // persistent UUID in the peripheral's local name
