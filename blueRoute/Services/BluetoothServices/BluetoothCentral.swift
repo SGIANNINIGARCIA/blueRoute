@@ -34,8 +34,9 @@ class BluetoothCentralManager: NSObject {
     // Temp list for peripherals discovered by the central
     var discoveredDevices = [CBPeripheral]()
     
-    // Property to prevent stop scanning when
-    // not all characteristics have been subscribed to
+    // Property to prevent stop scanning when not all characteristics
+    // of the last device we attempted to connect have been subscribed to
+    // This is to prevent having a device with missing characteristics
     var latestConnectedDevice: LatestDevice?
     
     var stopScanningSignal: Bool = false;
@@ -278,8 +279,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
                  
              } else {
                  print("Characteristic notifications have stopped. Disconnecting.")
-                // CANCEL CONNECTION TO PERIPHERAL
-                 // TO-DO
+                removePeripheral(peripheral)
              }
      }
     
@@ -304,16 +304,14 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             // PROCESS THE HANDSHAKE
         case BluetoothConstants.handshakeCharacteristicID :
             print("central: peripheral wrote to handshake")
-            // Decode the data to pull the name and save to list of devices
             
+            // Pass the data to the controller for handshake processing
             DispatchQueue.main.async { [weak self] in
-                self?.bluetoothController.addDevice(data: data, peripheral: peripheral)
+                self?.bluetoothController.processHandshake(data, from: peripheral)
                     }
-            //bluetoothController.addDevice(data: data, peripheral: peripheral)
-            
             // Send this central's information so the peripheral can write back
             // if it doesnt have a connection to our device's peripheral
-            respondToHandshake(peripheral: peripheral)
+            self.bluetoothController.sendHandshake(peripheral)
             
         case BluetoothConstants.routingCharacteristicID:
             print("central: peripheral wrote to routing")
@@ -331,11 +329,8 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             //process ping
             bluetoothController.processReceivedPing(data)
            
-            
         default:
-            print("default")
-            
-            
+            print("no matching characteristic")
         }
     }
     
@@ -345,12 +340,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         removePeripheral(peripheral)
     }
     
-    // If we connect to a peripheral and finished the initial Handshake,
-    // add the peripheral to the list
-
-    
     fileprivate func removeDeviceFromList(with device: CBPeripheral) {
-        
         print("removing \(device.identifier)")
         // If a device already exists in the list, replace it with this new device
         if let index = bluetoothController.devices.firstIndex(where: { $0.peripheral?.identifier == device.identifier }) {
@@ -362,15 +352,6 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         }
     }
     
-}
-
-// Extension to process handshake
-extension BluetoothCentralManager {
-    func respondToHandshake(peripheral: CBPeripheral) {
-        print("Central: sending handshake ")
-        let data: Data =  Data(self.name.utf8)
-        sendData(data, peripheral: peripheral, characteristic: BluetoothConstants.handshakeCharacteristicID)
-    }
 }
 
 
@@ -405,6 +386,8 @@ extension BluetoothController {
         self.central?.sendStopScanningSignal()
     }
     
+    // If we connect to a peripheral and finished the initial Handshake,
+    // add the peripheral to the list
     public func addDevice(data: Data, peripheral: CBPeripheral) {
         
         let name = String(decoding: data, as: UTF8.self)
@@ -431,8 +414,9 @@ extension BluetoothController {
 
 
 /*
-  To prevent the cental from stop scanning while we are still subscribing
-  to a peripheral's characteristic
+  Struct used to prevent the cental from stop scanning while we are still subscribing
+  to a peripheral's characteristic.
+  
  */
 
 struct LatestDevice {

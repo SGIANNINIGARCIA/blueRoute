@@ -153,20 +153,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                            central: CBCentral,
                            didSubscribeTo characteristic: CBCharacteristic) {
         
-        // Handshake which sends the central the fullname of the user
+        // Handshake which sends the central our fullname and our Adjcency List
         if(characteristic.uuid == BluetoothConstants.handshakeCharacteristicID) {
             print("A central has subscribed to the peripheral, initiating handshake")
-            let data: Data =  Data(self.name.utf8)
-            sendData(data, central: central, characteristic: BluetoothConstants.handshakeCharacteristicID)
+            self.bluetoothController.sendHandshake(central)
         }
-    }
-    
-    func initialHandshake(central: CBCentral, characteristic: CBCharacteristic) {
-               
-        let data: Data =  Data(self.name.utf8)
-        self.peripheral?.updateValue(data, for: characteristic as! CBMutableCharacteristic,
-                                       onSubscribedCentrals: [central])
-    
     }
     
     // Called when the central has sent a message to this peripheral
@@ -177,11 +168,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
 
         case BluetoothConstants.handshakeCharacteristicID:
             print("peripheral: central sent handshake data")
-            DispatchQueue.main.async { [weak self] in
-                self?.bluetoothController.addDevice(data: data, central: request.central)
-                    }
             
-            //bluetoothController.addDevice(data: data, central: request.central)
+            // now we pass the handshake processing  to the controller
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothController.processHandshake(data, from: request.central)
+                    }
             
         case BluetoothConstants.chatCharacteristicID:
             print("peripheral: central sent message for cha")

@@ -256,13 +256,16 @@ extension AdjacencyList {
     }
 }
 
-extension DeviceGraph {
+extension AdjacencyList {
     
-    public static func processForExchange(_ adjecency: [Vertex: [Edge]]) -> [String: [String]] {
+    // Convert Adjecency List into an dictionary where
+    // key is the vertex's fullname (displayName+separator+ID) and the value is an array containing
+    // the fullname (displayName+separator+ID) of all the edges
+    public func processForExchange() -> [String: [String]] {
         
         var processedList = [String: [String]]();
         
-        for (key, values) in adjecency {
+        for (key, values) in self.adjacencies {
             var edges = [String]()
             
             for edge in values {

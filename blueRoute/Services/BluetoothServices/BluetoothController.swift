@@ -125,6 +125,53 @@ extension BluetoothController {
     
 }
 
+// Methods to handle Handshake
+extension BluetoothController {
+    
+    // Send handshake to device using the passed CBPeer
+    func sendHandshake(_ sendTo: CBPeer){
+        
+        let processedAdjList = adjList.processForExchange()
+        let handshakeMessage = BTHandshake(name: self.name!, adjList: processedAdjList)
+        
+        guard let messageData = BTHandshake.BTHandshakeEncoder(message: handshakeMessage) else {
+            print("could not enconde message")
+            return;
+        }
+        
+        switch(sendTo) {
+        case is CBCentral:
+            self.peripheral?.sendData(messageData, central: sendTo as! CBCentral, characteristic: BluetoothConstants.handshakeCharacteristicID)
+        case is CBPeripheral:
+            self.central?.sendData(messageData, peripheral: sendTo as! CBPeripheral, characteristic: BluetoothConstants.handshakeCharacteristicID)
+        default:
+            print("unable to send handshale")
+        }
+    }
+    
+    func processHandshake(_ data: Data, from device: CBPeer){
+        
+        let receivedData = String(decoding: data, as: UTF8.self);
+        
+        guard let decodedBTHandshake: BTHandshake = BTHandshake.BTHandshakeDecoder(message: receivedData) else {
+            print("unable to decode handshake")
+            return;
+        }
+        
+        switch(device) {
+        case is CBPeripheral:
+            // add the new/updated vertex to the adjlist with a reference to the peripheral
+            print("adding/updating vertex with peripheral")
+            
+        case is CBCentral:
+            // add the new/updated vertex to the adjlist with a reference to the peripheral
+            print("adding/updating vertex with central")
+        default:
+            print("unable to process")
+        }
+    }
+}
+
 // Methods to handle Pinging
 extension BluetoothController {
     
@@ -181,7 +228,7 @@ extension BluetoothController {
             return;
         }
         
-        var adjList = AdjacencyList.processForExchange(adjList.adjacencies)
+        var adjList = adjList.processForExchange()
         
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
