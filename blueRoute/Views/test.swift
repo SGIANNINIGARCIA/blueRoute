@@ -13,12 +13,9 @@ struct test: View {
     
     init() {
         
-        // initiate app with self
-        let selfVertex = self.AdjMatrix.setSelf(name: "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")
-        
         // handshake with natalia, natalia passes her list as well
         // add natalia and her list
-        var natalia = self.AdjMatrix.processExchangedList(from: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", adjList: [
+      /*  var natalia = self.AdjMatrix.processExchangedList(from: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", adjList: [
             "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3": ["Tamara#?id?4951E515-24B1-41DC-8DEE-EC8CB3192AB2", "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Clara#?id?58DBB803-CCFD-4B5A-8803-FB69FEB46065"],
             "Tamara#?id?4951E515-24B1-41DC-8DEE-EC8CB3192AB2": [],
             "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531": [],
@@ -47,6 +44,7 @@ struct test: View {
         self.AdjMatrix.addEdge(between: carlos, and: roberto)
         self.AdjMatrix.addEdge(between: carlos, and: rebecca)
          */
+       */
         
     }
     

@@ -116,7 +116,7 @@ extension AdjacencyList {
 
 extension AdjacencyList {
     
-    public func processExchangedList(from user: String, adjList: [String: [String]]) {
+    public func processExchangedList(from user: String, adjList: [exchangedVertex]) {
         
         // check if the user who shared the list exists in our adjecency list
         if let userVertex = findVertex(user) {
@@ -142,21 +142,26 @@ extension AdjacencyList {
     }
     
     // Used to update our adjecency list with one passed by another vertex
-    public func updateList(with exchangedList: [String: [String]]) {
+    public func updateList(with exchangedList: [exchangedVertex]) {
         
         
-        for (vertex, edges) in exchangedList {
+        for (index, vertex) in exchangedList.enumerated() {
             
-            // check if we already have the vertex in our adjecency list
+            // 1. check if we already have the vertex in our adjecency list
             // and use the existing vertex to re-build/update it's edge list
-            if let existingVertex = findVertex(vertex) {
-                buildEdgeList(source: existingVertex, userList: edges)
+            if let existingVertex = findVertex(vertex.name) {
+                
+                // 2. check if the edge list we received is more recent than
+                // the one we currently have. If it is, then we proceed with updating it
+                if(vertex.lastUpdated > existingVertex.edgesLastUpdated!) {
+                    buildEdgeList(source: existingVertex, userList: vertex.edges)
+                }
                 
             } else {
                 // if not, then we create append a new vertex to our list and
                 // build its edge list with the data shared by our edge
-                let newVertex = createVertex(name: vertex)
-                buildEdgeList(source: newVertex, userList: edges)
+                let newVertex = createVertex(name: vertex.name)
+                buildEdgeList(source: newVertex, userList: vertex.edges)
             }
         }
     }
@@ -248,6 +253,7 @@ extension AdjacencyList {
             return nil;
         }
     }
+    
     
     public func removeConnection(_ name: String){
         

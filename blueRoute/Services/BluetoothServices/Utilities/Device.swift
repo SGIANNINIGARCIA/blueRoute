@@ -38,6 +38,11 @@ struct Vertex: Identifiable, Equatable, Hashable {
     // Last connection to keep track of reachability
     var lastKnownPing: Date?
     
+    // Property to check if our list is more recent than the one passed to
+    // us by one of our edges
+    var edgesLastUpdated: Date?
+    
+    // Timer that calls the timeout
     var pingTimeOutTimer: Timer?
     
     init(name: String = "Unknown", peripheral: CBPeripheral) {
@@ -109,6 +114,10 @@ struct Vertex: Identifiable, Equatable, Hashable {
     mutating func setPingTimer(_ timer: Timer) {
         self.pingTimeOutTimer = timer;
         self.lastKnownPing = Date()
+    }
+    
+    mutating func setEdgesLastUpdated(_ date: Date) {
+        self.edgesLastUpdated = date;
     }
 
 }
