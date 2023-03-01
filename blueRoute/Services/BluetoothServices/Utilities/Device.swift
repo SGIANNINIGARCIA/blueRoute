@@ -45,6 +45,9 @@ struct Vertex: Identifiable, Equatable, Hashable {
     // Timer that calls the timeout
     var pingTimeOutTimer: Timer?
     
+    // Edges of this vertex
+    var edges: [Edge] = []
+    
     init(name: String = "Unknown", peripheral: CBPeripheral) {
         self.displayName = BluetoothController.retrieveUsername(name: name)
         self.id = BluetoothController.retrieveID(name: name)

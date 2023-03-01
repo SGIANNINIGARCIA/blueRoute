@@ -24,7 +24,7 @@ protocol DeviceGraph {
 
 class AdjacencyList: DeviceGraph, ObservableObject  {
     
-    @Published public var adjacencies: [Vertex: [Edge]] = [:]
+    @Published public var adjacencies: [Vertex] = []
     var selfVertex: Vertex;
     
     init(name: String) {
@@ -40,7 +40,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     func createVertex(name: String) -> Vertex {
         
         let newVertex = Vertex(name: name)
-        adjacencies[newVertex] = []
+        adjacencies.append(newVertex)
         return newVertex;
             
     }
@@ -48,7 +48,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     func addEdge(between source: Vertex, and destination: Vertex) {
         
         let newEdge = Edge(source: source, destination: destination)
-        adjacencies[source]?.append(newEdge)
+        var index = findVertexIndex(source)
         
     }
     
@@ -252,6 +252,12 @@ extension AdjacencyList {
         } else {
             return nil;
         }
+    }
+    
+    public func findVertexIndex(_ vertex: Vertex) -> Int? {
+        var index = adjacencies.firstIndex(where: {$0 == vertex})
+        
+        return index;
     }
     
     
