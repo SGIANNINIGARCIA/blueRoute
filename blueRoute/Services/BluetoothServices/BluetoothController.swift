@@ -17,7 +17,7 @@ class BluetoothController: ObservableObject {
     @Published var peripheral: BluetoothPeripheralManager?
     @Published var central: BluetoothCentralManager?
     @Published var devices = [Device]();
-    @Published var adjList = AdjacencyList();
+    @Published var adjList: AdjacencyList?
     var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
     
@@ -41,6 +41,8 @@ class BluetoothController: ObservableObject {
         // instantiating the central manager which wont start discovering immediately
         // but will wait until we provide an username
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
+        
+        self.adjList = AdjacencyList(name: name)
         
         self.pingDevicesTimer = Timer.scheduledTimer(timeInterval: 30,
                                          target: self,
@@ -131,7 +133,7 @@ extension BluetoothController {
     // Send handshake to device using the passed CBPeer
     func sendHandshake(_ sendTo: CBPeer){
         
-        let processedAdjList = adjList.processForExchange()
+        let processedAdjList = adjList!.processForExchange()
         let handshakeMessage = BTHandshake(name: self.name!, adjList: processedAdjList)
         
         guard let messageData = BTHandshake.BTHandshakeEncoder(message: handshakeMessage) else {
@@ -228,7 +230,7 @@ extension BluetoothController {
             return;
         }
         
-        var adjList = adjList.processForExchange()
+        var adjList = (adjList?.processForExchange())!
         
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)

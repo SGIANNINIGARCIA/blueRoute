@@ -66,3 +66,19 @@ extension BTPing {
         }
     }
 }
+
+struct exchangedVertex: Codable, Hashable {
+    var name: String;
+    var lastUpdated: Date;
+    var edges: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case lastUpdated
+        case edges
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+}

@@ -35,4 +35,4 @@ Working on a messaging app using a bluetooth mesh.
     - [x] Decide whether to respond to peripheral or central, depending which one is available
     
 ### Known Issues:
-    - ~~If device B closes the app or the bluetooth connection restarts, device A will continue to message the device using old references to its peripheral/central, resulting in a undelivered message~~
+    ~~If device B closes the app or the bluetooth connection restarts, device A will continue to message the device using old references to its peripheral/central, resulting in a undelivered message~~

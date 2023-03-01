@@ -25,14 +25,16 @@ protocol DeviceGraph {
 class AdjacencyList: DeviceGraph, ObservableObject  {
     
     @Published public var adjacencies: [Vertex: [Edge]] = [:]
-    var selfVertex: Vertex?
+    var selfVertex: Vertex;
     
-    init() {}
+    init(name: String) {
+        self.selfVertex = Vertex(name: name)
+    }
     
     func setSelf(name: String) -> Vertex {
         self.selfVertex = createVertex(name: name)
         
-        return self.selfVertex!;
+        return self.selfVertex;
     }
     
     func createVertex(name: String) -> Vertex {
@@ -114,7 +116,53 @@ extension AdjacencyList {
 
 extension AdjacencyList {
     
-    public func updateList(with user: String, userList: [String]) -> Vertex{
+    public func processExchangedList(from user: String, adjList: [String: [String]]) {
+        
+        // check if the user who shared the list exists in our adjecency list
+        if let userVertex = findVertex(user) {
+            // Since the user shared the list, we can assume we have a direct connection to
+            // this user, so we add this user as one of our edges
+            
+            // First, we check if the edge exists and if it doesn't then create the edge
+            let edgeExists = self.adjacencies[selfVertex]!.contains(where: {$0.destination.id == userVertex.id})
+            
+            if(!edgeExists) {
+                addEdge(between: self.selfVertex, and: userVertex)
+            }
+            
+            updateList(with: adjList)
+            
+        } else {
+            // This is a new edge so we must create the vertex and add an edge to ourselves
+            let newUserVertex = createVertex(name: user)
+            addEdge(between: self.selfVertex, and: newUserVertex)
+            updateList(with: adjList)
+            
+        }
+    }
+    
+    // Used to update our adjecency list with one passed by another vertex
+    public func updateList(with exchangedList: [String: [String]]) {
+        
+        
+        for (vertex, edges) in exchangedList {
+            
+            // check if we already have the vertex in our adjecency list
+            // and use the existing vertex to re-build/update it's edge list
+            if let existingVertex = findVertex(vertex) {
+                buildEdgeList(source: existingVertex, userList: edges)
+                
+            } else {
+                // if not, then we create append a new vertex to our list and
+                // build its edge list with the data shared by our edge
+                let newVertex = createVertex(name: vertex)
+                buildEdgeList(source: newVertex, userList: edges)
+            }
+        }
+    }
+    
+    // Used to update our adjecency list with one passed by another device
+    public func updateList(with user: String, userList: [String]) -> Vertex {
         
         if let userVertex = findVertex(user) {
             // Since this is a 2 degree list, if the device receive a new-
@@ -122,13 +170,14 @@ extension AdjacencyList {
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
             
-            // if we already have an edge to this user, then we just rebuild the list
-            if let _ = self.adjacencies[selfVertex!]?.contains(where: {$0.destination.id == userVertex.id}) {
-                buildEdgeList(source: userVertex, userList: userList)
-                return userVertex;
+            // check if the edge exists and if it doesn't then create the edge
+            let edgeExists = self.adjacencies[selfVertex]!.contains(where: {$0.destination.id == userVertex.id})
+                
+            if(!edgeExists) {
+                addEdge(between: self.selfVertex, and: userVertex)
             }
             
-            addEdge(between: self.selfVertex!, and: userVertex)
+
             buildEdgeList(source: userVertex, userList: userList)
             return userVertex;
             
@@ -138,7 +187,7 @@ extension AdjacencyList {
             // user/userlist, it came froma new connection we made,
             // so it is assumed we have a direct connection to this new
             // user, hence we need to add it to our edge list
-            addEdge(between: self.selfVertex!, and: newUserVertex)
+            addEdge(between: self.selfVertex, and: newUserVertex)
             buildEdgeList(source: newUserVertex, userList: userList)
             
             return newUserVertex;
@@ -211,7 +260,7 @@ extension AdjacencyList {
         print("found \(vertexToRemove.displayName) - remove edge from self")
         
         // Remove the edge where source is self and dest is the user to be removed
-        removeEdge(remove: vertexToRemove, from: self.selfVertex!)
+        removeEdge(remove: vertexToRemove, from: self.selfVertex)
         
         // Remove the vertex if there is no path to it
         // after we removed our edge to it
@@ -244,7 +293,7 @@ extension AdjacencyList {
     }
     
     public func isReachable(_ destination: Vertex) -> Bool {
-        if let temp = bfs(from: selfVertex!, to: destination) {
+        if let temp = bfs(from: selfVertex, to: destination) {
             if(temp.count > 0) {
                 return true;
             } else {
