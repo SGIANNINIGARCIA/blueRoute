@@ -52,7 +52,10 @@ struct test: View {
             print("\(edge.source.displayName) -> \(edge.destination.displayName)")
         }
         
-        self.AdjMatrix.removeConnection("Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E")
+        for edge in self.AdjMatrix.selfVertex.edges {
+            print("\(edge.destination.displayName)")
+        }
+        
         
     }
     

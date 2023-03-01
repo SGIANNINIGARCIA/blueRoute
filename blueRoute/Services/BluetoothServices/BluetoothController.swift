@@ -53,7 +53,9 @@ class BluetoothController: ObservableObject {
     
     // send data to a characteristic and returns true if it succeded
     public func sendData(send data: Data, to name: String, characteristic: CBUUID) -> Bool {
-                
+            
+        // OLD FIND DEVICE
+        // MARKED TO REMOVE
         guard let device = findDevice(name: name) else {
             print("could not find \(name)")
             return false;
@@ -178,20 +180,27 @@ extension BluetoothController {
 extension BluetoothController {
     
     @objc private func checkDevicesLastConnection() {
-        for (index, device) in devices.enumerated() {
-                if(Date.now.timeIntervalSince(device.lastKnownPing!) > BluetoothConstants.LastConnectionInterval) {
+        
+        guard let neighbors = self.adjList?.getNeighbors() else {
+            return print("we have no neighbors")
+        }
+        
+        for (neighbor) in neighbors {
+            
+            // Check if its time to send a ping
+                if(Date.now.timeIntervalSince(neighbor.lastKnownPing!) > BluetoothConstants.LastConnectionInterval) {
                    // Send a Ping to the device
-                    sendInitialPing(device)
+                    sendInitialPing(neighbor)
                     
                     // Set a timer to check if there was ever a response to the ping
-                    let context = ["name": device.fullName]
-                    devices[index].setPingTimer(Timer.scheduledTimer(timeInterval: BluetoothConstants.TimeOutInterval,
+                    let context = ["name": neighbor.fullName]
+                    neighbor.setPingTimer(Timer.scheduledTimer(timeInterval: BluetoothConstants.TimeOutInterval,
                                                                            target: self,
                                                                            selector: #selector(pingTimeout),
                                                                            userInfo: context,
                                                                            repeats: false))
                     
-                    print("sent a ping to \(devices[index].displayName), timer starting")
+                    print("sent a ping to \(neighbor.displayName), timer starting")
                 }
             }
     }
@@ -205,20 +214,29 @@ extension BluetoothController {
         }
         
         switch(decodedBTPing.pingType) {
+            
         // if a device ping us first, we respond to the ping
         // and update the last connection which also invalidates any active timers
         case .initialPing:
             respondToPing(decodedBTPing)
-            if let index = findDeviceIndex(name: decodedBTPing.pingSender) {
-                devices[index].updateLastConnection()
-                print("received an initial ping from \(devices[index].displayName)")
+            if let vertex = findDevice(name: decodedBTPing.pingSender) {
+                // Update our lastconnection to this device/vertex
+                vertex.updateLastConnection()
+                // update the edges we have for this vertex
+                self.adjList?.processExchangedList(from: decodedBTPing.pingSender, adjList: decodedBTPing.adjList)
+                
+                print("received an initial ping from \(vertex.displayName)")
             }
             
         // if we receive a response to a ping we update
         // the last connection which also invalidates any active timers
         case .responsePing:
             if let index = findDeviceIndex(name: decodedBTPing.pingReceiver) {
+                // Update our lastconnection to this device/vertex
                 devices[index].updateLastConnection()
+                // update the edges we have for this vertex
+                self.adjList?.processExchangedList(from: decodedBTPing.pingReceiver, adjList: decodedBTPing.adjList)
+                
                 print("received a response ping from \(devices[index].displayName)")
             }
         }
@@ -230,7 +248,7 @@ extension BluetoothController {
             return;
         }
         
-        var adjList = (adjList?.processForExchange())!
+        let adjList = (adjList?.processForExchange())!
         
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
@@ -261,16 +279,16 @@ extension BluetoothController {
         guard let context = timer.userInfo as? [String: String] else { return }
             let name = context["name", default: "Anonymous"]
         
-        if let indexToRemove = findDeviceIndex(name: name) {
-            print("removing device \(devices[indexToRemove].displayName)")
+        if let vertexToRemove = findDevice(name: name) {
+            print("removing device \(vertexToRemove.displayName)")
             
             // removing central connection first, if there is one
-            if let peripheralToDisconnect = self.devices[indexToRemove].peripheral {
+            if let peripheralToDisconnect = vertexToRemove.peripheral {
                 self.central?.removePeripheral(peripheralToDisconnect)
             }
             
             // removing from published devices list
-            self.devices.remove(at: indexToRemove)
+            self.adjList?.removeConnection(vertexToRemove)
             
         }
     }
@@ -283,27 +301,27 @@ extension BluetoothController {
 extension BluetoothController {
    
    // Look up device using the unique ID
-   private func findDevice(name: String) -> Device? {
-       
-       let id = BluetoothController.retrieveID(name: name)
-       
-       
-       if let i = devices.firstIndex(where: { $0.id == id }) {
-           return devices[i]
-       } else {
-           return nil;
-       }
-   }
+    func findDevice(name: String) -> Device? {
+        
+        let id = BluetoothController.retrieveID(name: name)
+        
+        guard let device = self.adjList?.adjacencies.first(where: {$0.id == id}) else {
+            return nil;
+        }
+        
+        return device;
+        
+    }
     
     // Look up device using the unique ID
     private func findDeviceIndex(name: String) -> Int? {
         
         let id = BluetoothController.retrieveID(name: name)
-        if let i = devices.firstIndex(where: { $0.id == id }) {
-            return i
-        } else {
-            return nil;
+        
+        guard let index = self.adjList?.adjacencies.firstIndex(where: { $0.id == id }) else {
+            return nil
         }
+            return index;
     }
    
    // Returns only the username of the device using the Separator
@@ -324,7 +342,12 @@ extension BluetoothController {
    // Returns true if the device is reachable, else false.
    // Used for displaying the current availability of the user in the UI
    public func isReachable(_ toFind: UUID) -> Bool {
-       return devices.contains { $0.id == toFind };
+       
+       guard let isReachable = self.adjList?.adjacencies.contains(where: {$0.id == toFind}) else {
+           return false;
+       }
+       
+       return isReachable;
    }
 }
 

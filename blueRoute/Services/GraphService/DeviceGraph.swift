@@ -57,9 +57,18 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     }
     
     func edges(from source: Vertex) -> [Edge] {
-        
         return source.edges;
+    }
+    
+    func getNeighbors() -> [Vertex] {
         
+        var neighbors: [Vertex] = [];
+        
+        for edge in self.selfVertex.edges {
+            neighbors.append(edge.destination)
+        }
+        
+        return neighbors;
     }
     
     func printVertices() -> [String] {
@@ -233,6 +242,19 @@ extension AdjacencyList {
             return;
         }
         
+        print("found \(vertexToRemove.displayName) - remove edge from self")
+        
+        // Remove the edge where source is self and dest is the user to be removed
+        removeEdge(remove: vertexToRemove, from: self.selfVertex)
+        
+        // Remove the vertex if there is no path to it
+        // after we removed our edge to it
+        if !isReachable(vertexToRemove) {
+            removeVertex(vertexToRemove)
+        }
+    }
+    
+    public func removeConnection(_ vertexToRemove: Vertex){
         print("found \(vertexToRemove.displayName) - remove edge from self")
         
         // Remove the edge where source is self and dest is the user to be removed
