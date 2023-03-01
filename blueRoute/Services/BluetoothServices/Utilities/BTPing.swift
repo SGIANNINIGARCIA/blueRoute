@@ -16,7 +16,7 @@ struct BTPing: Codable {
     var pingType: PingType;
     var pingSender: String;
     var pingReceiver: String;
-    var adjList: [String: [String]]
+    var adjList: [ExchangeVertex]
     
     enum CodingKeys: String, CodingKey {
         case pingType
@@ -64,21 +64,5 @@ extension BTPing {
             print(error.localizedDescription)
             return nil;
         }
-    }
-}
-
-struct exchangedVertex: Codable, Hashable {
-    var name: String;
-    var lastUpdated: Date;
-    var edges: [String]
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case lastUpdated
-        case edges
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
     }
 }

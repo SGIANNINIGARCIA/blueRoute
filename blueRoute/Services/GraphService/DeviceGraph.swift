@@ -29,6 +29,9 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     
     init(name: String) {
         self.selfVertex = Vertex(name: name)
+        self.adjacencies.append(self.selfVertex)
+        
+        
     }
     
     func setSelf(name: String) -> Vertex {
@@ -48,19 +51,20 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     func addEdge(between source: Vertex, and destination: Vertex) {
         
         let newEdge = Edge(source: source, destination: destination)
-        var index = findVertexIndex(source)
+        source.edges.append(newEdge)
+        print("adding new edge between \(source.displayName) and \(destination.displayName)")
         
     }
     
     func edges(from source: Vertex) -> [Edge] {
         
-        return adjacencies[source] ?? []
+        return source.edges;
         
     }
     
     func printVertices() -> [String] {
       var toBeRe = [String]()
-        for (vertex, _) in adjacencies {
+        for (vertex) in adjacencies {
             toBeRe.append(vertex.displayName)
         }
         
@@ -116,7 +120,7 @@ extension AdjacencyList {
 
 extension AdjacencyList {
     
-    public func processExchangedList(from user: String, adjList: [exchangedVertex]) {
+    public func processExchangedList(from user: String, adjList: [ExchangeVertex]) {
         
         // check if the user who shared the list exists in our adjecency list
         if let userVertex = findVertex(user) {
@@ -124,7 +128,8 @@ extension AdjacencyList {
             // this user, so we add this user as one of our edges
             
             // First, we check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.adjacencies[selfVertex]!.contains(where: {$0.destination.id == userVertex.id})
+            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination.id == userVertex.id})
+            
             
             if(!edgeExists) {
                 addEdge(between: self.selfVertex, and: userVertex)
@@ -142,10 +147,10 @@ extension AdjacencyList {
     }
     
     // Used to update our adjecency list with one passed by another vertex
-    public func updateList(with exchangedList: [exchangedVertex]) {
+    public func updateList(with exchangedList: [ExchangeVertex]) {
         
         
-        for (index, vertex) in exchangedList.enumerated() {
+        for (vertex) in exchangedList{
             
             // 1. check if we already have the vertex in our adjecency list
             // and use the existing vertex to re-build/update it's edge list
@@ -153,8 +158,12 @@ extension AdjacencyList {
                 
                 // 2. check if the edge list we received is more recent than
                 // the one we currently have. If it is, then we proceed with updating it
-                if(vertex.lastUpdated > existingVertex.edgesLastUpdated!) {
+                if(vertex.lastUpdated >= existingVertex.edgesLastUpdated ?? vertex.lastUpdated) {
                     buildEdgeList(source: existingVertex, userList: vertex.edges)
+                    
+                    // since we updated the edge list, then we also update the
+                    // edges last updated member
+                    existingVertex.edgesLastUpdated = vertex.lastUpdated
                 }
                 
             } else {
@@ -167,45 +176,10 @@ extension AdjacencyList {
     }
     
     // Used to update our adjecency list with one passed by another device
-    public func updateList(with user: String, userList: [String]) -> Vertex {
-        
-        if let userVertex = findVertex(user) {
-            // Since this is a 2 degree list, if the device receive a new-
-            // user/userlist, it came froma new connection we made,
-            // so it is assumed we have a direct connection to this new
-            // user, hence we need to add it to our edge list
-            
-            // check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.adjacencies[selfVertex]!.contains(where: {$0.destination.id == userVertex.id})
-                
-            if(!edgeExists) {
-                addEdge(between: self.selfVertex, and: userVertex)
-            }
-            
-
-            buildEdgeList(source: userVertex, userList: userList)
-            return userVertex;
-            
-        } else {
-            let newUserVertex = createVertex(name: user)
-            // Since this is a 2 degree list, if the device receive a new-
-            // user/userlist, it came froma new connection we made,
-            // so it is assumed we have a direct connection to this new
-            // user, hence we need to add it to our edge list
-            addEdge(between: self.selfVertex, and: newUserVertex)
-            buildEdgeList(source: newUserVertex, userList: userList)
-            
-            return newUserVertex;
-        }
-    }
-    
     public func buildEdgeList(source: Vertex, userList: [String]) {
         
         // 1. retrieve the existing edges
-        guard let existingEdges: [Edge] = self.adjacencies[source] else {
-            // Vertex does not have an edge list in our adj list
-            return;
-        }
+        let existingEdges: [Edge] = source.edges;
         
         // 2. Remove outdated edges
         // If the list has an edge not on the new list passed by the device, then
@@ -244,11 +218,8 @@ extension AdjacencyList {
     
     public func findVertex(_ name: String) -> Vertex? {
         // Get the index, if there is one
-        let vertexIndex = adjacencies.firstIndex(where: { $0.key.fullName == name })
-        
-        // return the vertex at that index, if vertexIndex is not nil
-        if let index = vertexIndex {
-            return adjacencies[index].key
+        if let vertexIndex = adjacencies.firstIndex(where: { $0.fullName == name }) {
+            return adjacencies[vertexIndex]
         } else {
             return nil;
         }
@@ -287,24 +258,25 @@ extension AdjacencyList {
         // 1. check if there is a path to it without our edge
         if !isReachable(vertexToRemove) {
             // 2. save all the vertices it is connected to for later
-            let connectedEdges = self.adjacencies[vertexToRemove]
+            let connectedEdges = vertexToRemove.edges
             
             // 3. remove the vertex
-            if let index = self.adjacencies.firstIndex(where: {$0.key.fullName == vertexToRemove.fullName}) {
+            if let index = self.adjacencies.firstIndex(where: {$0.fullName == vertexToRemove.fullName}) {
                 self.adjacencies.remove(at: index)
             }
             // 4. repeat the process with all the destination vertices
-            for element in connectedEdges ?? [] { removeVertex(element.destination)
+            for element in connectedEdges { removeVertex(element.destination)
             }
         }
         
     }
     
     public func removeEdge(remove edgeToRemove: Vertex, from source: Vertex) {
-        self.adjacencies[source]?.removeAll(where: {$0.destination.fullName == edgeToRemove.fullName})
+        source.edges.removeAll(where: {$0.destination.fullName == edgeToRemove.fullName})
     }
     
     public func isReachable(_ destination: Vertex) -> Bool {
+        if destination == selfVertex {return true;}
         if let temp = bfs(from: selfVertex, to: destination) {
             if(temp.count > 0) {
                 return true;
@@ -322,18 +294,20 @@ extension AdjacencyList {
     // Convert Adjecency List into an dictionary where
     // key is the vertex's fullname (displayName+separator+ID) and the value is an array containing
     // the fullname (displayName+separator+ID) of all the edges
-    public func processForExchange() -> [String: [String]] {
+    public func processForExchange() -> [ExchangeVertex] {
         
-        var processedList = [String: [String]]();
+        var processedList = [ExchangeVertex]();
         
-        for (key, values) in self.adjacencies {
+        for (vertex) in self.adjacencies {
             var edges = [String]()
             
-            for edge in values {
+            for edge in vertex.edges {
                 edges.append(edge.destination.displayName)
             }
             
-            processedList[key.displayName] = edges;
+            var vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated!, edges: edges)
+            
+            processedList.append(vertexToSend)
         }
         
         return processedList;

@@ -15,7 +15,7 @@ enum MostRecentRef {
 
 
 // Devices available through bluetooth
-struct Vertex: Identifiable, Equatable, Hashable {
+class Vertex: Identifiable, Equatable, Hashable {
     
     // The peripheral object associated with the device
     var peripheral: CBPeripheral?
@@ -95,31 +95,31 @@ struct Vertex: Identifiable, Equatable, Hashable {
         hasher.combine(id)
     }
     
-    mutating func changePeripheralReference(_ newPeripheral: CBPeripheral) {
+    func changePeripheralReference(_ newPeripheral: CBPeripheral) {
         
         self.peripheral = newPeripheral;
         self.sendTo = .peripheral;
         
     }
     
-    mutating func changeCentralReference(_ newCentral: CBCentral) {
+    func changeCentralReference(_ newCentral: CBCentral) {
         
         self.central = newCentral;
         self.sendTo = .central;
         
     }
     
-    mutating func updateLastConnection() {
+    func updateLastConnection() {
         self.lastKnownPing = Date()
         self.pingTimeOutTimer?.invalidate()
     }
     
-    mutating func setPingTimer(_ timer: Timer) {
+    func setPingTimer(_ timer: Timer) {
         self.pingTimeOutTimer = timer;
         self.lastKnownPing = Date()
     }
     
-    mutating func setEdgesLastUpdated(_ date: Date) {
+    func setEdgesLastUpdated(_ date: Date) {
         self.edgesLastUpdated = date;
     }
 

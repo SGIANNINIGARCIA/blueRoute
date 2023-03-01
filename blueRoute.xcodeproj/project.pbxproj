@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3A26795429AB0BFD00C6EA5E /* BTHandshake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */; };
+		3A26795629AEF61600C6EA5E /* ExchangeVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */; };
 		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
 		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
 		3A6887492995DE7E00234F97 /* BTPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6887482995DE7E00234F97 /* BTPing.swift */; };
@@ -88,6 +89,7 @@
 
 /* Begin PBXFileReference section */
 		3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTHandshake.swift; sourceTree = "<group>"; };
+		3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeVertex.swift; sourceTree = "<group>"; };
 		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
 		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
 		3A6887482995DE7E00234F97 /* BTPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTPing.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				3A554C42292F3F960063A2FA /* BTMessage.swift */,
 				3A6887482995DE7E00234F97 /* BTPing.swift */,
 				3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */,
+				3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -576,6 +579,7 @@
 				3A7E9661293284ED003E8975 /* Queue.swift in Sources */,
 				3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */,
 				3A74726C291D8F2B00C5000D /* OnboardingView.swift in Sources */,
+				3A26795629AEF61600C6EA5E /* ExchangeVertex.swift in Sources */,
 				3A7472902925D9A200C5000D /* Avatar.swift in Sources */,
 				3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */,
 				3A747277291DF90900C5000D /* Device.swift in Sources */,

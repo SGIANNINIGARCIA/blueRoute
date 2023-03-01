@@ -3,13 +3,10 @@
 Working on a messaging app using a bluetooth mesh. 
 
 ## Currently working on
-- [ ] Implement 3rd degree connections exchange (working on it)
-    - [ ] Rewrite updateList to account for 3rd degree connections
 - [ ] Rewrite addDevice to use Adjacency List
     - [ ] Recognize when the device is a direct connection or a 2nd/3rd degree device based on reference to CBPeer 
 - [ ] Rewrite sendChatMessage to recognize if a message should be routed or sent directly based on BFS 
 - [ ] Implement Explore View and clearly show who is a direct connection and who requires routing
-- [ ] Implement a lastUpdated value in AdjecencyList we can compare to decide whether a value in our current adjacency list is the most up to date
 
 ### Future:
 - [ ] Manage undelivered Messages
@@ -21,6 +18,9 @@ Working on a messaging app using a bluetooth mesh.
 - [ ] Implement delivered message
 
 ### Done:
+- [x] Implement a lastUpdated value in AdjecencyList we can compare to decide whether a value in our current adjacency list is the most up to date
+- [x] Implement 3rd degree connections exchange (working on it)
+    - [x] Rewrite updateList to account for 3rd degree connections
 - [x] Implement Adjacency list exchange through handshake
 - [x] Merge Vertex struct and device struct
 - [x] Implement a pinging mechanism to determine if device is still in range
