@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Struct for sharing adjacency lists in between connected devices/nodes
 struct ExchangeVertex: Codable, Hashable {
     var name: String;
     var lastUpdated: Date;

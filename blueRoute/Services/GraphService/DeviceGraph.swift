@@ -128,7 +128,7 @@ extension AdjacencyList {
             // this user, so we add this user as one of our edges
             
             // First, we check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination.id == userVertex.id})
+            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
             
             
             if(!edgeExists) {
@@ -199,7 +199,7 @@ extension AdjacencyList {
             if let userVertex = findVertex(name) {
                 
                 // 5. check if the edge already exists and skip if it does / no change
-                if (existingEdges.contains(where: {$0.destination.fullName == name})) {
+                if (existingEdges.contains(where: {$0.destination.id == BluetoothController.retrieveID(name: name)})) {
                     continue;
                 }
                 
@@ -218,19 +218,12 @@ extension AdjacencyList {
     
     public func findVertex(_ name: String) -> Vertex? {
         // Get the index, if there is one
-        if let vertexIndex = adjacencies.firstIndex(where: { $0.fullName == name }) {
+        if let vertexIndex = adjacencies.firstIndex(where: { $0.id == BluetoothController.retrieveID(name: name) }) {
             return adjacencies[vertexIndex]
         } else {
             return nil;
         }
     }
-    
-    public func findVertexIndex(_ vertex: Vertex) -> Int? {
-        var index = adjacencies.firstIndex(where: {$0 == vertex})
-        
-        return index;
-    }
-    
     
     public func removeConnection(_ name: String){
         
@@ -261,7 +254,7 @@ extension AdjacencyList {
             let connectedEdges = vertexToRemove.edges
             
             // 3. remove the vertex
-            if let index = self.adjacencies.firstIndex(where: {$0.fullName == vertexToRemove.fullName}) {
+            if let index = self.adjacencies.firstIndex(where: {$0 == vertexToRemove}) {
                 self.adjacencies.remove(at: index)
             }
             // 4. repeat the process with all the destination vertices
@@ -272,7 +265,7 @@ extension AdjacencyList {
     }
     
     public func removeEdge(remove edgeToRemove: Vertex, from source: Vertex) {
-        source.edges.removeAll(where: {$0.destination.fullName == edgeToRemove.fullName})
+        source.edges.removeAll(where: {$0.destination == edgeToRemove})
     }
     
     public func isReachable(_ destination: Vertex) -> Bool {
@@ -305,7 +298,7 @@ extension AdjacencyList {
                 edges.append(edge.destination.displayName)
             }
             
-            var vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated!, edges: edges)
+            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated!, edges: edges)
             
             processedList.append(vertexToSend)
         }
