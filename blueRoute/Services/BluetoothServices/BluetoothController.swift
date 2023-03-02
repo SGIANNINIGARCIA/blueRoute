@@ -16,7 +16,6 @@ class BluetoothController: ObservableObject {
     // Variables holding our bluetooth managers
     @Published var peripheral: BluetoothPeripheralManager?
     @Published var central: BluetoothCentralManager?
-    @Published var devices = [Device]();
     @Published var adjList: AdjacencyList?
     var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
@@ -264,7 +263,7 @@ extension BluetoothController {
         let receivedData = String(decoding: data, as: UTF8.self)
         
         guard let decodedBTPing: BTPing = BTPing.BTPingDecoder(message: receivedData) else {
-            print("unable to decode message")
+            print("unable to decode message \(receivedData)")
             return;
         }
         
@@ -277,6 +276,7 @@ extension BluetoothController {
             if let vertex = findDevice(name: decodedBTPing.pingSender) {
                 // Update our lastconnection to this device/vertex
                 vertex.updateLastConnection()
+                self.adjList?.selfVertex.edgesLastUpdated = Date()
                 // update the edges we have for this vertex
                 self.adjList?.processExchangedList(from: decodedBTPing.pingSender, adjList: decodedBTPing.adjList)
                 
@@ -286,13 +286,14 @@ extension BluetoothController {
         // if we receive a response to a ping we update
         // the last connection which also invalidates any active timers
         case .responsePing:
-            if let index = findDeviceIndex(name: decodedBTPing.pingReceiver) {
+            if let vertex = findDevice(name: decodedBTPing.pingReceiver) {
                 // Update our lastconnection to this device/vertex
-                devices[index].updateLastConnection()
+                vertex.updateLastConnection()
+                self.adjList?.selfVertex.edgesLastUpdated = Date()
                 // update the edges we have for this vertex
                 self.adjList?.processExchangedList(from: decodedBTPing.pingReceiver, adjList: decodedBTPing.adjList)
                 
-                print("received a response ping from \(devices[index].displayName)")
+                print("received a response ping from \(vertex.displayName)")
             }
         }
     }
@@ -304,6 +305,7 @@ extension BluetoothController {
         }
         
         let adjList = (adjList?.processForExchange())!
+        self.adjList?.selfVertex.edgesLastUpdated = Date()
         
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)

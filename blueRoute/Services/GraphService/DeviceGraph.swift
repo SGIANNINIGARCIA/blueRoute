@@ -274,6 +274,8 @@ extension AdjacencyList {
     
     public func findVertex(_ name: String) -> Vertex? {
         // Get the index, if there is one
+        
+        print("issue is now ehre \(name)")
         if let vertexIndex = adjacencies.firstIndex(where: { $0.id == BluetoothController.retrieveID(name: name) }) {
             return adjacencies[vertexIndex]
         } else {
@@ -306,6 +308,7 @@ extension AdjacencyList {
         
         // Remove the edge where source is self and dest is the user to be removed
         removeEdge(remove: vertexToRemove, from: self.selfVertex)
+        self.selfVertex.edgesLastUpdated = Date()
         
         // Remove the vertex if there is no path to it
         // after we removed our edge to it
@@ -361,13 +364,14 @@ extension AdjacencyList {
         var processedList = [ExchangeVertex]();
         
         for (vertex) in self.adjacencies {
+            
             var edges = [String]()
             
             for edge in vertex.edges {
-                edges.append(edge.destination.displayName)
+                edges.append(edge.destination.fullName)
             }
             
-            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated!, edges: edges)
+            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated ?? Date(), edges: edges)
             
             processedList.append(vertexToSend)
         }

@@ -23,14 +23,15 @@ struct DiscoverView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(bluetoothController.devices) { user in
+                    ForEach(buildAvailableList() ?? []) { user in
+                        
                         NavigationLink {
                             ChatView(displayName: user.displayName, id: user.id)
                         } label: {
                             Text(user.displayName)
                         }
                     }
-                    .emptyState(bluetoothController.devices.count == 0) {
+                    .emptyState(bluetoothController.adjList?.adjacencies.count == 0 || (buildAvailableList() == nil || ((buildAvailableList()?.isEmpty) != nil))) {
                         HStack {
                             Spacer()
                             LoadingIcon()
@@ -54,6 +55,10 @@ struct DiscoverView: View {
         .onDisappear {
             bluetoothController.stopDiscovery()
         }
+    }
+    
+    func buildAvailableList() -> [Vertex]? {
+        return bluetoothController.adjList?.adjacencies.filter({$0.fullName != bluetoothController.name})
     }
 }
 

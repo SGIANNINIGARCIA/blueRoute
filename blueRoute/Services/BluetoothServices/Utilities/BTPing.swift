@@ -46,7 +46,7 @@ extension BTPing {
             print("Sender -- \(decodedMessage.pingSender) sent ping")
             return decodedMessage;
         } catch {
-            print("Error: \(error.localizedDescription)")
+            print(String(describing: error))
             return nil;
         }
         
