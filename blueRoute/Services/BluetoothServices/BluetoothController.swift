@@ -95,9 +95,23 @@ class BluetoothController: ObservableObject {
 
 extension BluetoothController {
     
+    /// Used by ChatView to send a chat message
+    ///
+    /// The method checks if the message needs to be routed or if the target useris one of our neighbors.
+    /// If it needs to be routed, it is passed to the methiod sendRoutedMessage for processing; if not, it is coded and sent to
+    /// the sendData method
+    ///
+    /// - Parameters:
+    ///     - message: the string to be sent
+    ///     - name: the name (displayName + ID) of the target user
+    ///
     public func sendChatMessage(send message: String, to name: String) {
         
-        let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name, type: .chat)
+        if (self.adjList!.isNeighbor(name) == false) {
+            return sendRoutedMessage(send: message, to: name)
+        }
+        
+        let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name)
         
         guard let messageData = BTMessage.BTMessageEncoder(message: codedMessage) else {
             print("could not enconde message")
@@ -125,8 +139,49 @@ extension BluetoothController {
     // TO-DO
     // Decodes routing message sent to this devices through the routing characteristic
     // Searches for next node and sends it
-    public func processIncomingRoutingMessage(){}
+    public func processIncomingRoutingMessage(_ data: Data){
+        
+        let receivedData = String(decoding: data, as: UTF8.self)
+        
+        guard let decodedMessage: BTRoutedMessage = BTRoutedMessage.BTRoutedMessageDecoder(message: receivedData) else {
+            print("unable to decode message")
+            return;
+        }
+        
+        // save message if we are the target
+        if(decodedMessage.targetUser == self.name) {
+            saveMessage(message: decodedMessage.BTmessage, isSelf: false, sendStatus: true)
+        } else {
+            routeMessage(messageToRoute: decodedMessage)
+        }
+    }
     
+    func routeMessage(messageToRoute: BTRoutedMessage) {
+        
+        guard let targetVertex = self.adjList?.findVertex(messageToRoute.targetUser) else {
+            return print("unable to find a vertex with this name")
+        }
+        
+        guard let nextHop = self.adjList?.nextHop(targetVertex) else {
+            return print("unable to route the message, no known path to target")
+        }
+        
+        guard let messageData = BTRoutedMessage.BTRoutedMessageEncoder(message: messageToRoute) else {
+            print("could not enconde message")
+            return;
+        }
+        
+        var successful = sendData(send: messageData, to: nextHop.fullName, characteristic: BluetoothConstants.routingCharacteristicID)
+    }
+    
+    public func sendRoutedMessage(send message: String, to name: String){
+        
+        let btMessage = BTMessage(sender: self.name!, message: message, receiver: name)
+        let messageToRoute = BTRoutedMessage(targetUser: name, BTmessage: btMessage)
+        
+        routeMessage(messageToRoute: messageToRoute)
+        
+    }
 }
 
 // Methods to handle Handshake
@@ -164,11 +219,11 @@ extension BluetoothController {
         
         switch(device) {
         case is CBPeripheral:
-            // add the new/updated vertex to the adjlist with a reference to the peripheral
+            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: decodedBTHandshake.adjList, peripheral: device as! CBPeripheral)
             print("adding/updating vertex with peripheral")
             
         case is CBCentral:
-            // add the new/updated vertex to the adjlist with a reference to the peripheral
+            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: decodedBTHandshake.adjList, central: device as! CBCentral)
             print("adding/updating vertex with central")
         default:
             print("unable to process")

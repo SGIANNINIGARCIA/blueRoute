@@ -1,4 +1,13 @@
 //
+//  BTRoutedMessage.swift
+//  blueRoute
+//
+//  Created by Sandro Giannini on 3/1/23.
+//
+
+import Foundation
+
+//
 //  BTMessage.swift
 //  blueRoute
 //
@@ -7,24 +16,22 @@
 
 import Foundation
 
-struct BTMessage: Codable {
+struct BTRoutedMessage: Codable {
     
-    var sender: String;
-    var message: String;
-    var receiver: String;
+    var targetUser: String;
+    var BTmessage: BTMessage;
     
     
     enum CodingKeys: String, CodingKey {
-        case sender
-        case message
-        case receiver
+        case targetUser
+        case BTmessage
     }
 }
 
 // Decode/Encode methods
-extension BTMessage {
+extension BTRoutedMessage {
     
-    public static func BTMessageDecoder(message: String) -> BTMessage? {
+    public static func BTRoutedMessageDecoder(message: String) -> BTRoutedMessage? {
         
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
@@ -37,8 +44,8 @@ extension BTMessage {
         
         //5 - Use the jsonDecoder instance to decode the json into a Person object
         do {
-            let decodedMessage = try jsonDecoder.decode(BTMessage.self, from: messageData)
-            print("Sender -- \(decodedMessage.sender) said: \(decodedMessage.message)")
+            let decodedMessage = try jsonDecoder.decode(BTRoutedMessage.self, from: messageData)
+            print("target: -- \(decodedMessage.targetUser)")
             return decodedMessage;
         } catch {
             print("Error: \(error.localizedDescription)")
@@ -47,7 +54,7 @@ extension BTMessage {
         
     }
     
-    public static func BTMessageEncoder(message: BTMessage) -> Data? {
+    public static func BTRoutedMessageEncoder(message: BTRoutedMessage) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

@@ -180,7 +180,7 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
             
         case BluetoothConstants.routingCharacteristicID:
             print("peripheral: central sent message for routing")
-            bluetoothController.processIncomingRoutingMessage()
+            bluetoothController.processIncomingRoutingMessage(data)
             
         case BluetoothConstants.pingCharacteristicID:
             print("peripheral: central sent ping")
@@ -209,28 +209,4 @@ extension BluetoothPeripheralManager {
            }
            return nil
        }
-}
-
-extension BluetoothController {
-    
-    public func addDevice(data: Data, central: CBCentral) {
-        let name = String(decoding: data, as: UTF8.self)
-        let displayName = BluetoothController.retrieveUsername(name: name)
-        let id = BluetoothController.retrieveID(name: name)
-        
-        // Loop trhough the array and check if it already has the device
-        for (index, device) in devices.enumerated() {
-            if(self.devices[index].id == id) {
-                print("peripheral: \(device.displayName)  already existed- updating central reference now")
-                // if it does,  Add the new reference to the peripheral and exit
-                self.devices[index].changeCentralReference(central)
-                return;
-            }
-        }
-        
-        print("peripheral: Adding new device with name: \(displayName) to the device array")
-        // This is a new device, so we must add it to the list
-        let newDevice = Device(name: name, central: central)
-        self.devices.append(newDevice)
-    }
 }

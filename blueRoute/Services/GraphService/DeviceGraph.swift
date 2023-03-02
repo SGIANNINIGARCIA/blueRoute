@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreBluetooth
 
 struct Edge: Hashable {
     let source: Vertex;
@@ -48,6 +49,22 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
             
     }
     
+    func createVertex(name: String, peripheral: CBPeripheral) -> Vertex {
+        
+        let newVertex = Vertex(name: name, peripheral: peripheral)
+        adjacencies.append(newVertex)
+        return newVertex;
+            
+    }
+    
+    func createVertex(name: String, central: CBCentral) -> Vertex {
+        
+        let newVertex = Vertex(name: name, central: central)
+        adjacencies.append(newVertex)
+        return newVertex;
+            
+    }
+    
     func addEdge(between source: Vertex, and destination: Vertex) {
         
         let newEdge = Edge(source: source, destination: destination)
@@ -69,6 +86,20 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
         }
         
         return neighbors;
+    }
+    
+    /// Check if an user is our neighbor
+    ///
+    /// - Parameters:
+    ///     - name:  the target user's full name (display name + ID)
+    ///
+    /// - returns: A boolean, true if the user is a neighbor, false if not
+    ///
+    func isNeighbor(_ name: String) -> Bool {
+        
+        let neighbors = getNeighbors()
+        
+        return neighbors.contains(where: {$0.fullName == name})
     }
     
     func printVertices() -> [String] {
@@ -124,6 +155,21 @@ extension AdjacencyList {
           return nil
         }
     
+    /// Returns the next hop a message needs to be routed to
+    ///
+    /// - parameters:
+    ///     -targetVertex: the final receiver of the message
+    ///
+    /// - returns: The vertex who the next hop
+    func nextHop(_ targetVertex: Vertex) -> Vertex? {
+        
+        guard let path = bfs(from: selfVertex, to: targetVertex) else {
+            return nil;
+        }
+        
+        return path[0].destination
+    }
+    
 }
 
 
@@ -154,6 +200,7 @@ extension AdjacencyList {
             
         }
     }
+    
     
     // Used to update our adjecency list with one passed by another vertex
     public func updateList(with exchangedList: [ExchangeVertex]) {
@@ -327,4 +374,80 @@ extension AdjacencyList {
         
         return processedList;
     }
+}
+
+
+
+
+/*
+ *
+ * PROBABLY WILL UPDATE THE ORIGINAL TO ACCEPT CBPEER INSTEAD OF SPECIFIC CENTRAL/PERIPHERAL REF
+ * BUT KEEPING IT HERE FOR NOW FOR TESTING
+ *
+ */
+
+extension AdjacencyList {
+    
+    public func processExchangedList(from user: String, adjList: [ExchangeVertex], central: CBCentral) {
+        
+        // check if the user who shared the list exists in our adjecency list
+        if let userVertex = findVertex(user) {
+            // Since the user shared the list, we can assume we have a direct connection to
+            // this user, so we add this user as one of our edges
+            
+            // Update the most recent CBPEER reference of the vertex if needed
+            if(userVertex.sendTo != .central || userVertex.central != central) {
+                userVertex.changeCentralReference(central)
+            }
+            
+            // First, we check if the edge exists and if it doesn't then create the edge
+            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
+            
+            
+            if(!edgeExists) {
+                addEdge(between: self.selfVertex, and: userVertex)
+            }
+            
+            updateList(with: adjList)
+            
+        } else {
+            // This is a new edge so we must create the vertex and add an edge to ourselves
+            let newUserVertex = createVertex(name: user, central: central)
+            addEdge(between: self.selfVertex, and: newUserVertex)
+            updateList(with: adjList)
+            
+        }
+    }
+    
+    public func processExchangedList(from user: String, adjList: [ExchangeVertex], peripheral: CBPeripheral) {
+        
+        // check if the user who shared the list exists in our adjecency list
+        if let userVertex = findVertex(user) {
+            // Since the user shared the list, we can assume we have a direct connection to
+            // this user, so we add this user as one of our edges
+            
+            // Update the most recent CBPEER reference of the vertex if needed
+            if(userVertex.sendTo != .peripheral || userVertex.peripheral != peripheral) {
+                userVertex.changePeripheralReference(peripheral)
+            }
+            
+            // First, we check if the edge exists and if it doesn't then create the edge
+            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
+            
+            
+            if(!edgeExists) {
+                addEdge(between: self.selfVertex, and: userVertex)
+            }
+            
+            updateList(with: adjList)
+            
+        } else {
+            // This is a new edge so we must create the vertex and add an edge to ourselves
+            let newUserVertex = createVertex(name: user, peripheral: peripheral)
+            addEdge(between: self.selfVertex, and: newUserVertex)
+            updateList(with: adjList)
+            
+        }
+    }
+    
 }

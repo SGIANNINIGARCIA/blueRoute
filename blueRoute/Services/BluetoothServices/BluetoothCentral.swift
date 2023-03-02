@@ -315,8 +315,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             
         case BluetoothConstants.routingCharacteristicID:
             print("central: peripheral wrote to routing")
-            //guard let data = characteristic.value else { return }
-            bluetoothController.processIncomingRoutingMessage()
+            bluetoothController.processIncomingRoutingMessage(data)
             
         case BluetoothConstants.chatCharacteristicID:
             print("central: peripheral wrote to chat")
@@ -343,12 +342,15 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     fileprivate func removeDeviceFromList(with device: CBPeripheral) {
         print("removing \(device.identifier)")
         // If a device already exists in the list, replace it with this new device
-        if let index = bluetoothController.devices.firstIndex(where: { $0.peripheral?.identifier == device.identifier }) {
-          //  guard bluetoothController.devices[index].id != device.id else { return }
-            print("\(bluetoothController.devices[index].displayName)  found- removing now")
-            bluetoothController.devices[index].pingTimeOutTimer?.invalidate()
-            bluetoothController.devices.remove(at: index)
-            return
+        if let deviceToRemove = bluetoothController.adjList?.adjacencies.first(where: {$0.peripheral == device}) {
+            
+            if(deviceToRemove.sendTo == .central) {
+                return;
+            }
+            
+            print("\(deviceToRemove.displayName)  found- removing now")
+            deviceToRemove.pingTimeOutTimer?.invalidate()
+            bluetoothController.adjList?.adjacencies.removeAll(where: {$0.self == deviceToRemove})
         }
     }
     
@@ -384,30 +386,6 @@ extension BluetoothController {
     
     public func stopDiscovery() {
         self.central?.sendStopScanningSignal()
-    }
-    
-    // If we connect to a peripheral and finished the initial Handshake,
-    // add the peripheral to the list
-    public func addDevice(data: Data, peripheral: CBPeripheral) {
-        
-        let name = String(decoding: data, as: UTF8.self)
-        let displayName = BluetoothController.retrieveUsername(name: name)
-        let id = BluetoothController.retrieveID(name: name)
-        
-        // Loop trhough the array and check if it already has the device
-        for (index, device) in devices.enumerated() {
-            if(self.devices[index].id == id) {
-                print("central: \(device.displayName)  already existed- updating reference to peripheral now")
-                // if it does,  Add the new reference to the peripheral and exit
-                self.devices[index].changePeripheralReference(peripheral)
-                return;
-            }
-        }
-        
-        print("central: Adding new device with name: \(displayName) to the device array")
-        // This is a new device, so we must add it to the list
-        let newDevice = Device(name: name, peripheral: peripheral)
-        self.devices.append(newDevice)
     }
 }
 
