@@ -3,9 +3,10 @@
 Working on a messaging app using a bluetooth mesh. 
 
 ## Currently working on
-- [ ] Rewrite addDevice to use Adjacency List
-    - [ ] Recognize when the device is a direct connection or a 2nd/3rd degree device based on reference to CBPeer 
-- [ ] Rewrite sendChatMessage to recognize if a message should be routed or sent directly based on BFS 
+- [ ] Work on sending data bigger than the max packet size (for sharing adj matrices)
+    - [ ] Rewrite everything to account for removal of matrix exchange from ping and handshake service
+    - [ ] Create new service for adjMatrix exchange
+    - [ ] Implement methods for sending data as multiple packages
 - [ ] Implement Explore View and clearly show who is a direct connection and who requires routing
 
 ### Future:
@@ -18,6 +19,9 @@ Working on a messaging app using a bluetooth mesh.
 - [ ] Implement delivered message
 
 ### Done:
+- [x] Rewrite addDevice to use Adjacency List
+    - [x] Recognize when the device is a direct connection or a 2nd/3rd degree device based on reference to CBPeer 
+- [x] Rewrite sendChatMessage to recognize if a message should be routed or sent directly based on BFS 
 - [x] Implement a lastUpdated value in AdjecencyList we can compare to decide whether a value in our current adjacency list is the most up to date
 - [x] Implement 3rd degree connections exchange (working on it)
     - [x] Rewrite updateList to account for 3rd degree connections
@@ -35,4 +39,6 @@ Working on a messaging app using a bluetooth mesh.
     - [x] Decide whether to respond to peripheral or central, depending which one is available
     
 ### Known Issues:
-    ~~If device B closes the app or the bluetooth connection restarts, device A will continue to message the device using old references to its peripheral/central, resulting in a undelivered message~~
+- AdjList exchange currently exceeds MTU max byte size, generating an error when decoding the message
+- ~If device B closes the app or the bluetooth connection restarts, device A will continue to message the device using old references to its peripheral/central, resulting in a undelivered message~
+    

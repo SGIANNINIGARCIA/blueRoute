@@ -44,7 +44,7 @@ struct test: View {
         self.AdjMatrix.addEdge(between: arturo, and: carlos)
         self.AdjMatrix.addEdge(between: carlos, and: roberto)
         self.AdjMatrix.addEdge(between: carlos, and: rebecca)
-         */
+        
         
         var te = self.AdjMatrix.bfs(from: self.AdjMatrix.findVertex("Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")!, to: self.AdjMatrix.findVertex("Attican#?id?FD630F84-F139-4E60-A92B-88F74C6B7568")!)
         
@@ -55,6 +55,62 @@ struct test: View {
         for edge in self.AdjMatrix.selfVertex.edges {
             print("\(edge.destination.displayName)")
         }
+         
+         */
+        
+        let adjList = (self.AdjMatrix.processForExchange())
+        self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
+        
+        
+        
+        let receiver = "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3"
+        let sender = "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"
+        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
+        
+        guard var messageData = BTPing.BTPingEncoder(message: codedMessage) else {
+            print("could not enconde message")
+            return;
+        }
+        
+        print(messageData.count)
+        
+        var chunks: [Data] = [];
+        
+        while(messageData.count > 0) {
+            
+            var range = Range(0...150)
+            
+            if(messageData.count >= 150) {
+                let subData = messageData.subdata(in: range)
+                chunks.insert(subData, at: chunks.endIndex)
+                messageData.removeSubrange(range)
+            } else {
+                chunks.insert(messageData, at: chunks.endIndex)
+                messageData.removeSubrange(0..<messageData.count)
+                print(messageData.count)
+            }
+        }
+        
+        print("\(messageData.count)")
+        
+        var newData = Data();
+        
+        for chunk in chunks {
+            newData.append(chunk)
+        }
+        
+        print("this is the resulting data \(newData.count)")
+        
+        let receivedData = String(decoding: newData, as: UTF8.self)
+        
+        
+        guard let decodedBTPing: BTPing = BTPing.BTPingDecoder(message: receivedData) else {
+            print("unable to decode message \(receivedData)")
+            return;
+        }
+         
+         print(decodedBTPing)
+        
         
         
     }
