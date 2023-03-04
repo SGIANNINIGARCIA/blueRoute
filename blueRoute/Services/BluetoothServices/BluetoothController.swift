@@ -13,7 +13,7 @@ typealias Device = Vertex;
 
 class BluetoothController: ObservableObject {
     
-    // Variables holding our bluetooth managers
+    /// Variables holding our bluetooth managers
     @Published var peripheral: BluetoothPeripheralManager?
     @Published var central: BluetoothCentralManager?
     @Published var adjList: AdjacencyList = AdjacencyList();
@@ -21,11 +21,16 @@ class BluetoothController: ObservableObject {
     var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
     
-    // Full name (displayName + unique ID)
+    /// Full name (displayName + unique ID)
     var name: String?
     
     private var pingDevicesTimer: Timer?
     private var pingedDevices = [Device]();
+    
+    /// Member to hold the AdjList exchanges that have not been completed yet
+    /// where the key is the vertex we are sending the AdjacencyList and PendingExchange is
+    /// a struct holding the data to send
+    public var pendingAdjacencyExchanges: [Vertex: PendingExchange] = [:]
     
     
     init(dataController: DataController, context: NSManagedObjectContext) {

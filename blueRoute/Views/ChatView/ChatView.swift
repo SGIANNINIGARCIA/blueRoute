@@ -7,6 +7,39 @@
 
 import SwiftUI
 
+class TextCountMgr: ObservableObject {
+    @Published var counted = 0;
+    @Published var text = "" {
+        didSet {
+            counted = text.count
+        }
+    }
+    
+    func reset() {
+        text = "";
+    }
+}
+
+struct TextInput: View {
+    
+    @Binding var text: String;
+    @Binding var count: Int;
+    
+    var body: some View {
+        HStack(alignment: .bottom) {
+            TextField("Message...", text: $text, axis: .vertical)
+                .lineLimit(1...5)
+            Text("\($count.wrappedValue)")
+        }.padding([.top, .leading], 8)
+         .padding(.bottom, 8)
+         .padding(.trailing, 6)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.blue, lineWidth: 2)
+        )
+    }
+}
+
 struct ChatView: View {
     
     // Username of the user this chat is with
@@ -20,7 +53,7 @@ struct ChatView: View {
     @EnvironmentObject var bluetoothController: BluetoothController;
     
     // message being typed
-    @State var typingMessage: String = ""
+    @ObservedObject var textCountMgr = TextCountMgr()
     
     init(displayName: String, id: UUID) {
         self.id = id;
@@ -39,15 +72,25 @@ struct ChatView: View {
                             .listRowSeparator(.hidden)
                     }
                 }.listStyle(PlainListStyle())
-                HStack {
-                    TextField("Message...", text: $typingMessage)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(minHeight: CGFloat(30))
-                    Button("Send") {
-                        bluetoothController.sendChatMessage(send: typingMessage, to: displayName + BluetoothConstants.NameIdentifierSeparator +    id.uuidString)
-                        typingMessage = "";
+                VStack{
+                    HStack {
+                        TextInput(text: $textCountMgr.text, count: $textCountMgr.counted)
+                        Button {
+                            bluetoothController.sendChatMessage(send: $textCountMgr.text.wrappedValue, to: displayName + BluetoothConstants.NameIdentifierSeparator +    id.uuidString)
+                            $textCountMgr.text.wrappedValue = ""
+                        } label: {
+                            if($textCountMgr.counted.wrappedValue > 0) {
+                                Image(systemName: "arrow.up.circle.fill")
+                                    .font(.system(size: 32, weight: .light))
+                            } else {
+                                Image(systemName: "arrow.up.circle")
+                                    .font(.system(size: 32, weight: .light))
+                            }
+                        }.padding(.leading, 6)
+                         .disabled($textCountMgr.counted.wrappedValue <= 0)
                     }
-                }.frame(minHeight: CGFloat(50)).padding()
+                }
+                .padding([.leading, .bottom, .trailing])
             }.navigationBarTitle(Text(self.displayName), displayMode: .inline)
             .onTapGesture {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

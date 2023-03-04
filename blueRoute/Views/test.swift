@@ -19,10 +19,11 @@ struct test: View {
         var natalia = self.AdjMatrix.processExchangedList(from: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", adjList: [
             ExchangeVertex(name: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", lastUpdated: Date(), edges: ["Tamara#?id?4951E515-24B1-41DC-8DEE-EC8CB3192AB2", "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Clara#?id?58DBB803-CCFD-4B5A-8803-FB69FEB46065"])])
         
-        var bryan = self.AdjMatrix.processExchangedList(from: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", adjList: [
+     /*   var bryan = self.AdjMatrix.processExchangedList(from: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", adjList: [
             ExchangeVertex(name: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", lastUpdated: Date(), edges: ["Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE","Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0", "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"]),
             ExchangeVertex(name: "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0", lastUpdated: Date(), edges: ["Attican#?id?FD630F84-F139-4E60-A92B-88F74C6B7568"])])
         
+      */
        /* var bryan = self.AdjMatrix.processExchangedList(from: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", adjList: [
             "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E": ["Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE","Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0"],
             "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531": [],
@@ -65,42 +66,26 @@ struct test: View {
         
         let receiver = "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3"
         let sender = "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"
-        var codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
+        var codedMessage = BTAdjacencyListExchange(sender: sender, adjacencyList: adjList)
         
-        guard var messageData = BTPing.BTPingEncoder(message: codedMessage) else {
+        guard var messageData = BTAdjacencyListExchange.BTAdjacencyListExchangeEncoder(message: codedMessage) else {
             print("could not enconde message")
             return;
         }
         
         print(messageData.count)
-        
-        adjList = (self.AdjMatrix.processForCompressedExchange())
-        self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
-
-        codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
-        
-        guard var messageData = BTPing.BTPingEncoder(message: codedMessage) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        print(messageData.count)
-        
-        /*
-        
+        var range = Range(0...150)
         var chunks: [Data] = [];
         
-        while(messageData.count > 0) {
+        while(messageData.count > range.lowerBound) {
             
-            var range = Range(0...150)
-            
-            if(messageData.count >= 150) {
+            if(messageData.count >= range.upperBound) {
                 let subData = messageData.subdata(in: range)
                 chunks.insert(subData, at: chunks.endIndex)
                 messageData.removeSubrange(range)
             } else {
                 chunks.insert(messageData, at: chunks.endIndex)
-                messageData.removeSubrange(0..<messageData.count)
+                messageData.removeSubrange(range.lowerBound..<messageData.count)
                 print(messageData.count)
             }
         }
@@ -118,14 +103,25 @@ struct test: View {
         let receivedData = String(decoding: newData, as: UTF8.self)
         
         
-        guard let decodedBTPing: BTPing = BTPing.BTPingDecoder(message: receivedData) else {
+        guard let decodedBTPing: BTAdjacencyListExchange = BTAdjacencyListExchange.BTAdjacencyListExchangeDecoder(message: receivedData) else {
             print("unable to decode message \(receivedData)")
             return;
         }
          
          print(decodedBTPing)
         
-        */
+        
+        
+        var testStruct = TestStruct(one: "SandroG")
+        
+        guard let testData = TestStruct.tencoder(message: testStruct) else {
+            print("could not do ut")
+            return;
+        }
+        
+        print("test data size is: \(testData.count)")
+        
+        
         
     }
     

@@ -10,6 +10,7 @@
 		3A26795429AB0BFD00C6EA5E /* BTHandshake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */; };
 		3A26795629AEF61600C6EA5E /* ExchangeVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */; };
 		3A26795829B02D4A00C6EA5E /* BTRoutedMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795729B02D4A00C6EA5E /* BTRoutedMessage.swift */; };
+		3A26795C29B3BDAC00C6EA5E /* AdjacencyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795B29B3BDAC00C6EA5E /* AdjacencyExchange.swift */; };
 		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
 		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
 		3A6887492995DE7E00234F97 /* BTPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6887482995DE7E00234F97 /* BTPing.swift */; };
@@ -92,6 +93,7 @@
 		3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTHandshake.swift; sourceTree = "<group>"; };
 		3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeVertex.swift; sourceTree = "<group>"; };
 		3A26795729B02D4A00C6EA5E /* BTRoutedMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTRoutedMessage.swift; sourceTree = "<group>"; };
+		3A26795B29B3BDAC00C6EA5E /* AdjacencyExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacencyExchange.swift; sourceTree = "<group>"; };
 		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
 		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
 		3A6887482995DE7E00234F97 /* BTPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTPing.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				3A7472F02929777600C5000D /* BluetoothCentral.swift */,
 				3A7472F4292A052D00C5000D /* BluetoothPeripheral.swift */,
 				3A554C3F292DB9340063A2FA /* BluetoothController.swift */,
+				3A26795B29B3BDAC00C6EA5E /* AdjacencyExchange.swift */,
 			);
 			path = BluetoothServices;
 			sourceTree = "<group>";
@@ -591,6 +594,7 @@
 				3A7472F32929794C00C5000D /* bluetoothConstants.swift in Sources */,
 				3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */,
 				3A747267291D889200C5000D /* blueRoute.xcdatamodeld in Sources */,
+				3A26795C29B3BDAC00C6EA5E /* AdjacencyExchange.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
