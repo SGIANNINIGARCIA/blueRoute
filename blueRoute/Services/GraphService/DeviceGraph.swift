@@ -378,6 +378,26 @@ extension AdjacencyList {
         
         return processedList;
     }
+    
+    public func processForCompressedExchange() -> [ExchangeVertex] {
+        
+        var processedList = [ExchangeVertex]();
+        
+        for (vertex) in self.adjacencies {
+            
+            var edges = [String]()
+            
+            for edge in vertex.edges {
+                edges.append(String(self.adjacencies.firstIndex(where: {$0.id == edge.destination.id})!))
+            }
+            
+            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated ?? Date(), edges: edges)
+            
+            processedList.append(vertexToSend)
+        }
+        
+        return processedList;
+    }
 }
 
 

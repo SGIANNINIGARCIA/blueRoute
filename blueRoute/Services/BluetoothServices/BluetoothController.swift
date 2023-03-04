@@ -190,7 +190,7 @@ extension BluetoothController {
     func sendHandshake(_ sendTo: CBPeer){
         
         let processedAdjList = adjList!.processForExchange()
-        let handshakeMessage = BTHandshake(name: self.name!, adjList: processedAdjList)
+        let handshakeMessage = BTHandshake(name: self.name!)
         
         guard let messageData = BTHandshake.BTHandshakeEncoder(message: handshakeMessage) else {
             print("could not enconde message")
@@ -218,11 +218,11 @@ extension BluetoothController {
         
         switch(device) {
         case is CBPeripheral:
-            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: decodedBTHandshake.adjList, peripheral: device as! CBPeripheral)
+            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: [], peripheral: device as! CBPeripheral)
             print("adding/updating vertex with peripheral")
             
         case is CBCentral:
-            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: decodedBTHandshake.adjList, central: device as! CBCentral)
+            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: [], central: device as! CBCentral)
             print("adding/updating vertex with central")
         default:
             print("unable to process")
@@ -278,7 +278,7 @@ extension BluetoothController {
                 vertex.updateLastConnection()
                 self.adjList?.selfVertex.edgesLastUpdated = Date()
                 // update the edges we have for this vertex
-                self.adjList?.processExchangedList(from: decodedBTPing.pingSender, adjList: decodedBTPing.adjList)
+                self.adjList?.processExchangedList(from: decodedBTPing.pingSender, adjList: [])
                 
                 print("received an initial ping from \(vertex.displayName)")
             }
@@ -291,7 +291,7 @@ extension BluetoothController {
                 vertex.updateLastConnection()
                 self.adjList?.selfVertex.edgesLastUpdated = Date()
                 // update the edges we have for this vertex
-                self.adjList?.processExchangedList(from: decodedBTPing.pingReceiver, adjList: decodedBTPing.adjList)
+                self.adjList?.processExchangedList(from: decodedBTPing.pingReceiver, adjList: [])
                 
                 print("received a response ping from \(vertex.displayName)")
             }
@@ -304,11 +304,8 @@ extension BluetoothController {
             return;
         }
         
-        let adjList = (adjList?.processForExchange())!
-        self.adjList?.selfVertex.edgesLastUpdated = Date()
-        
         let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
-        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
+        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
         
         guard let messageData = BTPing.BTPingEncoder(message: codedMessage) else {
             print("could not enconde message")

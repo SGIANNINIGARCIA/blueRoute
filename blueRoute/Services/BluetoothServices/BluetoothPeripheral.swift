@@ -35,6 +35,9 @@ class BluetoothPeripheralManager: NSObject {
     // The characteristic used for pinging devices
     private var peripheralPingCharacteristic: CBMutableCharacteristic!
     
+    // The characteristic used for exchanging Adjacency matrix
+    private var peripheralAdjExchangeCharacteristic: CBMutableCharacteristic!
+    
     // Make a queue we can run all of the events off
     /*private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
@@ -88,6 +91,9 @@ class BluetoothPeripheralManager: NSObject {
         case BluetoothConstants.handshakeCharacteristicID:
             peripheral.updateValue(data, for: self.peripheralHandshakeCharacteristic,
                                     onSubscribedCentrals: [central])
+        case BluetoothConstants.adjExchangeCharacteristicID:
+            peripheral.updateValue(data, for: self.peripheralAdjExchangeCharacteristic,
+                                    onSubscribedCentrals: [central])
         default:
             print("peripheral: no matching characteristic")
        
@@ -135,10 +141,16 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                                                  value: nil,
                                                  permissions: .writeable)
         
+        //BluetoothConstants.adjExchangeCharacteristicID
+        peripheralAdjExchangeCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.adjExchangeCharacteristicID,
+                                                 properties: [.write, .notify],
+                                                 value: nil,
+                                                 permissions: .writeable)
+        
         
         // Create the service that will represent this characteristic
         let service = CBMutableService(type: BluetoothConstants.blueRouteServiceID, primary: true)
-        service.characteristics = [self.peripheralChatCharacteristic!, self.peripheralHandshakeCharacteristic, self.peripheralRoutingCharacteristic, self.peripheralPingCharacteristic]
+        service.characteristics = [self.peripheralChatCharacteristic!, self.peripheralHandshakeCharacteristic, self.peripheralRoutingCharacteristic, self.peripheralPingCharacteristic, self.peripheralAdjExchangeCharacteristic]
         
         // Register this service to the peripheral so it can now be advertised
         self.peripheral?.add(service)
@@ -185,6 +197,9 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         case BluetoothConstants.pingCharacteristicID:
             print("peripheral: central sent ping")
             bluetoothController.processReceivedPing(data)
+            
+        case BluetoothConstants.adjExchangeCharacteristicID:
+            print("peripheral: central sent ping")
             
         default:
             print("peripheral: central send message: did not match a characteristic?")

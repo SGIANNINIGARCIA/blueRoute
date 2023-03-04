@@ -10,11 +10,9 @@ import Foundation
 struct BTHandshake: Codable {
     
     var name: String;
-    var adjList: [ExchangeVertex]
     
     enum CodingKeys: String, CodingKey {
         case name
-        case adjList
     }
 }
 

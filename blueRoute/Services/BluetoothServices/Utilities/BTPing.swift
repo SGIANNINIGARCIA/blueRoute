@@ -16,13 +16,11 @@ struct BTPing: Codable {
     var pingType: PingType;
     var pingSender: String;
     var pingReceiver: String;
-    var adjList: [ExchangeVertex]
     
     enum CodingKeys: String, CodingKey {
         case pingType
         case pingSender
         case pingReceiver
-        case adjList
     }
 }
 

@@ -58,14 +58,13 @@ struct test: View {
          
          */
         
-        let adjList = (self.AdjMatrix.processForExchange())
+        var adjList = (self.AdjMatrix.processForExchange())
         self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
-        
         
         
         let receiver = "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3"
         let sender = "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"
-        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver, adjList: adjList)
+        var codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
         
         guard var messageData = BTPing.BTPingEncoder(message: codedMessage) else {
             print("could not enconde message")
@@ -73,6 +72,20 @@ struct test: View {
         }
         
         print(messageData.count)
+        
+        adjList = (self.AdjMatrix.processForCompressedExchange())
+        self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
+
+        codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
+        
+        guard var messageData = BTPing.BTPingEncoder(message: codedMessage) else {
+            print("could not enconde message")
+            return;
+        }
+        
+        print(messageData.count)
+        
+        /*
         
         var chunks: [Data] = [];
         
@@ -111,7 +124,7 @@ struct test: View {
          
          print(decodedBTPing)
         
-        
+        */
         
     }
     

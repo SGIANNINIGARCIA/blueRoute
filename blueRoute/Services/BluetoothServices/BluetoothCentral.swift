@@ -211,7 +211,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         // It's possible there may be more than one service, so loop through each one to discover
         // the characteristic that we want
         peripheral.services?.forEach { service in
-            peripheral.discoverCharacteristics([BluetoothConstants.chatCharacteristicID, BluetoothConstants.handshakeCharacteristicID, BluetoothConstants.routingCharacteristicID, BluetoothConstants.pingCharacteristicID], for: service)
+            peripheral.discoverCharacteristics([BluetoothConstants.chatCharacteristicID, BluetoothConstants.handshakeCharacteristicID, BluetoothConstants.routingCharacteristicID, BluetoothConstants.pingCharacteristicID, BluetoothConstants.adjExchangeCharacteristicID], for: service)
         }
     }
     
@@ -232,7 +232,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
 
         // Perform a loop in case we received more than one
         service.characteristics?.forEach { characteristic in
-            guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID || characteristic.uuid == BluetoothConstants.pingCharacteristicID else { return }
+            guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID || characteristic.uuid == BluetoothConstants.pingCharacteristicID || characteristic.uuid == BluetoothConstants.adjExchangeCharacteristicID else { return }
             // Subscribe to this characteristic, so we can be notified when data comes from it
             peripheral.setNotifyValue(true, for: characteristic)
 
@@ -257,7 +257,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
          print("central didUpdateNotificationStateFor peripheral with id: \(peripheral.identifier.uuidString)")
 
          // Ensure this characteristic is the one we configured
-         guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID || characteristic.uuid == BluetoothConstants.pingCharacteristicID else { return }
+         guard characteristic.uuid == BluetoothConstants.chatCharacteristicID || characteristic.uuid == BluetoothConstants.handshakeCharacteristicID || characteristic.uuid == BluetoothConstants.routingCharacteristicID || characteristic.uuid == BluetoothConstants.pingCharacteristicID || characteristic.uuid == BluetoothConstants.adjExchangeCharacteristicID else { return }
          
          // if this peripheral is the last one our central connected to
          // append the current characteristic we subscribed to to the
@@ -327,6 +327,10 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             print("central: peripheral sent a ping")
             //process ping
             bluetoothController.processReceivedPing(data)
+            
+        case BluetoothConstants.adjExchangeCharacteristicID:
+            print("central: peripheral sent a list")
+            //process AdjExchange
            
         default:
             print("no matching characteristic")

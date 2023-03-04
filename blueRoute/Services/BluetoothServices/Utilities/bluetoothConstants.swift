@@ -31,7 +31,10 @@ struct BluetoothConstants {
     // characteristic used to send ping meant to check status of reachability
     static let pingCharacteristicID = CBUUID(string: "34D7134F-3EF9-4226-8CC5-05EEDD81FD11")
     
-    static let qtyCharacteristics = 4;
+    // characteristic used to send ping meant to check status of reachability
+    static let adjExchangeCharacteristicID = CBUUID(string: "635523F7-B760-46F0-913C-415D2F3142DD")
+    
+    static let qtyCharacteristics = 5;
     
     // The peripheral uses a local name to advertise with a custom name.
     // The local name contains the username provided by the user in adittion to
