@@ -9,10 +9,11 @@ import SwiftUI
 
 struct test: View {
     
-    @ObservedObject var AdjMatrix = AdjacencyList(name: "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")
+    @ObservedObject var AdjMatrix = AdjacencyList()
     
     init() {
         
+        self.AdjMatrix.setSelf(name: "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")
         // handshake with natalia, natalia passes her list as well
         // add natalia and her list
         var natalia = self.AdjMatrix.processExchangedList(from: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", adjList: [

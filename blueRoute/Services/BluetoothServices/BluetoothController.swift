@@ -16,7 +16,8 @@ class BluetoothController: ObservableObject {
     // Variables holding our bluetooth managers
     @Published var peripheral: BluetoothPeripheralManager?
     @Published var central: BluetoothCentralManager?
-    @Published var adjList: AdjacencyList?
+    @Published var adjList: AdjacencyList = AdjacencyList();
+    
     var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
     
@@ -41,7 +42,7 @@ class BluetoothController: ObservableObject {
         // but will wait until we provide an username
         self.central = BluetoothCentralManager(name: name, bluetoothController: self)
         
-        self.adjList = AdjacencyList(name: name)
+        self.adjList.setSelf(name: name)
         
         self.pingDevicesTimer = Timer.scheduledTimer(timeInterval: 30,
                                          target: self,
@@ -53,24 +54,22 @@ class BluetoothController: ObservableObject {
     // send data to a characteristic and returns true if it succeded
     public func sendData(send data: Data, to name: String, characteristic: CBUUID) -> Bool {
             
-        // OLD FIND DEVICE
-        // MARKED TO REMOVE
-        guard let device = findDevice(name: name) else {
+        guard let vertex = findVertex(name: name) else {
             print("could not find \(name)")
             return false;
         }
         
         // send the message using the newest reference we saved for the device
-        switch device.sendTo {
+        switch vertex.sendTo {
         case .peripheral:
-           if let peripheral = device.peripheral {
+           if let peripheral = vertex.peripheral {
                central!.sendData(data, peripheral: peripheral, characteristic: characteristic)
                return true;
            } else {
                fallthrough
            }
         case .central:
-            if let central = device.central {
+            if let central = vertex.central {
                 peripheral!.sendData(data, central: central, characteristic: characteristic)
                 return true;
             } else {
@@ -106,7 +105,7 @@ extension BluetoothController {
     ///
     public func sendChatMessage(send message: String, to name: String) {
         
-        if (self.adjList!.isNeighbor(name) == false) {
+        if (self.adjList.isNeighbor(name) == false) {
             return sendRoutedMessage(send: message, to: name)
         }
         
@@ -121,8 +120,14 @@ extension BluetoothController {
         saveMessage(message: codedMessage, isSelf: true, sendStatus: successful)
     }
     
-    // Decodes chat message sent to this devices through the chat characteristic
-    public func processIncomingChatMessage(_ data: Data){
+    /// Decodes chat message sent to this devices through the chat characteristic
+    ///
+    /// - parameters:
+    ///     - data: the data received by our peripheral/central
+    ///     - from: a reference to the device who sent the data which we use to update their last connection and invalidate ping, if any
+    ///
+    /// - note: the parameter from is not referencing the original sender of the message, but the device who sent the data
+    public func processIncomingChatMessage(_ data: Data, from ref: CBPeer){
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
@@ -131,14 +136,19 @@ extension BluetoothController {
             return;
         }
         
+        updateLastConnectionAndInvalidateTimer(for: ref)
         saveMessage(message: decodedMessage, isSelf: false, sendStatus: true)
     
     }
     
-    // TO-DO
-    // Decodes routing message sent to this devices through the routing characteristic
-    // Searches for next node and sends it
-    public func processIncomingRoutingMessage(_ data: Data){
+    /// Decodes routing message sent to this devices through the routing characteristic, searches for next node and sends it
+    ///
+    /// - parameters:
+    ///     - data: the data received by our peripheral/central
+    ///     - from: a reference to the device who sent the data which we use to update their last connection and invalidate ping, if any
+    ///
+    /// - note: the parameter from is not referencing the original sender of the message, but the device who sent the data
+    public func processIncomingRoutingMessage(_ data: Data, from ref: CBPeer){
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
@@ -153,15 +163,17 @@ extension BluetoothController {
         } else {
             routeMessage(messageToRoute: decodedMessage)
         }
+        
+        updateLastConnectionAndInvalidateTimer(for: ref)
     }
     
     func routeMessage(messageToRoute: BTRoutedMessage) {
         
-        guard let targetVertex = self.adjList?.findVertex(messageToRoute.targetUser) else {
+        guard let targetVertex = self.adjList.findVertex(messageToRoute.targetUser) else {
             return print("unable to find a vertex with this name")
         }
         
-        guard let nextHop = self.adjList?.nextHop(targetVertex) else {
+        guard let nextHop = self.adjList.nextHop(targetVertex) else {
             return print("unable to route the message, no known path to target")
         }
         
@@ -188,8 +200,6 @@ extension BluetoothController {
     
     // Send handshake to device using the passed CBPeer
     func sendHandshake(_ sendTo: CBPeer){
-        
-        let processedAdjList = adjList!.processForExchange()
         let handshakeMessage = BTHandshake(name: self.name!)
         
         guard let messageData = BTHandshake.BTHandshakeEncoder(message: handshakeMessage) else {
@@ -218,11 +228,11 @@ extension BluetoothController {
         
         switch(device) {
         case is CBPeripheral:
-            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: [], peripheral: device as! CBPeripheral)
+            self.adjList.processHandshake(from: decodedBTHandshake.name, peripheral: device as! CBPeripheral)
             print("adding/updating vertex with peripheral")
             
         case is CBCentral:
-            self.adjList?.processExchangedList(from: decodedBTHandshake.name, adjList: [], central: device as! CBCentral)
+            self.adjList.processHandshake(from: decodedBTHandshake.name, central: device as! CBCentral)
             print("adding/updating vertex with central")
         default:
             print("unable to process")
@@ -235,9 +245,7 @@ extension BluetoothController {
     
     @objc private func checkDevicesLastConnection() {
         
-        guard let neighbors = self.adjList?.getNeighbors() else {
-            return print("we have no neighbors")
-        }
+        let neighbors = self.adjList.getNeighbors()
         
         for (neighbor) in neighbors {
             
@@ -273,12 +281,9 @@ extension BluetoothController {
         // and update the last connection which also invalidates any active timers
         case .initialPing:
             respondToPing(decodedBTPing)
-            if let vertex = findDevice(name: decodedBTPing.pingSender) {
+            if let vertex = findVertex(name: decodedBTPing.pingSender) {
                 // Update our lastconnection to this device/vertex
-                vertex.updateLastConnection()
-                self.adjList?.selfVertex.edgesLastUpdated = Date()
-                // update the edges we have for this vertex
-                self.adjList?.processExchangedList(from: decodedBTPing.pingSender, adjList: [])
+                updateLastConnectionAndInvalidateTimer(for: vertex)
                 
                 print("received an initial ping from \(vertex.displayName)")
             }
@@ -286,12 +291,9 @@ extension BluetoothController {
         // if we receive a response to a ping we update
         // the last connection which also invalidates any active timers
         case .responsePing:
-            if let vertex = findDevice(name: decodedBTPing.pingReceiver) {
+            if let vertex = findVertex(name: decodedBTPing.pingReceiver) {
                 // Update our lastconnection to this device/vertex
-                vertex.updateLastConnection()
-                self.adjList?.selfVertex.edgesLastUpdated = Date()
-                // update the edges we have for this vertex
-                self.adjList?.processExchangedList(from: decodedBTPing.pingReceiver, adjList: [])
+                updateLastConnectionAndInvalidateTimer(for: vertex)
                 
                 print("received a response ping from \(vertex.displayName)")
             }
@@ -333,7 +335,7 @@ extension BluetoothController {
         guard let context = timer.userInfo as? [String: String] else { return }
             let name = context["name", default: "Anonymous"]
         
-        if let vertexToRemove = findDevice(name: name) {
+        if let vertexToRemove = findVertex(name: name) {
             print("removing device \(vertexToRemove.displayName)")
             
             // removing central connection first, if there is one
@@ -342,49 +344,60 @@ extension BluetoothController {
             }
             
             // removing from published devices list
-            self.adjList?.removeConnection(vertexToRemove)
+            self.adjList.removeConnection(vertexToRemove)
             
+        }
+    }
+    
+    public func updateLastConnectionAndInvalidateTimer(for vertex: Vertex) {
+        vertex.updateLastConnection();
+    }
+    
+    
+    public func updateLastConnectionAndInvalidateTimer(for ref: CBPeer) {
+        switch(ref) {
+        case is CBCentral:
+            guard let vertex = findVertex(central: ref as! CBCentral) else {
+                return;
+            }
+            vertex.updateLastConnection()
+        case is CBPeripheral:
+            guard let vertex = findVertex(peripheral: ref as! CBPeripheral) else {
+                return;
+            }
+            vertex.updateLastConnection()
+        default:
+            print("none of the above")
         }
     }
 }
 
+///  Methods to handle the exchange of Adjacency list
+extension BluetoothController {
+    
+}
+
 
 /*
- * Utility methods for device/user look up
+ * Utility methods for device/user and ID/DisplayName look up
  */
 extension BluetoothController {
-   
-   // Look up device using the unique ID
-    func findDevice(name: String) -> Device? {
-        
-        let id = BluetoothController.retrieveID(name: name)
-        
-        guard let device = self.adjList?.adjacencies.first(where: {$0.id == id}) else {
-            return nil;
-        }
-        
-        return device;
-        
-    }
-    
-    // Look up device using the unique ID
-    private func findDeviceIndex(name: String) -> Int? {
-        
-        let id = BluetoothController.retrieveID(name: name)
-        
-        guard let index = self.adjList?.adjacencies.firstIndex(where: { $0.id == id }) else {
-            return nil
-        }
-            return index;
-    }
-   
-   // Returns only the username of the device using the Separator
+      
+    /// Returns the displayName in a fullName
+    ///
+    ///  - Parameters:
+    ///     - name: string containing the fullName of a vertex
+    ///
    public static func retrieveUsername(name: String) -> String {
        return name.components(separatedBy: BluetoothConstants.NameIdentifierSeparator)[0]
        
    }
    
-   // Returns only the ID of the device using the Separator
+    /// Returns the unique ID in a fullName
+    ///
+    ///  - Parameters:
+    ///     - name: string containing the fullName of a vertex
+    ///
    public static func retrieveID(name: String) -> UUID {
        guard let ID: UUID = UUID(uuidString: name.components(separatedBy: BluetoothConstants.NameIdentifierSeparator)[1]) else {
            return UUID()
@@ -392,14 +405,53 @@ extension BluetoothController {
        
        return ID;
    }
+    
+    ///  Retrieves vertex from Adjacency List with matching name
+    ///
+    ///  - Parameters:
+    ///     - name: the fullName of the vertex
+    ///
+    public func findVertex(name: String) -> Vertex? {
+        let id = BluetoothController.retrieveID(name: name)
+        
+        guard let vertex = self.adjList.adjacencies.first(where: {$0.id == id}) else {
+            return nil;
+        }
+        
+        return vertex;
+    }
+    
+    /// Retrieve the vertex with matching reference to central
+    ///
+    ///  - Parameters:
+    ///     - central: reference of the central to match
+    ///
+    public func findVertex(central: CBCentral) -> Vertex? {
+        guard let vertex = self.adjList.adjacencies.first(where: {$0.central?.identifier == central.identifier}) else {
+            return nil;
+        }
+        
+        return vertex;
+    }
+    
+    /// Retrieve the vertex with matching reference to peripheral
+    ///
+    ///  - Parameters:
+    ///     - peripheral: reference of the peripheral to match
+    ///
+    public func findVertex(peripheral: CBPeripheral) -> Vertex? {
+        guard let vertex = self.adjList.adjacencies.first(where: {$0.peripheral?.identifier == peripheral.identifier}) else {
+            return nil;
+        }
+        
+        return vertex;
+    }
    
    // Returns true if the device is reachable, else false.
    // Used for displaying the current availability of the user in the UI
    public func isReachable(_ toFind: UUID) -> Bool {
        
-       guard let isReachable = self.adjList?.adjacencies.contains(where: {$0.id == toFind}) else {
-           return false;
-       }
+       let isReachable = self.adjList.adjacencies.contains(where: {$0.id == toFind})
        
        return isReachable;
    }

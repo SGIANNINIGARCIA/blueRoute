@@ -11,6 +11,10 @@ struct DiscoverView: View {
     
     //temp testing array
     @EnvironmentObject var bluetoothController: BluetoothController;
+    @ObservedObject var adjacencyList : AdjacencyList;
+    
+    
+    
     
     var body: some View {
         NavigationView {
@@ -23,15 +27,14 @@ struct DiscoverView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(buildAvailableList() ?? []) { user in
-                        
+                    ForEach(adjacencyList.adjacencies.filter({$0.fullName != adjacencyList.selfVertex.fullName})) { user in
                         NavigationLink {
                             ChatView(displayName: user.displayName, id: user.id)
                         } label: {
                             Text(user.displayName)
                         }
                     }
-                    .emptyState(bluetoothController.adjList?.adjacencies.count == 0 || (buildAvailableList() == nil || ((buildAvailableList()?.isEmpty) != nil))) {
+                    .emptyState(adjacencyList.adjacencies.count == 1) {
                         HStack {
                             Spacer()
                             LoadingIcon()
@@ -56,14 +59,10 @@ struct DiscoverView: View {
             bluetoothController.stopDiscovery()
         }
     }
-    
-    func buildAvailableList() -> [Vertex]? {
-        return bluetoothController.adjList?.adjacencies.filter({$0.fullName != bluetoothController.name})
-    }
 }
 
 struct DiscoverView_Previews: PreviewProvider {
     static var previews: some View {
-        DiscoverView()
+        DiscoverView(adjacencyList: AdjacencyList())
     }
 }

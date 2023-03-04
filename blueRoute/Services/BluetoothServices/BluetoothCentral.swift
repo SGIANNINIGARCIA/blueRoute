@@ -124,6 +124,19 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
         func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
                             advertisementData: [String: Any], rssi RSSI: NSNumber) {
             
+            // check if we already connected and if it is already set as our newest reference
+            if let existing = bluetoothController.findVertex(peripheral: peripheral) {
+                if(existing.sendTo == .peripheral) {
+                    return;
+                }
+            }
+            
+            // If we received the siganl to stop scanning, dont proceed with
+            // connecting to this peripheral
+            if(stopScanningSignal) {
+                return;
+            }
+            
             // Get the string value of the UUID of this device as the default value
             var name = peripheral.identifier.description
             
@@ -134,12 +147,8 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
             }
             
             print("central: found a peripheral with name = \(name) \ncentral: Attempting connection to peripheral with name = \(name)")
-            
-            // If we received the siganl to stop scanning, dont proceed with
-            // connecting to this peripheral
-            if(stopScanningSignal) {
-                return;
-            }
+        
+        
             
             // Save a reference to the peripheral before connecting
             self.discoveredDevices.append(peripheral)
@@ -315,12 +324,12 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             
         case BluetoothConstants.routingCharacteristicID:
             print("central: peripheral wrote to routing")
-            bluetoothController.processIncomingRoutingMessage(data)
+            bluetoothController.processIncomingRoutingMessage(data, from: peripheral)
             
         case BluetoothConstants.chatCharacteristicID:
             print("central: peripheral wrote to chat")
             //process chat
-            bluetoothController.processIncomingChatMessage(data)
+            bluetoothController.processIncomingChatMessage(data, from: peripheral)
             
             
         case BluetoothConstants.pingCharacteristicID:
@@ -346,7 +355,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     fileprivate func removeDeviceFromList(with device: CBPeripheral) {
         print("removing \(device.identifier)")
         // If a device already exists in the list, replace it with this new device
-        if let deviceToRemove = bluetoothController.adjList?.adjacencies.first(where: {$0.peripheral == device}) {
+        if let deviceToRemove = bluetoothController.adjList.adjacencies.first(where: {$0.peripheral == device}) {
             
             if(deviceToRemove.sendTo == .central) {
                 return;
@@ -354,7 +363,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             
             print("\(deviceToRemove.displayName)  found- removing now")
             deviceToRemove.pingTimeOutTimer?.invalidate()
-            bluetoothController.adjList?.adjacencies.removeAll(where: {$0.self == deviceToRemove})
+            bluetoothController.adjList.adjacencies.removeAll(where: {$0.self == deviceToRemove})
         }
     }
     

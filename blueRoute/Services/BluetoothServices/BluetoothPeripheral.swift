@@ -188,11 +188,11 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
             
         case BluetoothConstants.chatCharacteristicID:
             print("peripheral: central sent message for cha")
-            bluetoothController.processIncomingChatMessage(data)
+            bluetoothController.processIncomingChatMessage(data, from: request.central)
             
         case BluetoothConstants.routingCharacteristicID:
             print("peripheral: central sent message for routing")
-            bluetoothController.processIncomingRoutingMessage(data)
+            bluetoothController.processIncomingRoutingMessage(data, from: request.central)
             
         case BluetoothConstants.pingCharacteristicID:
             print("peripheral: central sent ping")
@@ -203,7 +203,6 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
             
         default:
             print("peripheral: central send message: did not match a characteristic?")
-            bluetoothController.processIncomingChatMessage(data)
         }
     }
 }

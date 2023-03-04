@@ -28,7 +28,7 @@ struct MainPage: View {
             }
             
             // View for finding reachable users
-            DiscoverView()
+            DiscoverView(adjacencyList: bluetoothController.adjList)
                 .tabItem {
                     Image(systemName: "point.3.filled.connected.trianglepath.dotted")
                     Text("Explore")
