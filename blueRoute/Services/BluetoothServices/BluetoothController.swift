@@ -30,7 +30,8 @@ class BluetoothController: ObservableObject {
     /// Member to hold the AdjList exchanges that have not been completed yet
     /// where the key is the vertex we are sending the AdjacencyList and PendingExchange is
     /// a struct holding the data to send
-    public var pendingAdjacencyExchanges: [Vertex: PendingExchange] = [:]
+    public var pendingAdjacencyExchangesSent: [Vertex: PendingExchange] = [:]
+    public var pendingAdjacencyExchangesReceived: [Vertex: PendingExchange] = [:]
     
     
     init(dataController: DataController, context: NSManagedObjectContext) {

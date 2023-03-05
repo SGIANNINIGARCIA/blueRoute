@@ -13,7 +13,7 @@ struct ChatTile: View {
     @State var lastMessage:String;
     @State var id:UUID;
     
-    @EnvironmentObject var bluetoothController: BluetoothController;
+    @ObservedObject var adjacencyList : AdjacencyList;
     
     var body: some View {
         HStack(alignment: .center, spacing: 28.0) {
@@ -22,7 +22,7 @@ struct ChatTile: View {
                 HStack{
                     Text(username)
                     .fontWeight(.bold)
-                    AvailabilityTagView(isReachable: bluetoothController.isReachable(id))
+                    AvailabilityTagView(isReachable: $adjacencyList.adjacencies.contains(where: {$0.id == id}))
                 }
                 Text(lastMessage)
                     .fontWeight(.light)
@@ -38,6 +38,6 @@ struct ChatTile: View {
 struct ChatTile_Previews: PreviewProvider {
     
     static var previews: some View {
-        ChatTile(username: "May Phan", lastMessage: "Hello", id: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        ChatTile(username: "May Phan", lastMessage: "Hello", id: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, adjacencyList: AdjacencyList())
     }
 }

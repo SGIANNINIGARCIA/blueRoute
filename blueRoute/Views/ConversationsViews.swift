@@ -11,6 +11,8 @@ struct ConversationsView: View {
     
     @Environment(\.managedObjectContext) var managedObjContext;
     @EnvironmentObject var dataController: DataController;
+    @EnvironmentObject var bluetoothController: BluetoothController;
+    
     @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "isSelf == %@", NSNumber(false))) private var chats: FetchedResults<User>
     
     var body: some View {
@@ -28,7 +30,7 @@ struct ConversationsView: View {
                         NavigationLink {
                             ChatView(displayName: chat.displayName!, id: chat.identifier!)
                         } label: {
-                            ChatTile(username: chat.displayName!, lastMessage: chat.latestMessage ?? "Message", id: chat.identifier!)
+                            ChatTile(username: chat.displayName!, lastMessage: chat.latestMessage ?? "Message", id: chat.identifier!, adjacencyList: bluetoothController.adjList )
                         }
                 
                     }

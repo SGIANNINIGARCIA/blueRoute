@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct DiscoverView: View {
-    
-    //temp testing array
+
     @EnvironmentObject var bluetoothController: BluetoothController;
     @ObservedObject var adjacencyList : AdjacencyList;
     

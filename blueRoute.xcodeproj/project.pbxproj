@@ -11,6 +11,7 @@
 		3A26795629AEF61600C6EA5E /* ExchangeVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */; };
 		3A26795829B02D4A00C6EA5E /* BTRoutedMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795729B02D4A00C6EA5E /* BTRoutedMessage.swift */; };
 		3A26795C29B3BDAC00C6EA5E /* AdjacencyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795B29B3BDAC00C6EA5E /* AdjacencyExchange.swift */; };
+		3A26795E29B41B2C00C6EA5E /* TextInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26795D29B41B2C00C6EA5E /* TextInputView.swift */; };
 		3A554C40292DB9340063A2FA /* BluetoothController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C3F292DB9340063A2FA /* BluetoothController.swift */; };
 		3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A554C42292F3F960063A2FA /* BTMessage.swift */; };
 		3A6887492995DE7E00234F97 /* BTPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6887482995DE7E00234F97 /* BTPing.swift */; };
@@ -25,7 +26,7 @@
 		3A747267291D889200C5000D /* blueRoute.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3A747265291D889200C5000D /* blueRoute.xcdatamodeld */; };
 		3A747269291D88E300C5000D /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747268291D88E300C5000D /* DataController.swift */; };
 		3A74726C291D8F2B00C5000D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74726B291D8F2B00C5000D /* OnboardingView.swift */; };
-		3A747277291DF90900C5000D /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747276291DF90900C5000D /* Device.swift */; };
+		3A747277291DF90900C5000D /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A747276291DF90900C5000D /* Vertex.swift */; };
 		3A7472902925D9A200C5000D /* Avatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74728F2925D9A200C5000D /* Avatar.swift */; };
 		3A7472922925DD3000C5000D /* ChatTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7472912925DD3000C5000D /* ChatTile.swift */; };
 		3A74729829270D3B00C5000D /* ContentMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74729729270D3B00C5000D /* ContentMessageView.swift */; };
@@ -94,6 +95,7 @@
 		3A26795529AEF61600C6EA5E /* ExchangeVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeVertex.swift; sourceTree = "<group>"; };
 		3A26795729B02D4A00C6EA5E /* BTRoutedMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTRoutedMessage.swift; sourceTree = "<group>"; };
 		3A26795B29B3BDAC00C6EA5E /* AdjacencyExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacencyExchange.swift; sourceTree = "<group>"; };
+		3A26795D29B41B2C00C6EA5E /* TextInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputView.swift; sourceTree = "<group>"; };
 		3A554C3F292DB9340063A2FA /* BluetoothController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothController.swift; sourceTree = "<group>"; };
 		3A554C42292F3F960063A2FA /* BTMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTMessage.swift; sourceTree = "<group>"; };
 		3A6887482995DE7E00234F97 /* BTPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTPing.swift; sourceTree = "<group>"; };
@@ -111,7 +113,7 @@
 		3A747266291D889200C5000D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		3A747268291D88E300C5000D /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		3A74726B291D8F2B00C5000D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		3A747276291DF90900C5000D /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		3A747276291DF90900C5000D /* Vertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
 		3A74728F2925D9A200C5000D /* Avatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Avatar.swift; sourceTree = "<group>"; };
 		3A7472912925DD3000C5000D /* ChatTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTile.swift; sourceTree = "<group>"; };
 		3A74729729270D3B00C5000D /* ContentMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMessageView.swift; sourceTree = "<group>"; };
@@ -199,7 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				3A7472F22929794C00C5000D /* bluetoothConstants.swift */,
-				3A747276291DF90900C5000D /* Device.swift */,
+				3A747276291DF90900C5000D /* Vertex.swift */,
 				3A554C42292F3F960063A2FA /* BTMessage.swift */,
 				3A6887482995DE7E00234F97 /* BTPing.swift */,
 				3A26795329AB0BFD00C6EA5E /* BTHandshake.swift */,
@@ -312,6 +314,7 @@
 				3A74729B2927164200C5000D /* MessageView.swift */,
 				3A74729D292719B600C5000D /* ChatView.swift */,
 				3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */,
+				3A26795D29B41B2C00C6EA5E /* TextInputView.swift */,
 			);
 			path = ChatView;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				3A7472EA2929629E00C5000D /* EmptyStateView.swift in Sources */,
 				3A7472E82929619200C5000D /* ConversationsViews.swift in Sources */,
 				3A7472E6292960A100C5000D /* MainPage.swift in Sources */,
+				3A26795E29B41B2C00C6EA5E /* TextInputView.swift in Sources */,
 				3A747269291D88E300C5000D /* DataController.swift in Sources */,
 				3AAF936C293ACCC800A43794 /* EdgeShape.swift in Sources */,
 				3AAF936E293ACD1E00A43794 /* VertexView.swift in Sources */,
@@ -589,7 +593,7 @@
 				3A26795629AEF61600C6EA5E /* ExchangeVertex.swift in Sources */,
 				3A7472902925D9A200C5000D /* Avatar.swift in Sources */,
 				3A554C43292F3F960063A2FA /* BTMessage.swift in Sources */,
-				3A747277291DF90900C5000D /* Device.swift in Sources */,
+				3A747277291DF90900C5000D /* Vertex.swift in Sources */,
 				3A74729829270D3B00C5000D /* ContentMessageView.swift in Sources */,
 				3A7472F32929794C00C5000D /* bluetoothConstants.swift in Sources */,
 				3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */,
