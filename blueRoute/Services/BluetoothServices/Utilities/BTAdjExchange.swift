@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ExchangeStatus: String, Codable {
+enum ExchangeMessageType: String, Codable {
     case handshakeAdjExchange
     case exchangeRequest
     case exchangePackage
@@ -16,8 +16,8 @@ enum ExchangeStatus: String, Codable {
 
 /// Wrapper message to communicate through the adjExchangeCharacteristicID characteristic
 /// where the type determines the payload to expect
-struct AdjacencyExchangeMessage: Codable {
-    var type: ExchangeStatus;
+struct BTAdjacencyExchangeMessage: Codable {
+    var type: ExchangeMessageType;
     var sender: String;
     var messagePayload: Data;
  
@@ -27,7 +27,7 @@ struct AdjacencyExchangeMessage: Codable {
         case messagePayload
     }
     
-    public static func AdjacencyExchangeMessageDecoder(message: String) -> AdjacencyExchangeMessage? {
+    public static func BTAdjacencyExchangeMessageDecoder(message: String) -> BTAdjacencyExchangeMessage? {
         
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
@@ -40,7 +40,7 @@ struct AdjacencyExchangeMessage: Codable {
         
         //5 - Use the jsonDecoder instance to decode the json into a Person object
         do {
-            let decodedMessage = try jsonDecoder.decode(AdjacencyExchangeMessage.self, from: messageData)
+            let decodedMessage = try jsonDecoder.decode(BTAdjacencyExchangeMessage.self, from: messageData)
             print("Sender -- \(decodedMessage.sender) of type: \(decodedMessage.type)")
             return decodedMessage;
         } catch {
@@ -50,7 +50,7 @@ struct AdjacencyExchangeMessage: Codable {
         
     }
     
-    public static func AdjacencyExchangeMessageEncoder(message: AdjacencyExchangeMessage) -> Data? {
+    public static func BTAdjacencyExchangeMessageEncoder(message: BTAdjacencyExchangeMessage) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

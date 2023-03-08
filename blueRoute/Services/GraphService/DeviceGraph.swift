@@ -28,6 +28,11 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     @Published public var adjacencies: [Vertex] = []
     var selfVertex: Vertex!;
     
+    /// members used to check whether we need to send
+    /// a requesting user our adjacencyList
+    var timeOfLastUpdate: Date?
+    var lastUpdateTriggeredBy: String?;
+    
     init() {
     }
     
@@ -37,7 +42,6 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     }
     
     func createVertex(name: String) -> Vertex {
-        
         let newVertex = Vertex(name: name)
         adjacencies.append(newVertex)
         return newVertex;
@@ -45,7 +49,6 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     }
     
     func createVertex(name: String, peripheral: CBPeripheral) -> Vertex {
-        
         let newVertex = Vertex(name: name, peripheral: peripheral)
         adjacencies.append(newVertex)
         return newVertex;
@@ -53,7 +56,6 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     }
     
     func createVertex(name: String, central: CBCentral) -> Vertex {
-        
         let newVertex = Vertex(name: name, central: central)
         adjacencies.append(newVertex)
         return newVertex;
@@ -271,12 +273,16 @@ extension AdjacencyList {
         }
     }
     
+    
+    /// method to remove a vertex who is also our edge - so we lost a direct connection to that device
     public func removeConnection(_ vertexToRemove: Vertex){
         print("found \(vertexToRemove.displayName) - remove edge from self")
         
         // Remove the edge where source is self and dest is the user to be removed
         removeEdge(remove: vertexToRemove, from: self.selfVertex)
         self.selfVertex.edgesLastUpdated = Date()
+        self.lastUpdateTriggeredBy = vertexToRemove.fullName;
+        self.timeOfLastUpdate = Date();
         
         // Remove the vertex if there is no path to it
         // after we removed our edge to it
@@ -504,18 +510,24 @@ extension AdjacencyList {
                 addEdge(between: self.selfVertex, and: userVertex)
             }
             
+            self.lastUpdateTriggeredBy = userVertex.fullName
+            self.timeOfLastUpdate = Date()
             updateList(with: adjList)
             
         } else {
             // This is a new edge so we must create the vertex and add an edge to ourselves
             let newUserVertex = createVertex(name: user, peripheral: peripheral)
             addEdge(between: self.selfVertex, and: newUserVertex)
+            
+            self.lastUpdateTriggeredBy = newUserVertex.fullName
+            self.timeOfLastUpdate = Date()
+            
             updateList(with: adjList)
             
         }
     }
     
-    /// Method to process and update the adjacency list shared by another user
+    /// Method to process and update our Adjacency List based on  the adjacency list shared by another user
     ///
     /// - Parameters:
     ///     - user: The fullName of the user who we connected to
@@ -540,12 +552,17 @@ extension AdjacencyList {
                 addEdge(between: self.selfVertex, and: userVertex)
             }
             
+            self.lastUpdateTriggeredBy = userVertex.fullName
+            self.timeOfLastUpdate = Date()
             updateList(with: adjList)
             
         } else {
             // This is a new edge so we must create the vertex and add an edge to ourselves
             let newUserVertex = createVertex(name: user, central: central)
             addEdge(between: self.selfVertex, and: newUserVertex)
+            
+            self.lastUpdateTriggeredBy = newUserVertex.fullName
+            self.timeOfLastUpdate = Date()
             updateList(with: adjList)
             
         }

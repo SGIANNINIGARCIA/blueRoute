@@ -10,6 +10,7 @@ import Foundation
 struct PendingExchange {
     var dataChunks: [Data];
     var chunksSent: Int;
+    var timeOfLastPackage: Date?
 }
 
 /// Based  on testing we can exchange up to 524 bytes, leaving 200 bytes to hold metadata info like sender
@@ -20,9 +21,9 @@ extension BluetoothController {
     
     func prepareData() -> PendingExchange? {
         let adjList = self.adjList.processForCompressedExchange();
-        let codedMessage = BTAdjacencyListExchange(sender: self.name!, adjacencyList: adjList)
+        let codedMessage = BTAdjacencyList(sender: self.name!, adjacencyList: adjList)
         
-        guard var messageData = BTAdjacencyListExchange.BTAdjacencyListExchangeEncoder(message: codedMessage) else {
+        guard var messageData = BTAdjacencyList.BTAdjacencyListEncoder(message: codedMessage) else {
             print("could not enconde message")
             return nil;
         }
@@ -46,7 +47,7 @@ extension BluetoothController {
             }
         }
         
-        return PendingExchange(dataChunks: chunks, chunksSent: 0)
+        return PendingExchange(dataChunks: chunks, chunksSent: 0, timeOfLastPackage: Date())
     }
     
     func startAdjacencyExchange(with vertex: Vertex) {
@@ -65,10 +66,61 @@ extension BluetoothController {
         }
 
         var nextChunk = pendingExchangeData.dataChunks[pendingExchangeData.chunksSent - 1]
+        
         var packageToSend = AdjacencyExchangePackage(packageTotalCount: pendingExchangeData.dataChunks.count, currentPackageNumber: pendingExchangeData.chunksSent - 1, payload: nextChunk)
         
         self.pendingAdjacencyExchangesSent[vertex]?.chunksSent =  self.pendingAdjacencyExchangesSent[vertex]!.chunksSent + 1;
+        
     }
+    
+    /// wrapped the message with AdjacencyExchangeMessage
+    func prepareMessageWrapper(payload: Data, type: ExchangeMessageType) -> Data? {
+        
+        let codedMessage = BTAdjacencyExchangeMessage(type: type, sender: self.name!, messagePayload: payload)
+        
+        guard var messageData = BTAdjacencyExchangeMessage.BTAdjacencyExchangeMessageEncoder(message: codedMessage) else {
+            print("could not enconde message")
+            return nil;
+        }
+        
+        return messageData
+    }
+    
+    /// send ack when receiving a AdjacencyExchangePackage
+    func sendPackageAcknowledgment(packagedReceived: Int, to vertex: String){
+        
+        let acknowledgement = AdjacencyPackageAcknowledgement(receivedPackageNumber: packagedReceived)
+        
+        guard var messageData = AdjacencyPackageAcknowledgement.AdjacencyPackageAcknowledgementEncoder(message: acknowledgement) else {
+            print("could not enconde message")
+            return;
+        }
+        
+        guard var wrappedMessageData = prepareMessageWrapper(payload: messageData, type: .packageAcknowledgement) else {
+            return;
+        }
+        
+        sendData(send: wrappedMessageData, to: vertex, characteristic: BluetoothConstants.routingCharacteristicID)
+    }
+    
+    /// process an ack sent by a vertex we are currently sending our adjacencyList
+    func processReceivedPackageAcknowledgment(){}
+    
+    /// process to determine if an exchange requested by a user is warranted
+    func processIncomingAdjacencyRequest(){}
+    
+    /// send a request if certain amount of time has passed
+    func sendAdjacencyRequest(){}
+    
+    /// process a received AdjacencyExchangePackage
+    func processReceivedPackage(){}
+    
+    
+    
+    
+    
+    
+    
 }
 
 
