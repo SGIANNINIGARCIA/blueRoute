@@ -7,7 +7,9 @@
 
 import Foundation
 
-// Struct for sharing adjacency lists in between connected devices/nodes
+/// Struct for sharing adjacency lists in between connected devices/nodes
+/// Exchange Vertex contains the info a single vertex,  it's connected edges and the last time
+/// the connected edges list was updated
 struct ExchangeVertex: Codable, Hashable {
     var name: String;
     var lastUpdated: Date;
@@ -25,7 +27,7 @@ struct ExchangeVertex: Codable, Hashable {
 }
 
 
-struct BTAdjacencyListExchange: Codable, Hashable {
+struct BTAdjacencyList: Codable, Hashable {
     var sender: String
     var adjacencyList: [ExchangeVertex]
     
@@ -38,7 +40,7 @@ struct BTAdjacencyListExchange: Codable, Hashable {
         hasher.combine(sender)
     }
     
-    public static func BTAdjacencyListExchangeDecoder(message: String) -> BTAdjacencyListExchange? {
+    public static func BTAdjacencyListDecoder(message: String) -> BTAdjacencyList? {
         
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
@@ -51,7 +53,7 @@ struct BTAdjacencyListExchange: Codable, Hashable {
         
         //5 - Use the jsonDecoder instance to decode the json into a Person object
         do {
-            let decodedMessage = try jsonDecoder.decode(BTAdjacencyListExchange.self, from: messageData)
+            let decodedMessage = try jsonDecoder.decode(BTAdjacencyList.self, from: messageData)
             print("AdjacencyList sent by -- \(decodedMessage.sender)")
             return decodedMessage;
         } catch {
@@ -61,7 +63,7 @@ struct BTAdjacencyListExchange: Codable, Hashable {
         
     }
     
-    public static func BTAdjacencyListExchangeEncoder(message: BTAdjacencyListExchange) -> Data? {
+    public static func BTAdjacencyListEncoder(message: BTAdjacencyList) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted
