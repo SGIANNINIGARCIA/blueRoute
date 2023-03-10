@@ -339,7 +339,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             
         case BluetoothConstants.adjExchangeCharacteristicID:
             print("central: peripheral sent a list")
-            //process AdjExchange
+            bluetoothController.processAdjacencyExchangeMessage(data)
            
         default:
             print("no matching characteristic")

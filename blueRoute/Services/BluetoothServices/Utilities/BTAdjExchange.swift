@@ -81,7 +81,7 @@ struct AdjacencyExchangeRequest: Codable {
     
     
     
-    public static func AdjacencyExchangeRequestDecoder(message: String) -> AdjacencyExchangeRequest? {
+    public static func decoder(message: String) -> AdjacencyExchangeRequest? {
         
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
@@ -103,7 +103,7 @@ struct AdjacencyExchangeRequest: Codable {
         
     }
     
-    public static func AdjacencyExchangeRequestEncoder(message: AdjacencyExchangeRequest) -> Data? {
+    public static func encoder(message: AdjacencyExchangeRequest) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted
@@ -133,7 +133,7 @@ struct AdjacencyExchangePackage: Codable {
         case payload
     }
     
-    public static func AdjacencyExchangePackageDecoder(message: String) -> AdjacencyExchangePackage? {
+    public static func decoder(message: String) -> AdjacencyExchangePackage? {
         
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
@@ -155,7 +155,7 @@ struct AdjacencyExchangePackage: Codable {
         
     }
     
-    public static func AdjacencyExchangePackageEncoder(message: AdjacencyExchangePackage) -> Data? {
+    public static func encoder(message: AdjacencyExchangePackage) -> Data? {
                 
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

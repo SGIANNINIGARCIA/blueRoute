@@ -58,7 +58,7 @@ struct test: View {
             print("\(edge.destination.displayName)")
         }
          
-         */
+        
         
         var adjList = (self.AdjMatrix.processForExchange())
         self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
@@ -122,7 +122,7 @@ struct test: View {
         print("test data size is: \(testData.count)")
         
         
-        
+         */
     }
     
     
