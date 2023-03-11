@@ -126,5 +126,9 @@ class Vertex: Identifiable, Equatable, Hashable {
     func setEdgesLastUpdated(_ date: Date) {
         self.edgesLastUpdated = date;
     }
+    
+    func updateLastExchangeDate(){
+        self.lastExchangeDate = Date();
+    }
 
 }

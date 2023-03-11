@@ -33,6 +33,7 @@ class BluetoothController: ObservableObject {
     public var pendingAdjacencyExchangesSent: [Vertex: PendingExchange] = [:]
     public var pendingAdjacencyExchangesReceived: [Vertex: PendingExchange] = [:]
     private var exchangeTimer: Timer?
+    private var exchangeCleanUpTimer: Timer?
     
     
     init(dataController: DataController, context: NSManagedObjectContext) {
@@ -61,6 +62,12 @@ class BluetoothController: ObservableObject {
         self.exchangeTimer = Timer.scheduledTimer(timeInterval: 30,
                                                   target: self,
                                                   selector: #selector(checkLastAdjacencyExchange),
+                                                  userInfo: nil,
+                                                  repeats: true)
+        
+        self.exchangeCleanUpTimer = Timer.scheduledTimer(timeInterval: 30,
+                                                  target: self,
+                                                  selector: #selector(cleanUpPendingExchanges),
                                                   userInfo: nil,
                                                   repeats: true)
     }

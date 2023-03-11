@@ -31,7 +31,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     /// members used to check whether we need to send
     /// a requesting user our adjacencyList
     var timeOfLastUpdate: Date?
-    var lastUpdateTriggeredBy: String?;
+    var lastUpdateTriggeredBy: UUID?;
     
     init() {
     }
@@ -45,21 +45,21 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
         let newVertex = Vertex(name: name)
         adjacencies.append(newVertex)
         return newVertex;
-            
+        
     }
     
     func createVertex(name: String, peripheral: CBPeripheral) -> Vertex {
         let newVertex = Vertex(name: name, peripheral: peripheral)
         adjacencies.append(newVertex)
         return newVertex;
-            
+        
     }
     
     func createVertex(name: String, central: CBCentral) -> Vertex {
         let newVertex = Vertex(name: name, central: central)
         adjacencies.append(newVertex)
         return newVertex;
-            
+        
     }
     
     func addEdge(between source: Vertex, and destination: Vertex) {
@@ -100,7 +100,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     }
     
     func printVertices() -> [String] {
-      var toBeRe = [String]()
+        var toBeRe = [String]()
         for (vertex) in adjacencies {
             toBeRe.append(vertex.displayName)
         }
@@ -111,8 +111,8 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
 }
 
 enum Visit {
-  case source
-  case edge(Edge)
+    case source
+    case edge(Edge)
 }
 
 
@@ -128,29 +128,29 @@ extension AdjacencyList {
         var visits : [Vertex: Visit] = [source: .source]
         
         while let visitedVertex = queue.dequeue() {
-          if visitedVertex == destination {
-            var vertex = destination // 1
-            var route : [Edge] = [] // 2
-              
-              while let visit = visits[vertex],
-                case .edge(let edge) = visit { // 3
-
-                route = [edge] + route
-                vertex = edge.source // 4
-
-              }
-              return route // 5
+            if visitedVertex == destination {
+                var vertex = destination // 1
+                var route : [Edge] = [] // 2
+                
+                while let visit = visits[vertex],
+                      case .edge(let edge) = visit { // 3
+                    
+                    route = [edge] + route
+                    vertex = edge.source // 4
+                    
+                }
+                return route // 5
             }
             let neighbourEdges = edges(from: visitedVertex)
             for edge in neighbourEdges {
-              if visits[edge.destination] == nil { // 2
-                queue.enqueue(edge.destination)
-                visits[edge.destination] = .edge(edge) // 3
-              }
+                if visits[edge.destination] == nil { // 2
+                    queue.enqueue(edge.destination)
+                    visits[edge.destination] = .edge(edge) // 3
+                }
             }
-          }
-          return nil
         }
+        return nil
+    }
     
     /// Returns the next hop a message needs to be routed to
     ///
@@ -172,35 +172,6 @@ extension AdjacencyList {
 
 extension AdjacencyList {
     
-    // Used to update our adjecency list with one passed by another vertex
-    public func updateList(with exchangedList: [ExchangeVertex]) {
-        
-        
-        for (vertex) in exchangedList{
-            
-            // 1. check if we already have the vertex in our adjecency list
-            // and use the existing vertex to re-build/update it's edge list
-            if let existingVertex = findVertex(vertex.name) {
-                
-                // 2. check if the edge list we received is more recent than
-                // the one we currently have. If it is, then we proceed with updating it
-                if(vertex.lastUpdated >= existingVertex.edgesLastUpdated ?? vertex.lastUpdated) {
-                    buildEdgeList(source: existingVertex, userList: vertex.edges)
-                    
-                    // since we updated the edge list, then we also update the
-                    // edges last updated member
-                    existingVertex.edgesLastUpdated = vertex.lastUpdated
-                }
-                
-            } else {
-                // if not, then we create append a new vertex to our list and
-                // build its edge list with the data shared by our edge
-                let newVertex = createVertex(name: vertex.name)
-                buildEdgeList(source: newVertex, userList: vertex.edges)
-            }
-        }
-    }
-    
     // Used to update our adjecency list with one passed by another device
     public func buildEdgeList(source: Vertex, userList: [String]) {
         
@@ -220,7 +191,7 @@ extension AdjacencyList {
         
         // 3. itireate through the updated/new list
         for name in userList {
-
+            
             // 4. check if the vertex already exist and use the reference
             if let userVertex = findVertex(name) {
                 
@@ -281,7 +252,7 @@ extension AdjacencyList {
         // Remove the edge where source is self and dest is the user to be removed
         removeEdge(remove: vertexToRemove, from: self.selfVertex)
         self.selfVertex.edgesLastUpdated = Date()
-        self.lastUpdateTriggeredBy = vertexToRemove.fullName;
+        self.lastUpdateTriggeredBy = vertexToRemove.id;
         self.timeOfLastUpdate = Date();
         
         // Remove the vertex if there is no path to it
@@ -293,7 +264,7 @@ extension AdjacencyList {
     
     
     public func removeVertex(_ vertexToRemove: Vertex) {
-                
+        
         // 1. check if there is a path to it without our edge
         if !isReachable(vertexToRemove) {
             // 2. save all the vertices it is connected to for later
@@ -333,39 +304,20 @@ extension AdjacencyList {
     // Convert Adjecency List into an dictionary where
     // key is the vertex's fullname (displayName+separator+ID) and the value is an array containing
     // the fullname (displayName+separator+ID) of all the edges
-    public func processForExchange() -> [ExchangeVertex] {
+    public func processListForExchange() -> [ExchangeVertex] {
         
+        let adjacencies = self.adjacencies;
         var processedList = [ExchangeVertex]();
         
-        for (vertex) in self.adjacencies {
+        for (vertex) in adjacencies {
             
             var edges = [String]()
             
             for edge in vertex.edges {
-                edges.append(edge.destination.fullName)
+                edges.append(String(adjacencies.firstIndex(where: {$0.id == edge.destination.id})!))
             }
             
-            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated ?? Date(), edges: edges)
-            
-            processedList.append(vertexToSend)
-        }
-        
-        return processedList;
-    }
-    
-    public func processForCompressedExchange() -> [ExchangeVertex] {
-        
-        var processedList = [ExchangeVertex]();
-        
-        for (vertex) in self.adjacencies {
-            
-            var edges = [String]()
-            
-            for edge in vertex.edges {
-                edges.append(String(self.adjacencies.firstIndex(where: {$0.id == edge.destination.id})!))
-            }
-            
-            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated ?? Date(), edges: edges)
+            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated, edges: edges)
             
             processedList.append(vertexToSend)
         }
@@ -385,34 +337,6 @@ extension AdjacencyList {
  */
 
 extension AdjacencyList {
-    
-    public func processExchangedList(from user: String, adjList: [ExchangeVertex]) {
-        
-        // check if the user who shared the list exists in our adjecency list
-        if let userVertex = findVertex(user) {
-            // Since the user shared the list, we can assume we have a direct connection to
-            // this user, so we add this user as one of our edges
-            
-            // First, we check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
-            
-            
-            if(!edgeExists) {
-                addEdge(between: self.selfVertex, and: userVertex)
-            }
-            
-            updateList(with: adjList)
-            
-        } else {
-            // This is a new edge so we must create the vertex and add an edge to ourselves
-            let newUserVertex = createVertex(name: user)
-            addEdge(between: self.selfVertex, and: newUserVertex)
-            updateList(with: adjList)
-            
-        }
-    }
-    
-    
     
     /// Method to process an incoming handshake from a central, check if it exist, and create/update the vertex
     ///
@@ -478,95 +402,77 @@ extension AdjacencyList {
         }
         
     }
-
+    
 }
 
 
-/// deprecated methods for processing adjLists
 extension AdjacencyList {
     
-    /// Method to process and update the adjacency list shared by another user
+    /// Method to handle a AdjacencyList shared by one of our neighbors
     ///
     /// - Parameters:
-    ///     - user: The fullName of the user who we connected to
-    ///     - peripheral: a reference to the peripheral who sent the list
-    public func processExchangedList(from user: String, adjList: [ExchangeVertex], peripheral: CBPeripheral) {
+    ///     - user: The vertex who sent the adjacency list to process
+    ///     - adjList: the compressed AdjacencyList of the sender
+    public func processReceivedExchangedList(from userVertex: Vertex, compressedAdjList: CompressedAdjacencyList) {
         
-        // check if the user who shared the list exists in our adjecency list
-        if let userVertex = findVertex(user) {
-            // Since the user shared the list, we can assume we have a direct connection to
-            // this user, so we add this user as one of our edges
-            
-            // Update the most recent CBPEER reference of the vertex if needed
-            if(userVertex.sendTo != .peripheral || userVertex.peripheral != peripheral) {
-                userVertex.changePeripheralReference(peripheral)
-            }
-            
-            // First, we check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
-            
-            
-            if(!edgeExists) {
-                addEdge(between: self.selfVertex, and: userVertex)
-            }
-            
-            self.lastUpdateTriggeredBy = userVertex.fullName
-            self.timeOfLastUpdate = Date()
-            updateList(with: adjList)
-            
-        } else {
-            // This is a new edge so we must create the vertex and add an edge to ourselves
-            let newUserVertex = createVertex(name: user, peripheral: peripheral)
-            addEdge(between: self.selfVertex, and: newUserVertex)
-            
-            self.lastUpdateTriggeredBy = newUserVertex.fullName
-            self.timeOfLastUpdate = Date()
-            
-            updateList(with: adjList)
-            
+        // Since the user shared the list, we can assume we have a direct connection to
+        // this user, so we add this user as one of our edges
+        
+        // First, we check if the edge exists and if it doesn't then create the edge
+        let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
+        
+        
+        if(!edgeExists) {
+            addEdge(between: self.selfVertex, and: userVertex)
         }
+        
+        self.lastUpdateTriggeredBy = userVertex.id
+        self.timeOfLastUpdate = Date()
+        
+        mergeExchangedAdjacencies(compressedAdjList);
+        
     }
     
-    /// Method to process and update our Adjacency List based on  the adjacency list shared by another user
+    /// Merges our adjacency list with one shared by one of our neighbors
     ///
     /// - Parameters:
-    ///     - user: The fullName of the user who we connected to
-    ///     - central: a reference to the central who sent the handshake
-    public func processExchangedList(from user: String, adjList: [ExchangeVertex], central: CBCentral) {
+    ///     - adjacencies: The compressed version of our neighbor's adjacency list
+    public func mergeExchangedAdjacencies(_ compressedAdjacencies: CompressedAdjacencyList) {
         
-        // check if the user who shared the list exists in our adjecency list
-        if let userVertex = findVertex(user) {
-            // Since the user shared the list, we can assume we have a direct connection to
-            // this user, so we add this user as one of our edges
+        /// decompressed list
+        var adjacencies = compressedAdjacencies.decompressList();
+        
+        for (vertex) in adjacencies {
             
-            // Update the most recent CBPEER reference of the vertex if needed
-            if(userVertex.sendTo != .central || userVertex.central != central) {
-                userVertex.changeCentralReference(central)
+            /// determine if the edgesLastUpdated value we have and the one shared are nil so we can compare
+            let sharedVertexHasDate = vertex.lastUpdated != nil;
+            
+            /// check if we already have the vertex in our adjecency list
+            /// and use the existing vertex to re-build/update it's edge list
+            if let existingVertex = findVertex(vertex.name) {
+                
+                /// determine if the edgesLastUpdated value we have and the one shared are nil so we can compare
+                let existingVertexHasDate = existingVertex.edgesLastUpdated != nil;
+                
+                /// if they are not nil, then compare the dates
+                /// else only rebuild the edge list if our value for the date is nil
+                if(existingVertexHasDate && sharedVertexHasDate) {
+                    
+                    /// if the list shared by the neighbor is more updated than ours, then rebuild this vertex's edge list
+                    if(existingVertex.edgesLastUpdated! < vertex.lastUpdated!) {
+                        buildEdgeList(source: existingVertex, userList: vertex.edges)
+                        existingVertex.setEdgesLastUpdated(vertex.lastUpdated!)
+                    }
+                } else if(existingVertexHasDate == false) {
+                    buildEdgeList(source: existingVertex, userList: vertex.edges)
+                    if(sharedVertexHasDate) {existingVertex.setEdgesLastUpdated(vertex.lastUpdated!)}
+                }
+            } else {
+                var newVertex = createVertex(name: vertex.name);
+                buildEdgeList(source: newVertex, userList: vertex.edges)
+                if(sharedVertexHasDate) {newVertex.setEdgesLastUpdated(vertex.lastUpdated!)}
             }
-            
-            // First, we check if the edge exists and if it doesn't then create the edge
-            let edgeExists = self.selfVertex.edges.contains(where: {$0.destination == userVertex})
-            
-            
-            if(!edgeExists) {
-                addEdge(between: self.selfVertex, and: userVertex)
-            }
-            
-            self.lastUpdateTriggeredBy = userVertex.fullName
-            self.timeOfLastUpdate = Date()
-            updateList(with: adjList)
-            
-        } else {
-            // This is a new edge so we must create the vertex and add an edge to ourselves
-            let newUserVertex = createVertex(name: user, central: central)
-            addEdge(between: self.selfVertex, and: newUserVertex)
-            
-            self.lastUpdateTriggeredBy = newUserVertex.fullName
-            self.timeOfLastUpdate = Date()
-            updateList(with: adjList)
-            
         }
+        
     }
-    
-    
 }
