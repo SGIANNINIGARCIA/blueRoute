@@ -42,6 +42,10 @@ class Vertex: Identifiable, Equatable, Hashable {
     // us by one of our edges
     var edgesLastUpdated: Date?
     
+    // Property to check if our list is more recent than the one passed to
+    // us by one of our edges
+    var lastExchangeDate: Date?
+    
     // Timer that calls the timeout
     var pingTimeOutTimer: Timer?
     

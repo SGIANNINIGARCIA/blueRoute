@@ -73,7 +73,7 @@ struct AdjacencyExchangeRequest: Codable {
     ///  Member describes the last time we received a AdjacencyList from the user and it is used
     ///  by the receiving user to determine if a new exchange is needed by comparing it with the last time their
     ///  adjacencyList was updated
-    var lastUpdateReceived: Date;
+    var lastUpdateReceived: Date?;
     
     enum CodingKeys: String, CodingKey {
         case lastUpdateReceived

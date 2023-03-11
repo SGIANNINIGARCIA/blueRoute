@@ -32,6 +32,7 @@ class BluetoothController: ObservableObject {
     /// a struct holding the data to send
     public var pendingAdjacencyExchangesSent: [Vertex: PendingExchange] = [:]
     public var pendingAdjacencyExchangesReceived: [Vertex: PendingExchange] = [:]
+    private var exchangeTimer: Timer?
     
     
     init(dataController: DataController, context: NSManagedObjectContext) {
@@ -55,6 +56,13 @@ class BluetoothController: ObservableObject {
                                          selector: #selector(checkDevicesLastConnection),
                                          userInfo: nil,
                                          repeats: true)
+        
+        
+        self.exchangeTimer = Timer.scheduledTimer(timeInterval: 30,
+                                                  target: self,
+                                                  selector: #selector(checkLastAdjacencyExchange),
+                                                  userInfo: nil,
+                                                  repeats: true)
     }
     
     // send data to a characteristic and returns true if it succeded
@@ -64,6 +72,31 @@ class BluetoothController: ObservableObject {
             print("could not find \(name)")
             return false;
         }
+        
+        // send the message using the newest reference we saved for the device
+        switch vertex.sendTo {
+        case .peripheral:
+           if let peripheral = vertex.peripheral {
+               central!.sendData(data, peripheral: peripheral, characteristic: characteristic)
+               return true;
+           } else {
+               fallthrough
+           }
+        case .central:
+            if let central = vertex.central {
+                peripheral!.sendData(data, central: central, characteristic: characteristic)
+                return true;
+            } else {
+                fallthrough
+            }
+        default:
+            print("unable to send message - could not find a reference to the device")
+            return false;
+        }
+    }
+    
+    // send data to a characteristic and returns true if it succeded with a vertex
+    public func sendData(send data: Data, to vertex: Vertex, characteristic: CBUUID) -> Bool {
         
         // send the message using the newest reference we saved for the device
         switch vertex.sendTo {
