@@ -32,6 +32,8 @@ struct AdjacencyExchangeMessageWrapper: Codable {
     
     public static func decoder(message: String) -> AdjacencyExchangeMessageWrapper? {
         
+        print("this is the wrapped message \(message)")
+        
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
 
@@ -47,7 +49,7 @@ struct AdjacencyExchangeMessageWrapper: Codable {
             print("Sender -- \(decodedMessage.sender) of type: \(decodedMessage.type)")
             return decodedMessage;
         } catch {
-            print("Error: \(error.localizedDescription)")
+            print("\(String(describing: error)) error at AdjacencyExchangeMessageWrapper decoder")
             return nil;
         }
         
@@ -62,7 +64,7 @@ struct AdjacencyExchangeMessageWrapper: Codable {
             let encodeMessage = try jsonEncoder.encode(message)
             return encodeMessage;
         } catch {
-            print(error.localizedDescription)
+            print("\(String(describing: error)) error at AdjacencyExchangeMessageWrapper encoder")
             return nil;
         }
     }

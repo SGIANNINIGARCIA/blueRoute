@@ -9,13 +9,15 @@ import Foundation
 
 /// Based  on testing we can exchange up to 524 bytes, leaving 200 bytes to hold metadata info like sender
 /// package number and totalamountofpackages
-let MAX_MTU = 350;
+let MAX_MTU = 150;
 
 extension BluetoothController {
     
     /// Receives the data sent by one of our neighbors through the AdjacencyExchange characteristic
     /// and process the data according to the type wrapped by the AdjacencyExchangeMessageWrapper
     func processAdjacencyExchangeMessage(_ data: Data) {
+        
+        //print("\(data.count)")
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
@@ -33,12 +35,15 @@ extension BluetoothController {
         
         switch(decodedMessageWrapper.type) {
         case .exchangeRequest:
+           // print("receive an exchange request")
             processIncomingAdjacencyExchangeRequest(from: sender, data: decodedMessageWrapper.messagePayload)
             
         case .exchangePackage:
+            //print("receive a package")
             processReceivedPackage(from: sender, data: decodedMessageWrapper.messagePayload)
             
         case .packageAcknowledgement:
+            //print("receive an acknowledgment")
             processReceivedPackageAcknowledgment(from: sender, data: decodedMessageWrapper.messagePayload)
         }
     }
@@ -59,15 +64,15 @@ extension BluetoothController {
             return;
         }
         
-        /// if nil, then we have never done an exchange with this user so we initiate the exchange
-        guard let timeOfLastExchange = request.lastUpdateReceived else {
-            return initiateAdjacencyExchange(with: requestor)
-        }
-        
         /// if we have updated our Adjacency List after our last exchange with the requestor
         /// and the requestor did not trigger our last update, then we initiate the exchange
         /// otherwise an exchange is not warrated and we can dismiss the request with no need for acknowledgement
-        if(self.adjList.timeOfLastUpdate! > timeOfLastExchange && self.adjList.lastUpdateTriggeredBy != requestor.id) {
+        guard let timeOfLastUpdate  = self.adjList.timeOfLastUpdate, let lastUpdateTriggeredBy = self.adjList.lastUpdateTriggeredBy, let timeOfLastExchange = request.lastUpdateReceived else {
+            return initiateAdjacencyExchange(with: requestor);
+        }
+        
+        if(timeOfLastUpdate > timeOfLastExchange && lastUpdateTriggeredBy != requestor.id) {
+            print("initiated adjacency request with \(requestor.displayName)")
             initiateAdjacencyExchange(with: requestor)
         }
     }
@@ -114,10 +119,14 @@ extension BluetoothController {
         /// Send the data through the AdjacencyExchange characteristic
         let sentSuccesfully = sendData(send: wrappedPackage, to: vertex, characteristic: BluetoothConstants.adjExchangeCharacteristicID)
         
+       
+        
         /// if it sends, then add one to the processed chunks
         if(sentSuccesfully) {
             self.pendingAdjacencyExchangesSent[vertex]?.update();
             
+        } else {
+            print("failed to send data package number: \(packageToSend.currentPackageNumber) to \(vertex.displayName)")
         }
     }
     
@@ -130,18 +139,18 @@ extension BluetoothController {
         let acknowledgement = AdjacencyPackageAcknowledgement(receivedPackageNumber: packagedReceived)
         
         /// encode acknowledgment
-        guard var messageData = AdjacencyPackageAcknowledgement.encoder(message: acknowledgement) else {
+        guard let messageData = AdjacencyPackageAcknowledgement.encoder(message: acknowledgement) else {
             print("could not enconde message")
             return;
         }
         
         /// wrap acknowledgment
-        guard var wrappedMessageData = prepareMessageWrapper(payload: messageData, type: .packageAcknowledgement) else {
+        guard let wrappedMessageData = prepareMessageWrapper(payload: messageData, type: .packageAcknowledgement) else {
             return;
         }
         
         /// Send the wrapped acknowledgment through the AdjacencyExchange characteristic
-        sendData(send: wrappedMessageData, to: vertex, characteristic: BluetoothConstants.routingCharacteristicID)
+       _ = sendData(send: wrappedMessageData, to: vertex, characteristic: BluetoothConstants.adjExchangeCharacteristicID)
     }
     
     /// Method to process an acknowledgment sent by a vertex we are currently sending our adjacencyList to
@@ -150,13 +159,18 @@ extension BluetoothController {
         
         let receivedData = String(decoding: data, as: UTF8.self)
         
-        guard var acknowledgement = AdjacencyPackageAcknowledgement.decoder(message: receivedData) else {
+        guard let acknowledgement = AdjacencyPackageAcknowledgement.decoder(message: receivedData) else {
             return print("unable to decode ack data")
         }
         
         /// If all packages have been sent, then we remove the PendingExchange from our list
         /// else, we send the next data segment
-        if (acknowledgement.receivedPackageNumber == self.pendingAdjacencyExchangesSent[sender]?.segmentsProcessed) {
+        
+        guard let totalPackageCount = self.pendingAdjacencyExchangesSent[sender]?.dataSegments.count else {
+            return;
+        }
+                
+        if (acknowledgement.receivedPackageNumber == totalPackageCount) {
             self.pendingAdjacencyExchangesSent.removeValue(forKey: sender)
         } else {
             sendDataSegment(to: sender)
@@ -176,9 +190,9 @@ extension BluetoothController {
             return print("unable to wrap the request")
         }
         
-        sendData(send: wrappedRequest, to: vertex, characteristic: BluetoothConstants.adjExchangeCharacteristicID)
+       _ = sendData(send: wrappedRequest, to: vertex, characteristic: BluetoothConstants.adjExchangeCharacteristicID)
         
-        /// update the time our last exchange date
+        /// update the time of our last exchange date with this vertex
         vertex.updateLastExchangeDate()
     }
     
@@ -192,18 +206,24 @@ extension BluetoothController {
             return;
         }
         
-        /// send an acknowledgement back
-        sendPackageAcknowledgment(packagedReceived: packageData.currentPackageNumber, to: sender)
-        
         /// Check if there is already an ongoing exchange
         if(self.pendingAdjacencyExchangesReceived.contains(where: {$0.key == sender})) {
             
             /// update it with the data we received
             self.pendingAdjacencyExchangesReceived[sender]?.update(packageData)
             
-            /// rebuild the exchanged adjacencyList if we received all packages
+            /// send an acknowledgement back
+            sendPackageAcknowledgment(packagedReceived: packageData.currentPackageNumber, to: sender)
+            
+            /// rebuild the exchanged adjacencyList if we received all packages and remove PendingExchange
             if(packageData.packageTotalCount == self.pendingAdjacencyExchangesReceived[sender]?.segmentsProcessed) {
-                rebuildSegmentedAdjacencyList(self.pendingAdjacencyExchangesReceived[sender]!.dataSegments, from: sender)
+                
+                guard let rebuiltList = rebuildSegmentedAdjacencyList(self.pendingAdjacencyExchangesReceived[sender]!.dataSegments, from: sender) else {
+                    return;
+                }
+                
+                self.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                self.pendingAdjacencyExchangesReceived.removeValue(forKey: sender)
             }
             
         } else {
@@ -211,55 +231,21 @@ extension BluetoothController {
             let inProcessExchange = PendingExchange(dataSegments: [packageData.payload])
             self.pendingAdjacencyExchangesReceived[sender] = inProcessExchange;
             
-            /// rebuild the exchanged adjacencyList if we received all packages
+            /// send an acknowledgement back
+            sendPackageAcknowledgment(packagedReceived: packageData.currentPackageNumber, to: sender)
+            
+            /// rebuild the exchanged adjacencyList if we received all packages and remove PendingExchange
             if(packageData.packageTotalCount == self.pendingAdjacencyExchangesReceived[sender]?.segmentsProcessed) {
-                rebuildSegmentedAdjacencyList(self.pendingAdjacencyExchangesReceived[sender]!.dataSegments, from: sender)
+                guard let rebuiltList = rebuildSegmentedAdjacencyList(self.pendingAdjacencyExchangesReceived[sender]!.dataSegments, from: sender) else {
+                    return;
+                }
+                
+                self.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                self.pendingAdjacencyExchangesReceived.removeValue(forKey: sender)
             }
         }
         
         
-    }
-    
-    @objc func checkLastAdjacencyExchange() {
-        
-        let neighbors = self.adjList.getNeighbors()
-        
-        for (neighbor) in neighbors {
-            // Check if its time to send an exchange request
-            guard let lastExchange = neighbor.lastExchangeDate else {
-                return sendAdjacencyRequest(to: neighbor)
-                print("sent a exchange request to \(neighbor.displayName)")
-            }
-            
-            if(Date.now.timeIntervalSince(lastExchange) > BluetoothConstants.LastExchangeInterval) {
-                // Send an exchange request
-                sendAdjacencyRequest(to: neighbor)
-                print("sent a exchange request to \(neighbor.displayName)")
-            }
-        }
-    }
-    
-    @objc func cleanUpPendingExchanges() {
-        
-        for (pending) in self.pendingAdjacencyExchangesSent {
-            
-            /// get the last update info
-            var timeOfLastUpdate = pending.value.timeOfLastPackage!
-            
-            if(Date.now.timeIntervalSince(timeOfLastUpdate) > 120) {
-                self.pendingAdjacencyExchangesSent.removeValue(forKey: pending.key)
-            }
-        }
-        
-        for (pending) in self.pendingAdjacencyExchangesReceived {
-            
-            /// get the last update info
-            var timeOfLastUpdate = pending.value.timeOfLastPackage!
-            
-            if(Date.now.timeIntervalSince(timeOfLastUpdate) > 120) {
-                self.pendingAdjacencyExchangesReceived.removeValue(forKey: pending.key)
-            }
-        }
     }
     
     /// Returns a PendingExchange with the segmented data of our AdjacencyList
@@ -305,7 +291,7 @@ extension BluetoothController {
         
         let codedMessage = AdjacencyExchangeMessageWrapper(type: type, sender: self.name!, messagePayload: payload)
         
-        guard var messageData = AdjacencyExchangeMessageWrapper.encoder(message: codedMessage) else {
+        guard let messageData = AdjacencyExchangeMessageWrapper.encoder(message: codedMessage) else {
             print("could not enconde message")
             return nil;
         }
@@ -313,7 +299,10 @@ extension BluetoothController {
         return messageData
     }
     
-    func rebuildSegmentedAdjacencyList(_ segments: [Data], from vertex: Vertex){
+    /// returns the rebuilt CompressedAdjacencyExchange passed in the form of data segments
+    func rebuildSegmentedAdjacencyList(_ segments: [Data], from vertex: Vertex) -> CompressedAdjacencyList? {
+        
+        print("rebuilding list")
         
         var rebuiltData = Data();
         
@@ -326,74 +315,59 @@ extension BluetoothController {
         
         guard let decodedCompressedAdjList: CompressedAdjacencyList = CompressedAdjacencyList.decoder(message: processedRebuiltData) else {
             print("unable to decode compressed list")
-            return;
+            return nil;
+        }
+        
+        return decodedCompressedAdjList;
+    }
+    
+    
+    /// Timer related methods for Adjacency Exchange
+    
+    @objc func checkForDueOrExpiredExchanges() {
+        checkForDueExchanges();
+        cleanUpPendingExchanges();
+    }
+    
+    // Check if its time to send an exchange request
+    private func checkForDueExchanges() {
+        let neighbors = self.adjList.getNeighbors()
+        
+        for (neighbor) in neighbors {
+            guard let lastExchange = neighbor.lastExchangeDate else {
+                return sendAdjacencyRequest(to: neighbor)
+              
+            }
+            
+            if(Date.now.timeIntervalSince(lastExchange) > BluetoothConstants.LastExchangeInterval) {
+                // Send an exchange request
+                sendAdjacencyRequest(to: neighbor)
+                print("sent a exchange request to \(neighbor.displayName)")
+            }
+        }
+    }
+    
+    private func cleanUpPendingExchanges() {
+        
+        for (pending) in self.pendingAdjacencyExchangesSent {
+            
+            /// get the last update info
+            let timeOfLastUpdate = pending.value.timeOfLastPackage!
+            
+            if(Date.now.timeIntervalSince(timeOfLastUpdate) > 120) {
+                self.pendingAdjacencyExchangesSent.removeValue(forKey: pending.key)
+            }
+        }
+        
+        for (pending) in self.pendingAdjacencyExchangesReceived {
+            
+            /// get the last update info
+            let timeOfLastUpdate = pending.value.timeOfLastPackage!
+            
+            if(Date.now.timeIntervalSince(timeOfLastUpdate) > 120) {
+                self.pendingAdjacencyExchangesReceived.removeValue(forKey: pending.key)
+            }
         }
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-struct TestStruct: Codable, Hashable {
-    var one: String;
-    //var two: Int;
-    //var three: Int;
-    //var four: Int;
-    
-    enum CodingKeys: String, CodingKey {
-        case one
-        // case two
-        // case three
-        //case four
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(one)
-    }
-    
-    public static func tdecoder(message: String) -> TestStruct? {
-        
-        //2 - Convert the string to data
-        let messageData = Data(message.utf8)
-        
-        //3 - Create a JSONDecoder instance
-        let jsonDecoder = JSONDecoder()
-        
-        //4 - set the keyDecodingStrategy to convertFromSnakeCase on the jsonDecoder instance
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        //5 - Use the jsonDecoder instance to decode the json into a Person object
-        do {
-            let decodedMessage = try jsonDecoder.decode(TestStruct.self, from: messageData)
-            return decodedMessage;
-        } catch {
-            print("Error: \(error.localizedDescription)")
-            return nil;
-        }
-        
-    }
-    
-    public static func tencoder(message: TestStruct) -> Data? {
-        
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.outputFormatting = .prettyPrinted
-        
-        do {
-            let encodeMessage = try jsonEncoder.encode(message)
-            return encodeMessage;
-        } catch {
-            print(error.localizedDescription)
-            return nil;
-        }
-        
-    }
-}

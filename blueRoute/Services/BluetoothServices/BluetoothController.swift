@@ -27,13 +27,14 @@ class BluetoothController: ObservableObject {
     private var pingDevicesTimer: Timer?
     private var pingedDevices = [Device]();
     
-    /// Member to hold the AdjList exchanges that have not been completed yet
-    /// where the key is the vertex we are sending the AdjacencyList and PendingExchange is
-    /// a struct holding the data to send
+    /// Members to hold the AdjList exchanges that have not been completed yet
+    /// where the key is the vertex we are sending/receiving the AdjacencyList and PendingExchange is
+    /// a struct holding the data to send/receive
     public var pendingAdjacencyExchangesSent: [Vertex: PendingExchange] = [:]
     public var pendingAdjacencyExchangesReceived: [Vertex: PendingExchange] = [:]
+    
+    /// timer to check for due exchanges and clean up expired ones
     private var exchangeTimer: Timer?
-    private var exchangeCleanUpTimer: Timer?
     
     
     init(dataController: DataController, context: NSManagedObjectContext) {
@@ -61,13 +62,7 @@ class BluetoothController: ObservableObject {
         
         self.exchangeTimer = Timer.scheduledTimer(timeInterval: 30,
                                                   target: self,
-                                                  selector: #selector(checkLastAdjacencyExchange),
-                                                  userInfo: nil,
-                                                  repeats: true)
-        
-        self.exchangeCleanUpTimer = Timer.scheduledTimer(timeInterval: 30,
-                                                  target: self,
-                                                  selector: #selector(cleanUpPendingExchanges),
+                                                  selector: #selector(checkForDueOrExpiredExchanges),
                                                   userInfo: nil,
                                                   repeats: true)
     }
@@ -162,7 +157,7 @@ extension BluetoothController {
             return;
         }
         
-       var successful = sendData(send: messageData, to: name, characteristic: BluetoothConstants.chatCharacteristicID)
+        let successful = sendData(send: messageData, to: name, characteristic: BluetoothConstants.chatCharacteristicID)
         saveMessage(message: codedMessage, isSelf: true, sendStatus: successful)
     }
     
@@ -228,7 +223,7 @@ extension BluetoothController {
             return;
         }
         
-        var successful = sendData(send: messageData, to: nextHop.fullName, characteristic: BluetoothConstants.routingCharacteristicID)
+        _ = sendData(send: messageData, to: nextHop, characteristic: BluetoothConstants.routingCharacteristicID)
     }
     
     public func sendRoutedMessage(send message: String, to name: String){
@@ -274,12 +269,14 @@ extension BluetoothController {
         
         switch(device) {
         case is CBPeripheral:
-            self.adjList.processHandshake(from: decodedBTHandshake.name, peripheral: device as! CBPeripheral)
+           let vertex = self.adjList.processHandshake(from: decodedBTHandshake.name, peripheral: device as! CBPeripheral)
             print("adding/updating vertex with peripheral")
+            sendAdjacencyRequest(to: vertex)
             
         case is CBCentral:
-            self.adjList.processHandshake(from: decodedBTHandshake.name, central: device as! CBCentral)
+            let vertex = self.adjList.processHandshake(from: decodedBTHandshake.name, central: device as! CBCentral)
             print("adding/updating vertex with central")
+            sendAdjacencyRequest(to: vertex)
         default:
             print("unable to process")
         }
@@ -345,14 +342,14 @@ extension BluetoothController {
             }
         }
     }
-    public func sendInitialPing(_ device: Device){
+    public func sendInitialPing(_ vertex: Vertex){
         
         guard let sender = self.name else {
             print("unable to ping, name not set")
             return;
         }
         
-        let receiver = device.displayName + BluetoothConstants.NameIdentifierSeparator + device.id.uuidString
+        let receiver = vertex.displayName + BluetoothConstants.NameIdentifierSeparator + vertex.id.uuidString
         let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
         
         guard let messageData = BTPing.BTPingEncoder(message: codedMessage) else {
@@ -360,7 +357,7 @@ extension BluetoothController {
             return;
         }
         
-        sendData(send: messageData, to: receiver, characteristic: BluetoothConstants.pingCharacteristicID)
+        _ = sendData(send: messageData, to: vertex, characteristic: BluetoothConstants.pingCharacteristicID)
         
     }
     private func respondToPing(_ pingReceived: BTPing){
@@ -373,7 +370,7 @@ extension BluetoothController {
             return;
         }
         
-        sendData(send: messageData, to: pingReceived.pingSender, characteristic: BluetoothConstants.pingCharacteristicID)
+       _ = sendData(send: messageData, to: pingReceived.pingSender, characteristic: BluetoothConstants.pingCharacteristicID)
     }
     
     // If pingTimeout is triggered, we removed the device from the list

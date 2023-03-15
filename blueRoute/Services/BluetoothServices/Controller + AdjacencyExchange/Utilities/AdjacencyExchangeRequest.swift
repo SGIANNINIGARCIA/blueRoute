@@ -42,7 +42,7 @@ struct AdjacencyExchangeRequest: Codable {
             let decodedMessage = try jsonDecoder.decode(AdjacencyExchangeRequest.self, from: messageData)
             return decodedMessage;
         } catch {
-            print("Error: \(error.localizedDescription)")
+            print("\(String(describing: error)) error at AdjacencyExchangeRequest decoder")
             return nil;
         }
         
@@ -57,7 +57,7 @@ struct AdjacencyExchangeRequest: Codable {
             let encodeMessage = try jsonEncoder.encode(message)
             return encodeMessage;
         } catch {
-            print(error.localizedDescription)
+            print("\(String(describing: error)) error at AdjacencyExchangeRequest encoder")
             return nil;
         }
     }

@@ -216,7 +216,7 @@ extension AdjacencyList {
     public func findVertex(_ name: String) -> Vertex? {
         // Get the index, if there is one
         
-        print("issue is now ehre \(name)")
+       // print("issue is now ehre \(name)")
         if let vertexIndex = adjacencies.firstIndex(where: { $0.id == BluetoothController.retrieveID(name: name) }) {
             return adjacencies[vertexIndex]
         } else {
@@ -343,7 +343,7 @@ extension AdjacencyList {
     /// - Parameters:
     ///     - user: The fullName of the user who we connected to
     ///     - central: a reference to the central who sent the handshake
-    public func processHandshake(from user: String, central: CBCentral) {
+    public func processHandshake(from user: String, central: CBCentral) -> Vertex {
         
         // check if the user who shared the list exists in our adjecency list
         if let userVertex = findVertex(user) {
@@ -361,12 +361,17 @@ extension AdjacencyList {
             
             if(!edgeExists) {
                 addEdge(between: self.selfVertex, and: userVertex)
+                self.selfVertex.edgesLastUpdated = Date();
             }
+            
+            return userVertex;
             
         } else {
             // This is a new edge so we must create the vertex and add an edge to ourselves
             let newUserVertex = createVertex(name: user, central: central)
             addEdge(between: self.selfVertex, and: newUserVertex)
+            self.selfVertex.edgesLastUpdated = Date();
+            return newUserVertex;
         }
     }
     
@@ -375,7 +380,7 @@ extension AdjacencyList {
     /// - Parameters:
     ///     - user: The fullName of the user who we connected to
     ///     - peripheral: a reference to the peripheral who sent the handshake
-    public func processHandshake(from user: String, peripheral: CBPeripheral) {
+    public func processHandshake(from user: String, peripheral: CBPeripheral) -> Vertex {
         
         // check if the user who shared the list exists in our adjecency list
         if let userVertex = findVertex(user) {
@@ -393,12 +398,18 @@ extension AdjacencyList {
             
             if(!edgeExists) {
                 addEdge(between: self.selfVertex, and: userVertex)
+                self.selfVertex.edgesLastUpdated = Date();
             }
+            
+            return userVertex;
             
         } else {
             // This is a new edge so we must create the vertex and add an edge to ourselves
             let newUserVertex = createVertex(name: user, peripheral: peripheral)
             addEdge(between: self.selfVertex, and: newUserVertex)
+            self.selfVertex.edgesLastUpdated = Date();
+            return newUserVertex;
+            
         }
         
     }
@@ -440,9 +451,11 @@ extension AdjacencyList {
     public func mergeExchangedAdjacencies(_ compressedAdjacencies: CompressedAdjacencyList) {
         
         /// decompressed list
-        var adjacencies = compressedAdjacencies.decompressList();
+        let adjacencies = compressedAdjacencies.decompressList();
         
         for (vertex) in adjacencies {
+            
+            if(vertex.name == selfVertex.fullName) {continue}
             
             /// determine if the edgesLastUpdated value we have and the one shared are nil so we can compare
             let sharedVertexHasDate = vertex.lastUpdated != nil;
@@ -468,7 +481,7 @@ extension AdjacencyList {
                     if(sharedVertexHasDate) {existingVertex.setEdgesLastUpdated(vertex.lastUpdated!)}
                 }
             } else {
-                var newVertex = createVertex(name: vertex.name);
+                let newVertex = createVertex(name: vertex.name);
                 buildEdgeList(source: newVertex, userList: vertex.edges)
                 if(sharedVertexHasDate) {newVertex.setEdgesLastUpdated(vertex.lastUpdated!)}
             }
