@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatView: View {
     
+    @Namespace var bottomID
     // Username of the user this chat is with
     var id: UUID;
     var displayName: String;
@@ -27,18 +28,24 @@ struct ChatView: View {
     
     var body: some View {
         VStack {
-            List {
-                ForEach(messages) { message in
-                    
-                    MessageView(currentMessage: message.content!, displayName: (message.chat?.displayName)!, isSelf: message.senderIsSelf)
-                        .listRowSeparator(.hidden)
-                    
+            ScrollViewReader { scrollViewProxy in
+                ZStack {
+                    ScrollView {
+                        VStack {
+                            ForEach(messages) { message in
+                                MessageView(currentMessage: message.content!, displayName: (message.chat?.displayName)!, isSelf: message.senderIsSelf)
+                            }
+                            Text("").id(bottomID)
+                        }
+                        .padding([.leading, .trailing], 8)
+                        .padding([.top, .bottom], 16)
+                        .onAppear{
+                            scrollViewProxy.scrollTo(bottomID)
+                        }
+                    }
                 }
-            }.listStyle(PlainListStyle())
-            
+            }
             TextInputView(displayName: displayName, id: id)
-            
-            
         }
         .navigationBarTitle(Text(self.displayName), displayMode: .inline)
         .onTapGesture {
@@ -46,6 +53,7 @@ struct ChatView: View {
         }
     }
 }
+
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {

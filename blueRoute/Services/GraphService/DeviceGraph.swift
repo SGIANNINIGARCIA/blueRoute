@@ -41,6 +41,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
         self.adjacencies.append(self.selfVertex)
     }
     
+    /// Creates a vertex with the given name, adds it to adjacencies and returns the new vertex
     func createVertex(name: String) -> Vertex {
         let newVertex = Vertex(name: name)
         adjacencies.append(newVertex)
@@ -48,13 +49,15 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
         
     }
     
+    /// Creates a vertex with the given name and the reference to the peripheral, adds it to adjacencies and returns the new vertex
     func createVertex(name: String, peripheral: CBPeripheral) -> Vertex {
         let newVertex = Vertex(name: name, peripheral: peripheral)
         adjacencies.append(newVertex)
         return newVertex;
         
     }
-    
+  
+    /// Creates a vertex with the given name and the reference to the central, adds it to adjacencies and returns the new vertex
     func createVertex(name: String, central: CBCentral) -> Vertex {
         let newVertex = Vertex(name: name, central: central)
         adjacencies.append(newVertex)
@@ -62,18 +65,18 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
         
     }
     
+    /// adds an new edge to the source and sets the destination to be the passed vertex
     func addEdge(between source: Vertex, and destination: Vertex) {
-        
         let newEdge = Edge(source: source, destination: destination)
         source.edges.append(newEdge)
-        print("adding new edge between \(source.displayName) and \(destination.displayName)")
-        
     }
     
+    /// returns all the edges belonging to the given source vertex
     func edges(from source: Vertex) -> [Edge] {
         return source.edges;
     }
     
+    /// returns all the Vertices who are edges to self
     func getNeighbors() -> [Vertex] {
         
         var neighbors: [Vertex] = [];
@@ -320,13 +323,6 @@ extension AdjacencyList {
         
     }
 }
-
-/*
- *
- * PROBABLY WILL UPDATE THE ORIGINAL TO ACCEPT CBPEER INSTEAD OF SPECIFIC CENTRAL/PERIPHERAL REF
- * BUT KEEPING IT HERE FOR NOW FOR TESTING
- *
- */
 
 extension AdjacencyList {
     

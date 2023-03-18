@@ -17,10 +17,12 @@ struct MessageView: View {
         HStack(alignment: .center, spacing: 24.0){
             if(!(isSelf)) {
                 Avatar(username: displayName)
+                ContentMessageView(contentMessage: currentMessage, isCurrentUser: isSelf)
+                Spacer()
             } else {
                 Spacer()
+                ContentMessageView(contentMessage: currentMessage, isCurrentUser: isSelf)
             }
-            ContentMessageView(contentMessage: currentMessage, isCurrentUser: isSelf)
         }
         .padding(.leading)
     }

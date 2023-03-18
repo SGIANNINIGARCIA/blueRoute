@@ -12,9 +12,6 @@ struct DiscoverView: View {
     @EnvironmentObject var bluetoothController: BluetoothController;
     @ObservedObject var adjacencyList : AdjacencyList;
     
-    
-    
-    
     var body: some View {
         NavigationView {
             VStack {
@@ -80,24 +77,5 @@ struct DiscoverView: View {
 struct DiscoverView_Previews: PreviewProvider {
     static var previews: some View {
         DiscoverView(adjacencyList: AdjacencyList())
-    }
-}
-
-
-
-struct ImmediateDiscover: View {
-    
-    @Binding var adjacencies: [Vertex];
-    
-    var body: some View {
-        Section {
-            ForEach(adjacencies) { user in
-                NavigationLink {
-                    ChatView(displayName: user.displayName, id: user.id)
-                } label: {
-                    Text(user.displayName)
-                }
-            }
-        }
     }
 }
