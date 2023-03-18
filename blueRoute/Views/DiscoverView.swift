@@ -26,23 +26,37 @@ struct DiscoverView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(adjacencyList.adjacencies.filter({$0.fullName != adjacencyList.selfVertex.fullName})) { user in
-                        NavigationLink {
-                            ChatView(displayName: user.displayName, id: user.id)
-                        } label: {
-                            Text(user.displayName)
+                    Section(header: Text("Neighbors")) {
+                        ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.isNeighbor($0.id)})) { user in
+                            NavigationLink {
+                                ChatView(displayName: user.displayName, id: user.id)
+                            } label: {
+                                DiscoveryAvatar(name: user.displayName)
+                            }
                         }
                     }
-                    .emptyState(adjacencyList.adjacencies.count == 1) {
-                        HStack {
-                            Spacer()
-                            LoadingIcon()
-                            Spacer()
+                    Section(header: Text("Reachable")) {
+                        ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.notANeighbor($0.id)})) { user in
+                            NavigationLink {
+                                ChatView(displayName: user.displayName, id: user.id)
+                            } label: {
+                                DiscoveryAvatar(name: user.displayName)
+                            }
                         }
                     }
                     
-                } .navigationTitle("Discover")
-                    .toolbar(Visibility.hidden)
+                }
+                .listStyle(GroupedListStyle())
+                .navigationTitle("Discover")
+                .toolbar(Visibility.hidden)
+                .emptyState(adjacencyList.adjacencies.count == 1) {
+                    HStack {
+                        Spacer()
+                        LoadingIcon()
+                        Spacer()
+                    }.frame(maxHeight: .infinity)
+                }
+        
                 
             }
         }
@@ -58,10 +72,32 @@ struct DiscoverView: View {
             bluetoothController.stopDiscovery()
         }
     }
+    
+    
 }
+
 
 struct DiscoverView_Previews: PreviewProvider {
     static var previews: some View {
         DiscoverView(adjacencyList: AdjacencyList())
+    }
+}
+
+
+
+struct ImmediateDiscover: View {
+    
+    @Binding var adjacencies: [Vertex];
+    
+    var body: some View {
+        Section {
+            ForEach(adjacencies) { user in
+                NavigationLink {
+                    ChatView(displayName: user.displayName, id: user.id)
+                } label: {
+                    Text(user.displayName)
+                }
+            }
+        }
     }
 }

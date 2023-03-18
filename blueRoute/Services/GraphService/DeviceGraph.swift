@@ -94,10 +94,32 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     ///
     func isNeighbor(_ name: String) -> Bool {
         
-        let neighbors = getNeighbors()
-        
-        return neighbors.contains(where: {$0.fullName == name})
+        return self.selfVertex.edges.contains(where: {$0.destination.fullName == name})
     }
+    
+    /// Check if an user is our neighbor
+    ///
+    /// - Parameters:
+    ///     - id:  the target user's ID
+    ///
+    /// - returns: A boolean, true if the user is a neighbor, false if not
+    ///
+    func isNeighbor(_ id: UUID) -> Bool {
+        return self.selfVertex.edges.contains(where: {$0.destination.id == id})
+    }
+    
+    /// Check if an user is our neighbor
+    ///
+    /// - Parameters:
+    ///     - id:  the target user's ID
+    ///
+    /// - returns: A boolean, true if the user is a neighbor, false if not
+    ///
+    func notANeighbor(_ id: UUID) -> Bool {
+        if(id == selfVertex.id) {return false}
+        return self.selfVertex.edges.contains(where: {$0.destination.id != id})
+    }
+    
     
     func printVertices() -> [String] {
         var toBeRe = [String]()
@@ -299,36 +321,6 @@ extension AdjacencyList {
     }
 }
 
-extension AdjacencyList {
-    
-    // Convert Adjecency List into an dictionary where
-    // key is the vertex's fullname (displayName+separator+ID) and the value is an array containing
-    // the fullname (displayName+separator+ID) of all the edges
-    public func processListForExchange() -> [ExchangeVertex] {
-        
-        let adjacencies = self.adjacencies;
-        var processedList = [ExchangeVertex]();
-        
-        for (vertex) in adjacencies {
-            
-            var edges = [String]()
-            
-            for edge in vertex.edges {
-                edges.append(String(adjacencies.firstIndex(where: {$0.id == edge.destination.id})!))
-            }
-            
-            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated, edges: edges)
-            
-            processedList.append(vertexToSend)
-        }
-        
-        return processedList;
-    }
-}
-
-
-
-
 /*
  *
  * PROBABLY WILL UPDATE THE ORIGINAL TO ACCEPT CBPEER INSTEAD OF SPECIFIC CENTRAL/PERIPHERAL REF
@@ -418,6 +410,30 @@ extension AdjacencyList {
 
 
 extension AdjacencyList {
+    
+    // Convert Adjecency List into an dictionary where
+    // key is the vertex's fullname (displayName+separator+ID) and the value is an array containing
+    // the fullname (displayName+separator+ID) of all the edges
+    public func processListForExchange() -> [ExchangeVertex] {
+        
+        let adjacencies = self.adjacencies;
+        var processedList = [ExchangeVertex]();
+        
+        for (vertex) in adjacencies {
+            
+            var edges = [String]()
+            
+            for edge in vertex.edges {
+                edges.append(String(adjacencies.firstIndex(where: {$0.id == edge.destination.id})!))
+            }
+            
+            let vertexToSend = ExchangeVertex(name: vertex.fullName, lastUpdated: vertex.edgesLastUpdated, edges: edges)
+            
+            processedList.append(vertexToSend)
+        }
+        
+        return processedList;
+    }
     
     /// Method to handle a AdjacencyList shared by one of our neighbors
     ///

@@ -67,6 +67,9 @@
 		3A78164929BCED320077BC5B /* AdjacencyExchangePackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164829BCED320077BC5B /* AdjacencyExchangePackage.swift */; };
 		3A78164B29BCEE950077BC5B /* AdjacencyPackageAcknowledgment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164A29BCEE950077BC5B /* AdjacencyPackageAcknowledgment.swift */; };
 		3A78164D29BD1B490077BC5B /* PendingExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164C29BD1B490077BC5B /* PendingExchange.swift */; };
+		3A78164F29C527730077BC5B /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164E29C527730077BC5B /* TextManager.swift */; };
+		3A78165129C529620077BC5B /* DiscoveryAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78165029C529620077BC5B /* DiscoveryAvatar.swift */; };
+		3A78165429C5371B0077BC5B /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 3A78165329C5371B0077BC5B /* WrappingHStack */; };
 		3A7E96592931577B003E8975 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E96582931577B003E8975 /* SettingsView.swift */; };
 		3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965B2931CF33003E8975 /* DeviceGraph.swift */; };
 		3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965D2932848F003E8975 /* LinkedList.swift */; };
@@ -159,6 +162,8 @@
 		3A78164829BCED320077BC5B /* AdjacencyExchangePackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacencyExchangePackage.swift; sourceTree = "<group>"; };
 		3A78164A29BCEE950077BC5B /* AdjacencyPackageAcknowledgment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacencyPackageAcknowledgment.swift; sourceTree = "<group>"; };
 		3A78164C29BD1B490077BC5B /* PendingExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingExchange.swift; sourceTree = "<group>"; };
+		3A78164E29C527730077BC5B /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
+		3A78165029C529620077BC5B /* DiscoveryAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryAvatar.swift; sourceTree = "<group>"; };
 		3A7E96582931577B003E8975 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3A7E965B2931CF33003E8975 /* DeviceGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGraph.swift; sourceTree = "<group>"; };
 		3A7E965D2932848F003E8975 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
@@ -175,6 +180,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A78165429C5371B0077BC5B /* WrappingHStack in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +318,8 @@
 				3A74728F2925D9A200C5000D /* Avatar.swift */,
 				3A7472E92929629E00C5000D /* EmptyStateView.swift */,
 				3A7472ED29296AF100C5000D /* LoadingIcon.swift */,
+				3A78164E29C527730077BC5B /* TextManager.swift */,
+				3A78165029C529620077BC5B /* DiscoveryAvatar.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -457,6 +465,9 @@
 			dependencies = (
 			);
 			name = blueRoute;
+			packageProductDependencies = (
+				3A78165329C5371B0077BC5B /* WrappingHStack */,
+			);
 			productName = blueRoute;
 			productReference = 3A747237291D885500C5000D /* blueRoute.app */;
 			productType = "com.apple.product-type.application";
@@ -529,6 +540,9 @@
 				Base,
 			);
 			mainGroup = 3A74722E291D885500C5000D;
+			packageReferences = (
+				3A78165229C5371B0077BC5B /* XCRemoteSwiftPackageReference "WrappingHStack" */,
+			);
 			productRefGroup = 3A747238291D885500C5000D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -595,6 +609,7 @@
 			files = (
 				3A78164D29BD1B490077BC5B /* PendingExchange.swift in Sources */,
 				3A7472F5292A052D00C5000D /* BluetoothPeripheral.swift in Sources */,
+				3A78165129C529620077BC5B /* DiscoveryAvatar.swift in Sources */,
 				3A74723D291D885500C5000D /* ContentView.swift in Sources */,
 				3A78164329B801D40077BC5B /* AdjacencyExchangeMessageWrapper.swift in Sources */,
 				3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */,
@@ -608,6 +623,7 @@
 				3A78164729BCEC770077BC5B /* AdjacencyExchangeRequest.swift in Sources */,
 				3A74729C2927164200C5000D /* MessageView.swift in Sources */,
 				3A7472EC2929683500C5000D /* DiscoverView.swift in Sources */,
+				3A78164F29C527730077BC5B /* TextManager.swift in Sources */,
 				3A7472EE29296AF100C5000D /* LoadingIcon.swift in Sources */,
 				3A7472F12929777600C5000D /* BluetoothCentral.swift in Sources */,
 				3A26795829B02D4A00C6EA5E /* BTRoutedMessage.swift in Sources */,
@@ -965,6 +981,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3A78165229C5371B0077BC5B /* XCRemoteSwiftPackageReference "WrappingHStack" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ksemianov/WrappingHStack";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3A78165329C5371B0077BC5B /* WrappingHStack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A78165229C5371B0077BC5B /* XCRemoteSwiftPackageReference "WrappingHStack" */;
+			productName = WrappingHStack;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		3A747265291D889200C5000D /* blueRoute.xcdatamodeld */ = {

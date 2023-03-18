@@ -32,8 +32,6 @@ struct AdjacencyExchangeMessageWrapper: Codable {
     
     public static func decoder(message: String) -> AdjacencyExchangeMessageWrapper? {
         
-        print("this is the wrapped message \(message)")
-        
         //2 - Convert the string to data
         let messageData = Data(message.utf8)
 

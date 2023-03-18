@@ -6,133 +6,29 @@
 //
 
 import SwiftUI
+import WrappingHStack
 
 struct test: View {
     
-    @ObservedObject var AdjMatrix = AdjacencyList()
+    var neighbors = ["SandroGiannini", "SantiagoMarriaga", "NataliaGiannini", "TamaraGiannini", "ArturoSaatdjian"]
     
-    init() {
-        /*
-        self.AdjMatrix.setSelf(name: "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")
-        // handshake with natalia, natalia passes her list as well
-        // add natalia and her list
-        var natalia = self.AdjMatrix.processExchangedList(from: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", adjList: [
-            ExchangeVertex(name: "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", lastUpdated: Date(), edges: ["Tamara#?id?4951E515-24B1-41DC-8DEE-EC8CB3192AB2", "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Clara#?id?58DBB803-CCFD-4B5A-8803-FB69FEB46065"])])
-        */
-     /*   var bryan = self.AdjMatrix.processExchangedList(from: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", adjList: [
-            ExchangeVertex(name: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", lastUpdated: Date(), edges: ["Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE","Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0", "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"]),
-            ExchangeVertex(name: "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0", lastUpdated: Date(), edges: ["Attican#?id?FD630F84-F139-4E60-A92B-88F74C6B7568"])])
-        
-      */
-       /* var bryan = self.AdjMatrix.processExchangedList(from: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", adjList: [
-            "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E": ["Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE","Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0"],
-            "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531": [],
-                        "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE": [],
-            "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3": ["Tamara#?id?4951E515-24B1-41DC-8DEE-EC8CB3192AB2", "Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Clara#?id?58DBB803-CCFD-4B5A-8803-FB69FEB46065"],
-            "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0": []
-        ])
-        */
-                       
-        /*
-        var bryan = (self.AdjMatrix.updateList(with: "Bryan#?id?0497459A-1236-4AAB-A278-2BF07CA6AF3E", userList: ["Jose#?id?0984965D-AF9E-4D61-91F1-D5AC3D0D5531", "Vincent#?id?C1DBFC41-D0D8-4A95-A1BC-0B5147A03FCE","Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3", "May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0"]))
-        var attican = (self.AdjMatrix.updateList(with: "Attican#?id?FD630F84-F139-4E60-A92B-88F74C6B7568", userList: ["May#?id?7DEE114C-A547-422B-840A-46FB1E3D48A0"]))
-        var gianfranco = (self.AdjMatrix.updateList(with: "Gianfranco#?id?5AB45AFD-7CBC-4E29-9DCA-4D0525F565E6", userList: ["Mimma#?id?624D4E63-944E-4138-B3EE-2E03E6FE6735", "Arturo#?id?0D2F1485-0C54-4A51-B598-9CC5685107C2"]))
-        
-        var arturo = self.AdjMatrix.findVertex("Arturo#?id?0D2F1485-0C54-4A51-B598-9CC5685107C2")!
-        var carlos = self.AdjMatrix.createVertex(name: "Carlos#?id?71786EE2-9C01-462E-8824-82A09888FA5E")
-        var roberto = self.AdjMatrix.createVertex(name: "Roberto#?id?5BE51CDF-C569-4B6E-BFD2-F44143876F37")
-        var rebecca = self.AdjMatrix.createVertex(name: "Rebecca#?id?6EC1B6A4-7B1B-41B0-9035-F244F79A805E")
-        
-        self.AdjMatrix.addEdge(between: arturo, and: carlos)
-        self.AdjMatrix.addEdge(between: carlos, and: roberto)
-        self.AdjMatrix.addEdge(between: carlos, and: rebecca)
-        
-        
-        var te = self.AdjMatrix.bfs(from: self.AdjMatrix.findVertex("Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835")!, to: self.AdjMatrix.findVertex("Attican#?id?FD630F84-F139-4E60-A92B-88F74C6B7568")!)
-        
-        for edge in te! {
-            print("\(edge.source.displayName) -> \(edge.destination.displayName)")
-        }
-        
-        for edge in self.AdjMatrix.selfVertex.edges {
-            print("\(edge.destination.displayName)")
-        }
-         
-        
-        
-        var adjList = (self.AdjMatrix.processForExchange())
-        self.AdjMatrix.selfVertex.edgesLastUpdated = Date()
-        
-        
-        let receiver = "Natalia#?id?7E66E6E1-F3A5-4612-9B70-A9600BFD94F3"
-        let sender = "Self#?id?1D89FDC1-8198-40E2-A724-F107CBFC7835"
-        var codedMessage = BTAdjacencyListExchange(sender: sender, adjacencyList: adjList)
-        
-        guard var messageData = BTAdjacencyListExchange.BTAdjacencyListExchangeEncoder(message: codedMessage) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        print(messageData.count)
-        var range = Range(0...150)
-        var chunks: [Data] = [];
-        
-        while(messageData.count > range.lowerBound) {
-            
-            if(messageData.count >= range.upperBound) {
-                let subData = messageData.subdata(in: range)
-                chunks.insert(subData, at: chunks.endIndex)
-                messageData.removeSubrange(range)
-            } else {
-                chunks.insert(messageData, at: chunks.endIndex)
-                messageData.removeSubrange(range.lowerBound..<messageData.count)
-                print(messageData.count)
-            }
-        }
-        
-        print("\(messageData.count)")
-        
-        var newData = Data();
-        
-        for chunk in chunks {
-            newData.append(chunk)
-        }
-        
-        print("this is the resulting data \(newData.count)")
-        
-        let receivedData = String(decoding: newData, as: UTF8.self)
-        
-        
-        guard let decodedBTPing: BTAdjacencyListExchange = BTAdjacencyListExchange.BTAdjacencyListExchangeDecoder(message: receivedData) else {
-            print("unable to decode message \(receivedData)")
-            return;
-        }
-         
-         print(decodedBTPing)
-        
-        
-        
-        var testStruct = TestStruct(one: "SandroG")
-        
-        guard let testData = TestStruct.tencoder(message: testStruct) else {
-            print("could not do ut")
-            return;
-        }
-        
-        print("test data size is: \(testData.count)")
-        
-        
-         */
-    }
+    var reachable = ["ValeriaSaatdjian", "GianfrancoGiannini", "JoseManuel"]
     
     
     var body: some View {
         List {
-            ForEach(Array(self.AdjMatrix.adjacencies), id: \.self) {key  in
-                HStack{
-                    Text("\(key.displayName) ->")
-                    ForEach(Array(key.edges), id: \.self) { vertex in
-                        Text(vertex.destination.displayName)
+            Section("Neighbors") {
+                WrappingHStack(alignment: .leading) {
+                    ForEach(neighbors, id: \.self) { user in
+                        DiscoveryAvatar(name: user)
+                        
+                    }
+                }
+            }
+            Section("Reachable") {
+                WrappingHStack(alignment: .leading) {
+                    ForEach(neighbors, id: \.self) { user in
+                        DiscoveryAvatar(name: user)
                     }
                 }
             }

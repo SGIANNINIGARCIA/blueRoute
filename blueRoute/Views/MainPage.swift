@@ -41,13 +41,6 @@ struct MainPage: View {
                 Image(systemName: "gearshape.fill")
                 Text("Settings")
             }
-            test()
-                .tabItem {
-                    Image(systemName: "point.3.filled.connected.trianglepath.dotted")
-                    Text("Explore")
-                }
-                .environmentObject(bluetoothController)
-            
         }
         .onAppear {
             // on appear, set up the name of the device to start advertising as online

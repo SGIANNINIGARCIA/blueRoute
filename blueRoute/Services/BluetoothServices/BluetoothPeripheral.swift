@@ -199,7 +199,7 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
             bluetoothController.processReceivedPing(data)
             
         case BluetoothConstants.adjExchangeCharacteristicID:
-            bluetoothController.processAdjacencyExchangeMessage(data)
+            bluetoothController.processAdjacencyExchangeMessage(data, from: request.central)
             
         default:
             print("peripheral: central send message: did not match a characteristic?")

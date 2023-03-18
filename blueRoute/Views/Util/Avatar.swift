@@ -11,6 +11,7 @@ struct Avatar: View {
     
     @State var username:String;
     
+    
     var body: some View {
         Text(GetFirstChar(username:username))
             .font(.system(size: 24))

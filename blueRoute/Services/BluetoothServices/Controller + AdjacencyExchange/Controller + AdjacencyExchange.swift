@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreBluetooth
 
 /// Based  on testing we can exchange up to 524 bytes, leaving 200 bytes to hold metadata info like sender
 /// package number and totalamountofpackages
@@ -15,11 +16,12 @@ extension BluetoothController {
     
     /// Receives the data sent by one of our neighbors through the AdjacencyExchange characteristic
     /// and process the data according to the type wrapped by the AdjacencyExchangeMessageWrapper
-    func processAdjacencyExchangeMessage(_ data: Data) {
-        
-        //print("\(data.count)")
+    func processAdjacencyExchangeMessage(_ data: Data, from ref: CBPeer) {
         
         let receivedData = String(decoding: data, as: UTF8.self)
+        
+        /// update last connection for sender
+        updateLastConnectionAndInvalidateTimer(for: ref)
         
         /// decode the wrapper
         guard let decodedMessageWrapper: AdjacencyExchangeMessageWrapper = AdjacencyExchangeMessageWrapper.decoder(message: receivedData) else {
@@ -72,7 +74,6 @@ extension BluetoothController {
         }
         
         if(timeOfLastUpdate > timeOfLastExchange && lastUpdateTriggeredBy != requestor.id) {
-            print("initiated adjacency request with \(requestor.displayName)")
             initiateAdjacencyExchange(with: requestor)
         }
     }
@@ -169,7 +170,8 @@ extension BluetoothController {
         guard let totalPackageCount = self.pendingAdjacencyExchangesSent[sender]?.dataSegments.count else {
             return;
         }
-                
+        
+        
         if (acknowledgement.receivedPackageNumber == totalPackageCount) {
             self.pendingAdjacencyExchangesSent.removeValue(forKey: sender)
         } else {

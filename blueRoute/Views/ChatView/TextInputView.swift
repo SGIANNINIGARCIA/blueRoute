@@ -16,7 +16,7 @@ struct TextInputView: View {
     @EnvironmentObject var bluetoothController: BluetoothController;
     
     // message being typed
-    @ObservedObject var textInputManager = TextManager()
+    @ObservedObject var textInputManager = TextManager(maxLenght: MAX_MESSAGE_LENGHT)
     
     // Username of the user this chat is with
     var id: UUID;
@@ -102,21 +102,5 @@ struct TextArea: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.blue, lineWidth: 2)
             )
-    }
-}
-
-class TextManager: ObservableObject {
-    @Published var counted = 0;
-    @Published var text = "" {
-        didSet {
-            counted = text.count
-            if text.count > MAX_MESSAGE_LENGHT {
-                text = String(text.prefix(MAX_MESSAGE_LENGHT))
-            }
-        }
-    }
-    
-    func reset() {
-        text = "";
     }
 }
