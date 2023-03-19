@@ -22,7 +22,7 @@ struct OnboardingView: View {
             Text("1.")
                 .font(Font.custom("LatoBold", size: 112))
                 .foregroundColor(Color.white)
-            Text("You need a unique and memorable display name so other people can identify you when using the app")
+            Text("You need an unique and memorable display name so other people can identify you when using the app")
                 .font(Font.custom("LatoRegular", size: 27))
                 .foregroundColor(Color.white)
            
@@ -50,7 +50,6 @@ struct OnboardingView: View {
                             .foregroundColor(/*@START_MENU_TOKEN@*/.white/*@END_MENU_TOKEN@*/)
                     }
                 }
-            .frame(width: .infinity, height: 70)
             .transition(.opacity)
             .animation(.easeIn, value: (userInput.count > 6 && userInput.count < 16))
 

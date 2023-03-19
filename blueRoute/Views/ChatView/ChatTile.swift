@@ -14,6 +14,7 @@ struct ChatTile: View {
     @State var id:UUID;
     
     @ObservedObject var adjacencyList : AdjacencyList;
+
     
     var body: some View {
         HStack(alignment: .center, spacing: 28.0) {

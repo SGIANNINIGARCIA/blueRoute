@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct ChatView: View {
-    
+    /// Namespace to use as reference to the bottom of the conversation, so
+    /// we can programatically scroll to the bottom of the conversation on appear
     @Namespace var bottomID
-    // Username of the user this chat is with
+    
+    /// display name and ID of the user this chat is with
     var id: UUID;
     var displayName: String;
     
-    // variable to hold stored messages belonging to this chat
+    /// variable to hold stored messages belonging to this chat
     @FetchRequest var messages: FetchedResults<Message>;
     
     init(displayName: String, id: UUID) {
@@ -43,6 +45,7 @@ struct ChatView: View {
                             scrollViewProxy.scrollTo(bottomID)
                         }
                     }
+                    ToastMessage(action: {})
                 }
             }
             TextInputView(displayName: displayName, id: id)
