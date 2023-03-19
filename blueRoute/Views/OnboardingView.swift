@@ -14,6 +14,7 @@ struct OnboardingView: View {
     
     @State var userInput:String = "";
     @State private var animationAmount = 5.0;
+    @Binding var needsOnboarding: Bool;
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -31,14 +32,15 @@ struct OnboardingView: View {
                 .font(Font.custom("KarlaRegular", size: 22))
             Divider()
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.white/*@END_MENU_TOKEN@*/)
-            Text("Make sure it is at least 12 characters long and add some numbers for good measure")
+            Text("Make sure it is at least 6 characters long and add some numbers for good measure")
                 .font(Font.custom("KarlaRegular", size: 14))
                 .foregroundColor(Color(hue: 1.0, saturation: 0.0, brightness: 0.96))
             HStack(alignment: .center) {
                     Spacer()
-                if(!userInput.isEmpty && userInput.count > 12) {
+                if(!userInput.isEmpty && userInput.count > 6 && userInput.count < 16) {
                         Button("Continue") {
                             setUser(displayName: userInput)
+                            needsOnboarding = false;
                         }
                           .accentColor(/*@START_MENU_TOKEN@*/.white/*@END_MENU_TOKEN@*/)
                           .fontWeight(/*@START_MENU_TOKEN@*/.regular/*@END_MENU_TOKEN@*/)
@@ -50,7 +52,7 @@ struct OnboardingView: View {
                 }
             .frame(width: .infinity, height: 70)
             .transition(.opacity)
-            .animation(.easeIn, value: (userInput.count > 12))
+            .animation(.easeIn, value: (userInput.count > 6 && userInput.count < 16))
 
             Spacer()
         }
@@ -61,11 +63,12 @@ struct OnboardingView: View {
     private func setUser(displayName: String){
         dataController.setUser(displayName: displayName, isSelf: true, context: managedObjContext)
         
+        
     }
 }
 
 struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
-        OnboardingView()
+        OnboardingView(needsOnboarding: .constant(true))
     }
 }

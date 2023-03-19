@@ -146,6 +146,8 @@ extension BluetoothController {
     ///
     public func sendChatMessage(send message: String, to name: String) {
         
+        
+        /// check if the destination is a neighbor, else it passes the message to the routing method
         if (self.adjList.isNeighbor(name) == false) {
             return sendRoutedMessage(send: message, to: name)
         }

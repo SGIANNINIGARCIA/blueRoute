@@ -17,7 +17,6 @@ struct DiscoveryAvatar: View {
             Text(name)
                 .fontWeight(.semibold)
         }
-        .frame(width: .infinity)
         .padding(.leading, 12)
         .padding([.top, .bottom], 16)
     }

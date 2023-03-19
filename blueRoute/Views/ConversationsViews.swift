@@ -10,6 +10,7 @@ import SwiftUI
 struct ConversationsView: View {
     
     @Environment(\.managedObjectContext) var managedObjContext;
+    
     @EnvironmentObject var dataController: DataController;
     @EnvironmentObject var bluetoothController: BluetoothController;
     
@@ -37,7 +38,7 @@ struct ConversationsView: View {
                     .onDelete(perform: removeConversation)
                 }
                 .emptyState(chats.isEmpty) {
-                    VStack{
+                    VStack {
                         Text("No active conversations   :(")
                           .font(.title3)
                           .foregroundColor(Color.secondary)
