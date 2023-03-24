@@ -34,7 +34,10 @@ struct PendingExchange {
     }
     
     /// Returns the next segment of data to send
-    func retrieveNextSegment() -> Data {
+    func retrieveNextSegment() -> Data? {
+        
+        if 0 > (segmentsProcessed - 1) {return nil}
+        
         return self.dataSegments[segmentsProcessed - 1]
     }
     

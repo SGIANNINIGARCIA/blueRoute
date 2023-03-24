@@ -45,7 +45,7 @@ struct ChatView: View {
                             scrollViewProxy.scrollTo(bottomID)
                         }
                     }
-                    ToastMessage(action: {})
+                   // ToastMessage(action: {})
                 }
             }
             TextInputView(displayName: displayName, id: id)

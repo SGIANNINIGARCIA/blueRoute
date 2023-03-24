@@ -53,9 +53,9 @@ struct ConversationsView: View {
     func removeConversation(at offsets: IndexSet) {
         for index in offsets {
             let toBeDeleted = chats[index]
-            managedObjContext.delete(toBeDeleted)
+         //   managedObjContext.delete(toBeDeleted)
         }
-        dataController.save(context: managedObjContext)
+     //   dataController.save(context: managedObjContext)
     }
 }
 

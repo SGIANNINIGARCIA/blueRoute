@@ -103,7 +103,12 @@ extension BluetoothController {
         }
         
         /// Retrieve the next segment
-        let nextSegment: Data = pendingExchangeData.retrieveNextSegment();
+        /// if else executes, remove the vertex from pending list
+        /// this is caused by error when trying to access out of bound index in the dataSegments 
+        guard let nextSegment: Data = pendingExchangeData.retrieveNextSegment() else {
+            self.pendingAdjacencyExchangesSent.removeValue(forKey: vertex)
+            return
+        }
         
         /// Create the ExchangePackage and encode it
         let packageToSend = AdjacencyExchangePackage(packageTotalCount: pendingExchangeData.dataSegments.count, currentPackageNumber: pendingExchangeData.segmentsProcessed, payload: nextSegment)
