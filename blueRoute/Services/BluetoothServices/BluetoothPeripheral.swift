@@ -39,15 +39,14 @@ class BluetoothPeripheralManager: NSObject {
     private var peripheralAdjExchangeCharacteristic: CBMutableCharacteristic!
     
     // Make a queue we can run all of the events off
-    /*private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
+    private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
                                       qos: .background, attributes: .concurrent,
                                       autoreleaseFrequency: .workItem, target: nil)
-     */
     
     init(name: String? = nil, bluetoothController: BluetoothController? = nil) {
         super.init()
         
-        self.peripheral = CBPeripheralManager(delegate: self, queue: nil)
+        self.peripheral = CBPeripheralManager(delegate: self, queue: queue)
         
         if let bluetoothController = bluetoothController { self.bluetoothController = bluetoothController}
         

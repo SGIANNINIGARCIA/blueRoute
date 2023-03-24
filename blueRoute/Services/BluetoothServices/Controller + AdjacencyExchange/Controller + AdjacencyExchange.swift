@@ -66,6 +66,14 @@ extension BluetoothController {
             return;
         }
         
+        /// if we already have an exchange in process with this requestor, then disregard.
+        /// it can happen when we already connected with the requestor's peripheral during discovery and
+        /// initiated an exchange but the requestor entered discovery as well and
+        /// is trying to connect with us through the peripheral while the exchange is still ongoing
+        /// which if left to continue, can cause an array out bounds error
+        let exchangeInProcess = self.pendingAdjacencyExchangesSent.contains(where: {$0.key == requestor})
+        if exchangeInProcess {return;}
+        
         /// if we have updated our Adjacency List after our last exchange with the requestor
         /// and the requestor did not trigger our last update, then we initiate the exchange
         /// otherwise an exchange is not warrated and we can dismiss the request with no need for acknowledgement

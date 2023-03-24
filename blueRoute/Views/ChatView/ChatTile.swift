@@ -15,31 +15,12 @@ struct ChatTile: View {
     var id:UUID;
     
     @ObservedObject var adjacencyList : AdjacencyList;
-    @FetchRequest var last: FetchedResults<Message>;
 
     init(username: String, lastMessage:String, id: UUID, adjacencyList: AdjacencyList) {
         self.username = username;
         self.lastMessage = lastMessage;
         self.id = id;
         self.adjacencyList = adjacencyList;
-        
-    
-         let request: NSFetchRequest<Message> = Message.fetchRequest()
-         request.predicate = NSPredicate(format: "chat.identifier == %@", id as CVarArg)
-
-         request.sortDescriptors = [
-             NSSortDescriptor(keyPath: \Message.timestamp, ascending: true)
-         ]
-
-         request.fetchLimit = 1
-         _last = FetchRequest(fetchRequest: request)
-        /*
-        self._last = FetchRequest<Message>(entity: Message.entity(),
-                                           sortDescriptors: [NSSortDescriptor(keyPath: \Message.timestamp, ascending: true)],
-                                               predicate: NSPredicate(format: "chat.identifier == %@", id as CVarArg),
-                                               animation: .default)
-         */
-        
     }
     
     var body: some View {
@@ -51,7 +32,7 @@ struct ChatTile: View {
                     .fontWeight(.bold)
                     AvailabilityTagView(isReachable: $adjacencyList.adjacencies.contains(where: {$0.id == id}))
                 }
-                Text(last[0].content ?? "Message")
+                Text(lastMessage)
                     .fontWeight(.light)
                     .lineLimit(1)
             }
