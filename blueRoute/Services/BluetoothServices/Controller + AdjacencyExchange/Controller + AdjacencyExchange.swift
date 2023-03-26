@@ -354,11 +354,16 @@ extension BluetoothController {
               
             }
             
-            if(Date.now.timeIntervalSince(lastExchange) > BluetoothConstants.LastExchangeInterval) {
-                // Send an exchange request
+            /// check if there is an existing exchange
+            let existingExchange = self.pendingAdjacencyExchangesReceived.contains(where: {$0.key == neighbor})
+            
+            /// if there is no ongoing exchange and time after last exchange exeeds interval, send request
+            if((Date.now.timeIntervalSince(lastExchange) > BluetoothConstants.LastExchangeInterval)
+               && existingExchange == false) {
                 sendAdjacencyRequest(to: neighbor)
-                print("sent a exchange request to \(neighbor.displayName)")
+           //     print("sent a exchange request to \(neighbor.displayName)")
             }
+            
         }
     }
     
