@@ -193,7 +193,7 @@ extension BluetoothController {
     }
     
     /// Method to send an Adjacency Exchange request if certain amount of time has passed since the last exchange happen
-    func sendAdjacencyRequest(to vertex: Vertex){
+    func sendAdjacencyRequest(to vertex: Vertex) {
         
         let request = AdjacencyExchangeRequest(lastUpdateReceived: vertex.lastExchangeDate)
         

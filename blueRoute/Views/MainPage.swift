@@ -9,17 +9,13 @@ import SwiftUI
 
 struct MainPage: View {
     
-    @State var name: String;
-    @State var identifier: String;
-    
+    @EnvironmentObject var userSettings: UserSettings;
     @EnvironmentObject var dataController: DataController;
     @EnvironmentObject var bluetoothController: BluetoothController;
     
     
-    
     var body: some View {
         TabView {
-            
             // View containing all the conversations
             ConversationsView()
             .tabItem {
@@ -45,13 +41,13 @@ struct MainPage: View {
         }
         .onAppear {
             // on appear, set up the name of the device to start advertising as online
-            bluetoothController.setUp(name: name + BluetoothConstants.NameIdentifierSeparator + identifier)
+            bluetoothController.setUp(name: userSettings.getFullName()!)
         }
     }
 }
 
 struct MainPage_Previews: PreviewProvider {
     static var previews: some View {
-        MainPage(name: "Sandro", identifier: "Identifier")
+        MainPage()
     }
 }

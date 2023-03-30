@@ -75,6 +75,7 @@
 		3A7E9661293284ED003E8975 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E9660293284ED003E8975 /* Queue.swift */; };
 		3AAF93CC293BC7F300A43794 /* AvailabilityTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */; };
 		3AAF93D2293C667800A43794 /* ChatStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF93D1293C667800A43794 /* ChatStorage.swift */; };
+		3AE47AFA29D3AC67000EAE9A /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE47AF929D3AC67000EAE9A /* UserSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +167,7 @@
 		3A7E9660293284ED003E8975 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		3AAF93CB293BC7F300A43794 /* AvailabilityTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityTagView.swift; sourceTree = "<group>"; };
 		3AAF93D1293C667800A43794 /* ChatStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorage.swift; sourceTree = "<group>"; };
+		3AE47AF929D3AC67000EAE9A /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -284,6 +286,7 @@
 				3A747265291D889200C5000D /* blueRoute.xcdatamodeld */,
 				3A747268291D88E300C5000D /* DataController.swift */,
 				3AAF93D1293C667800A43794 /* ChatStorage.swift */,
+				3AE47AF929D3AC67000EAE9A /* UserSettings.swift */,
 			);
 			path = DataModel;
 			sourceTree = "<group>";
@@ -611,6 +614,7 @@
 				3A7472E82929619200C5000D /* ConversationsViews.swift in Sources */,
 				3A7472E6292960A100C5000D /* MainPage.swift in Sources */,
 				3A26795E29B41B2C00C6EA5E /* TextInputView.swift in Sources */,
+				3AE47AFA29D3AC67000EAE9A /* UserSettings.swift in Sources */,
 				3A747269291D88E300C5000D /* DataController.swift in Sources */,
 				3A74723B291D885500C5000D /* blueRouteApp.swift in Sources */,
 				3A7E9661293284ED003E8975 /* Queue.swift in Sources */,

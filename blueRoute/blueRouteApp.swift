@@ -11,6 +11,7 @@ import SwiftUI
 struct blueRouteApp: App {
     @StateObject private var dataController: DataController;
     @StateObject var bluetoothController: BluetoothController;
+    @StateObject var userSettings: UserSettings = UserSettings()
     
     init() {
         
@@ -21,6 +22,8 @@ struct blueRouteApp: App {
         // Initiate bluetoothManager and pass core data context and data manager
         let bluetoothController = BluetoothController(dataController: dataController, context: dataController.container.viewContext)
         self._bluetoothController = StateObject(wrappedValue: bluetoothController);
+        
+        
     }
     var body: some Scene {
         WindowGroup {
@@ -28,7 +31,7 @@ struct blueRouteApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(bluetoothController)
                 .environmentObject(dataController)
-                
+                .environmentObject(userSettings)
         }
     }
 }

@@ -34,22 +34,6 @@ class DataController: ObservableObject {
 
 extension DataController {
     
-    func setUser(displayName: String, isSelf: Bool = false, context: NSManagedObjectContext) {
-        let user = User(context: context)
-        
-        // Unique identifier use for maintaining user information across name changes
-        user.identifier = UUID()
-        
-        // User's display name
-        user.displayName = displayName;
-        
-        // isSelf separates the current user from others in coredata
-        user.isSelf = NSNumber(value: true);
-        
-        
-        save(context: context)
-    }
-    
     public func saveMessage(message: BTMessage, context: NSManagedObjectContext, isSelf: Bool, sendStatus: Bool) {
         
         let messageToSave = Message(context: context)
@@ -114,7 +98,6 @@ extension DataController {
         
         user.displayName = BluetoothController.retrieveUsername(name: name)
         user.identifier = BluetoothController.retrieveID(name: name)
-        user.isSelf = NSNumber(value: false);
         
         save(context: container.viewContext)
         

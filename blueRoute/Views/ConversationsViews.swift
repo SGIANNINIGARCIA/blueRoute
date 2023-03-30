@@ -9,12 +9,12 @@ import SwiftUI
 
 struct ConversationsView: View {
     
-    @Environment(\.managedObjectContext) var managedObjContext;
+ //   @Environment(\.managedObjectContext) var managedObjContext;
     
     @EnvironmentObject var dataController: DataController;
     @EnvironmentObject var bluetoothController: BluetoothController;
     
-    @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "isSelf == %@", NSNumber(false))) private var chats: FetchedResults<User>
+    @FetchRequest(sortDescriptors: []) private var chats: FetchedResults<User>
     
     var body: some View {
         NavigationView {

@@ -8,13 +8,10 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    
-    @Environment(\.managedObjectContext) var managedObjContext;
-    @EnvironmentObject var dataController: DataController;
+    @EnvironmentObject var userSettings: UserSettings;
     
     @State var userInput:String = "";
     @State private var animationAmount = 5.0;
-    @Binding var needsOnboarding: Bool;
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -40,7 +37,6 @@ struct OnboardingView: View {
                 if(!userInput.isEmpty && userInput.count > 6 && userInput.count < 16) {
                         Button("Continue") {
                             setUser(displayName: userInput)
-                            needsOnboarding = false;
                         }
                           .accentColor(/*@START_MENU_TOKEN@*/.white/*@END_MENU_TOKEN@*/)
                           .fontWeight(/*@START_MENU_TOKEN@*/.regular/*@END_MENU_TOKEN@*/)
@@ -60,14 +56,12 @@ struct OnboardingView: View {
     }
     
     private func setUser(displayName: String){
-        dataController.setUser(displayName: displayName, isSelf: true, context: managedObjContext)
-        
-        
+        userSettings.setUserData(displayName: userInput)
     }
 }
 
 struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
-        OnboardingView(needsOnboarding: .constant(true))
+        OnboardingView()
     }
 }
