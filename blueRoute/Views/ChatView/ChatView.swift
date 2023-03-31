@@ -16,8 +16,14 @@ struct ChatView: View {
     var id: UUID;
     var displayName: String;
     
+    @Environment(\.managedObjectContext) var managedObjContext;
+    @EnvironmentObject var dataController: DataController;
+    
+    
+    
     /// variable to hold stored messages belonging to this chat
     @FetchRequest var messages: FetchedResults<Message>;
+    
     
     init(displayName: String, id: UUID) {
         self.id = id;
@@ -33,17 +39,20 @@ struct ChatView: View {
             ScrollViewReader { scrollViewProxy in
                 ZStack {
                     ScrollView {
-                        VStack {
+                        LazyVStack {
                             ForEach(messages) { message in
                                 MessageView(currentMessage: message.content!, displayName: (message.chat?.displayName)!, isSelf: message.senderIsSelf)
+                                    .onAppear {
+                                        self.dataController.updateMessageSeenStatus(message: message, context: managedObjContext)
+                                    }
                             }
                             Text("").id(bottomID)
                         }
                         .padding([.leading, .trailing], 8)
                         .padding([.top, .bottom], 16)
-                        .onAppear{
-                            scrollViewProxy.scrollTo(bottomID)
-                        }
+                        
+                    }.onAppear{
+                        scrollViewProxy.scrollTo(bottomID)
                     }
                    // ToastMessage(action: {})
                 }

@@ -2,6 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Message" representedClassName="Message" syncable="YES" codeGenerationType="class">
         <attribute name="content" attributeType="String" defaultValueString="message"/>
+        <attribute name="seen" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="senderIsSelf" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="sendStatus" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="timestamp" attributeType="Date" defaultDateTimeInterval="690953880" usesScalarValueType="NO"/>

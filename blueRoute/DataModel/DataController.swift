@@ -38,13 +38,17 @@ extension DataController {
         
         let messageToSave = Message(context: context)
         var user: User;
+        var seen: Bool;
         
         // If message was sent by the user, the chat reference should point to the message receiver
         // else, it should point to the sender
         if(isSelf){
             user = findUser(name: message.receiver)!
+            seen = true;
         } else {
             user = findUser(name: message.sender)!
+            seen = false;
+            
         }
 
         // save new message to chat
@@ -53,11 +57,21 @@ extension DataController {
         messageToSave.senderIsSelf = isSelf;
         messageToSave.timestamp = Date();
         messageToSave.sendStatus = sendStatus;
+        messageToSave.seen = seen;
         
         // change user lastmessage attribute to this new message
         user.latestMessage = message.message;
         
         save(context: context)
+    }
+    
+    func updateMessageSeenStatus(message: Message, context: NSManagedObjectContext) {
+        
+        if(message.seen == false) {
+            message.seen = true;
+            save(context: context)
+        }
+        
     }
     
     // find the user the chat is linked to and if there is no user
