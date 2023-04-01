@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ToastMessage: View {
+struct NewMessageBanner: View {
     
-    var action: () -> Void?;
+    var action: () -> Void;
     
     var body: some View {
         VStack() {
@@ -17,6 +17,7 @@ struct ToastMessage: View {
                 Spacer()
                 Button {
                     action()
+                    
                 } label: {
                     HStack {
                         Text("New Message")
@@ -36,9 +37,9 @@ struct ToastMessage: View {
         
 }
 
-struct ToastMessage_Previews: PreviewProvider {
+struct NewMessageBanner_Previews: PreviewProvider {
     static var previews: some View {
-        ToastMessage(action: {})
+        NewMessageBanner(action: {})
     }
 }
 

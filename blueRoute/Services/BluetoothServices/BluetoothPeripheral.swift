@@ -186,7 +186,7 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                     }
             
         case BluetoothConstants.chatCharacteristicID:
-            print("peripheral: central sent message for cha")
+            print("peripheral: central sent message for chat characteristic")
             bluetoothController.processIncomingChatMessage(data, from: request.central)
             
         case BluetoothConstants.routingCharacteristicID:

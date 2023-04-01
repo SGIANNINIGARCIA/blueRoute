@@ -9,19 +9,17 @@ import SwiftUI
 
 struct MessageView: View {
     
-    var currentMessage: String;
-    var displayName: String;
-    var isSelf: Bool;
+    var message: Message
     
     var body: some View {
         HStack(alignment: .center, spacing: 24.0){
-            if(!(isSelf)) {
-                Avatar(username: displayName)
-                ContentMessageView(contentMessage: currentMessage, isCurrentUser: isSelf)
+            if(!(message.senderIsSelf)) {
+                Avatar(username: message.chat?.displayName ?? "")
+                ContentMessageView(contentMessage: message.content ?? "", isCurrentUser: message.senderIsSelf)
                 Spacer()
             } else {
                 Spacer()
-                ContentMessageView(contentMessage: currentMessage, isCurrentUser: isSelf)
+                ContentMessageView(contentMessage: message.content ?? "", isCurrentUser: message.senderIsSelf)
             }
         }
         .padding(.leading)
@@ -29,12 +27,7 @@ struct MessageView: View {
 }
 
 struct MessageView_Previews: PreviewProvider {
-    
-   // let user = UserModel(username: "Sandro Giannini", isSelf: true)
-    
-    
-    
     static var previews: some View {
-        MessageView(currentMessage: "this is a message", displayName:"Sandro Giannini", isSelf: false)
+        MessageView(message: Message())
     }
 }

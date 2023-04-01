@@ -97,7 +97,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     ///
     func isNeighbor(_ name: String) -> Bool {
         
-        return self.selfVertex.edges.contains(where: {$0.destination.fullName == name})
+        return self.selfVertex.edges.contains(where: {$0.destination.id == BluetoothController.retrieveID(name: name)})
     }
     
     /// Check if an user is our neighbor
@@ -208,7 +208,7 @@ extension AdjacencyList {
         // we must remove the existing edge and pass it to removeVertex to check if
         // the resulting change creates a subset and remove it
         for existingEdge in existingEdges {
-            if (!userList.contains(where: {$0 == existingEdge.destination.fullName})) {
+            if (!userList.contains(where: {BluetoothController.retrieveID(name: $0) == existingEdge.destination.id})) {
                 removeEdge(remove: existingEdge.destination, from: source)
                 removeVertex(existingEdge.destination)
             }

@@ -68,7 +68,7 @@
 		3A78164D29BD1B490077BC5B /* PendingExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164C29BD1B490077BC5B /* PendingExchange.swift */; };
 		3A78164F29C527730077BC5B /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78164E29C527730077BC5B /* TextManager.swift */; };
 		3A78165129C529620077BC5B /* DiscoveryAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78165029C529620077BC5B /* DiscoveryAvatar.swift */; };
-		3A78165629C61B8E0077BC5B /* ToastMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78165529C61B8E0077BC5B /* ToastMessage.swift */; };
+		3A78165629C61B8E0077BC5B /* NewMessageBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A78165529C61B8E0077BC5B /* NewMessageBanner.swift */; };
 		3A7E96592931577B003E8975 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E96582931577B003E8975 /* SettingsView.swift */; };
 		3A7E965C2931CF33003E8975 /* DeviceGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965B2931CF33003E8975 /* DeviceGraph.swift */; };
 		3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7E965D2932848F003E8975 /* LinkedList.swift */; };
@@ -163,7 +163,7 @@
 		3A78164C29BD1B490077BC5B /* PendingExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingExchange.swift; sourceTree = "<group>"; };
 		3A78164E29C527730077BC5B /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
 		3A78165029C529620077BC5B /* DiscoveryAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryAvatar.swift; sourceTree = "<group>"; };
-		3A78165529C61B8E0077BC5B /* ToastMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastMessage.swift; sourceTree = "<group>"; };
+		3A78165529C61B8E0077BC5B /* NewMessageBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageBanner.swift; sourceTree = "<group>"; };
 		3A7E96582931577B003E8975 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3A7E965B2931CF33003E8975 /* DeviceGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGraph.swift; sourceTree = "<group>"; };
 		3A7E965D2932848F003E8975 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
@@ -207,7 +207,7 @@
 				3ADEB90B29D7B57C00AF533D /* BluetoothController */,
 				3A554C41292F3F760063A2FA /* Utilities */,
 				3A7472F4292A052D00C5000D /* BluetoothPeripheral.swift */,
-				3A554C3F292DB9340063A2FA /* BluetoothController.swift */,
+				3A7472F02929777600C5000D /* BluetoothCentral.swift */,
 			);
 			path = BluetoothServices;
 			sourceTree = "<group>";
@@ -317,7 +317,6 @@
 				3A7472ED29296AF100C5000D /* LoadingIcon.swift */,
 				3A78164E29C527730077BC5B /* TextManager.swift */,
 				3A78165029C529620077BC5B /* DiscoveryAvatar.swift */,
-				3A78165529C61B8E0077BC5B /* ToastMessage.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -325,6 +324,7 @@
 		3A74729629270D1A00C5000D /* ChatView */ = {
 			isa = PBXGroup;
 			children = (
+				3A78165529C61B8E0077BC5B /* NewMessageBanner.swift */,
 				3A7472912925DD3000C5000D /* ChatTile.swift */,
 				3A74729729270D3B00C5000D /* ContentMessageView.swift */,
 				3A74729B2927164200C5000D /* MessageView.swift */,
@@ -443,9 +443,9 @@
 				3A78164429BCEA570077BC5B /* Controller + AdjacencyExchange */,
 				3ADEB90329D7B40F00AF533D /* BluetoothController + Handshake.swift */,
 				3ADEB90529D7B46600AF533D /* BluetoothController + Ping.swift */,
-				3A7472F02929777600C5000D /* BluetoothCentral.swift */,
 				3ADEB90729D7B4A500AF533D /* BluetoothController + Routing.swift */,
 				3ADEB90929D7B54800AF533D /* BluetoothController + Chat.swift */,
+				3A554C3F292DB9340063A2FA /* BluetoothController.swift */,
 			);
 			path = BluetoothController;
 			sourceTree = "<group>";
@@ -649,7 +649,7 @@
 				3A7472F32929794C00C5000D /* bluetoothConstants.swift in Sources */,
 				3A7E965E2932848F003E8975 /* LinkedList.swift in Sources */,
 				3A747267291D889200C5000D /* blueRoute.xcdatamodeld in Sources */,
-				3A78165629C61B8E0077BC5B /* ToastMessage.swift in Sources */,
+				3A78165629C61B8E0077BC5B /* NewMessageBanner.swift in Sources */,
 				3A26795C29B3BDAC00C6EA5E /* Controller + AdjacencyExchange.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

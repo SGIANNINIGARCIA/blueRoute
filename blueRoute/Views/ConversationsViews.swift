@@ -11,7 +11,6 @@ struct ConversationsView: View {
     
     @EnvironmentObject var dataController: DataController;
     @EnvironmentObject var bluetoothController: BluetoothController;
-    
     @FetchRequest(sortDescriptors: []) private var chats: FetchedResults<User>
     
     var body: some View {
@@ -25,11 +24,11 @@ struct ConversationsView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(chats) { chat in
+                    ForEach(chats) { chatData in
                         NavigationLink {
-                            ChatView(displayName: chat.displayName!, id: chat.identifier!)
+                            ChatView(displayName: chatData.displayName ?? "", id: chatData.identifier ?? UUID())
                         } label: {
-                            ChatTile(username: chat.displayName!, lastMessage: chat.latestMessage ?? "Message", id: chat.identifier!, adjacencyList: bluetoothController.adjList )
+                            ChatTile(chatData, adjacencyList: bluetoothController.adjList )
                         }
                 
                     }

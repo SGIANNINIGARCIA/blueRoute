@@ -29,7 +29,6 @@ struct MainPage: View {
                     Image(systemName: "point.3.filled.connected.trianglepath.dotted")
                     Text("Explore")
                 }
-                .environmentObject(bluetoothController)
             
             // View for changing settings
             /*SettingsView()

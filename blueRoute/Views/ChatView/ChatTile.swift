@@ -10,17 +10,15 @@ import CoreData
 
 struct ChatTile: View {
     
-    var username:String;
-    var lastMessage:String;
+    var displayName:String;
     var id:UUID;
     
     @ObservedObject var adjacencyList : AdjacencyList;
     @FetchRequest var messages: FetchedResults<Message>;
 
-    init(username: String, lastMessage:String, id: UUID, adjacencyList: AdjacencyList) {
-        self.username = username;
-        self.lastMessage = lastMessage;
-        self.id = id;
+    init(_ chatData: User, adjacencyList: AdjacencyList) {
+        self.displayName = chatData.displayName ?? "";
+        self.id = chatData.identifier ?? UUID();
         self.adjacencyList = adjacencyList;
         self._messages = FetchRequest<Message>(entity: Message.entity(),
                                                sortDescriptors: [NSSortDescriptor(keyPath: \Message.timestamp, ascending: false)],
@@ -31,10 +29,10 @@ struct ChatTile: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 28.0) {
-            Avatar(username: username)
+            Avatar(username: displayName)
             VStack(alignment: .leading, spacing: 4.0) {
                 HStack{
-                    Text(username)
+                    Text(displayName)
                     .fontWeight(.bold)
                     AvailabilityTagView(isReachable: $adjacencyList.adjacencies.contains(where: {$0.id == id}))
                 }
@@ -55,18 +53,12 @@ struct ChatTile: View {
         .padding(.all, 10.0)
         
     }
-    
-    func countUnread(messages: [Message]) {
-        
-        
-        
-    }
 }
 
 struct ChatTile_Previews: PreviewProvider {
     
     static var previews: some View {
-        ChatTile(username: "May Phan", lastMessage: "Hello", id: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!, adjacencyList: AdjacencyList())
+        ChatTile(User(), adjacencyList: AdjacencyList())
     }
 }
 
