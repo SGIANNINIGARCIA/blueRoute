@@ -19,12 +19,12 @@ class DataController: ObservableObject {
             }
         }
         
-        save(context: container.viewContext);
+        save();
     }
     
-    func save(context: NSManagedObjectContext) {
+    func save() {
         do {
-            try context.save()
+            try container.viewContext.save()
             print("UserModel data has been saved")
         } catch {
             print("unable to save data in UserModel")
@@ -34,9 +34,9 @@ class DataController: ObservableObject {
 
 extension DataController {
     
-    public func saveMessage(message: BTMessage, context: NSManagedObjectContext, isSelf: Bool, sendStatus: Bool) {
+    public func saveMessage(message: BTMessage, isSelf: Bool, sendStatus: Bool) {
         
-        let messageToSave = Message(context: context)
+        let messageToSave = Message(context: container.viewContext)
         var user: User;
         var seen: Bool;
         
@@ -62,14 +62,14 @@ extension DataController {
         // change user lastmessage attribute to this new message
         user.latestMessage = message.message;
         
-        save(context: context)
+        save()
     }
     
-    func updateMessageSeenStatus(message: Message, context: NSManagedObjectContext) {
+    func updateMessageSeenStatus(message: Message) {
         
         if(message.seen == false) {
             message.seen = true;
-            save(context: context)
+            save()
         }
         
     }
@@ -113,7 +113,7 @@ extension DataController {
         user.displayName = BluetoothController.retrieveUsername(name: name)
         user.identifier = BluetoothController.retrieveID(name: name)
         
-        save(context: container.viewContext)
+        save()
         
         
         return user;

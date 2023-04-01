@@ -15,15 +15,11 @@ struct ChatView: View {
     /// display name and ID of the user this chat is with
     var id: UUID;
     var displayName: String;
-    
-    @Environment(\.managedObjectContext) var managedObjContext;
+
     @EnvironmentObject var dataController: DataController;
-    
-    
     
     /// variable to hold stored messages belonging to this chat
     @FetchRequest var messages: FetchedResults<Message>;
-    
     
     init(displayName: String, id: UUID) {
         self.id = id;
@@ -43,14 +39,13 @@ struct ChatView: View {
                             ForEach(messages) { message in
                                 MessageView(currentMessage: message.content!, displayName: (message.chat?.displayName)!, isSelf: message.senderIsSelf)
                                     .onAppear {
-                                        self.dataController.updateMessageSeenStatus(message: message, context: managedObjContext)
+                                        self.dataController.updateMessageSeenStatus(message: message)
                                     }
                             }
                             Text("").id(bottomID)
                         }
                         .padding([.leading, .trailing], 8)
                         .padding([.top, .bottom], 16)
-                        
                     }.onAppear{
                         scrollViewProxy.scrollTo(bottomID)
                     }

@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ConversationsView: View {
     
- //   @Environment(\.managedObjectContext) var managedObjContext;
-    
     @EnvironmentObject var dataController: DataController;
     @EnvironmentObject var bluetoothController: BluetoothController;
     

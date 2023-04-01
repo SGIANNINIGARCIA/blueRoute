@@ -39,7 +39,7 @@ class BluetoothPeripheralManager: NSObject {
     private var peripheralAdjExchangeCharacteristic: CBMutableCharacteristic!
     
     // Make a queue we can run all of the events off
-    private let queue = DispatchQueue(label: "bluetooth-peripheral.bluetooth-discovery",
+    private let queue = DispatchQueue(label: "blueRoute-peripheral.bluetooth",
                                       qos: .background, attributes: .concurrent,
                                       autoreleaseFrequency: .workItem, target: nil)
     

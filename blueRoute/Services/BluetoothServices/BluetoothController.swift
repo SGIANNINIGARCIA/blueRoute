@@ -18,7 +18,7 @@ class BluetoothController: ObservableObject {
     @Published var central: BluetoothCentralManager?
     @Published var adjList: AdjacencyList = AdjacencyList();
     
-    var managedObjContext: NSManagedObjectContext?;
+    //var managedObjContext: NSManagedObjectContext?;
     weak var dataController: DataController?;
     
     /// Full name (displayName + unique ID)
@@ -37,9 +37,8 @@ class BluetoothController: ObservableObject {
     private var exchangeTimer: Timer?
     
     
-    init(dataController: DataController, context: NSManagedObjectContext) {
+    init(dataController: DataController) {
         self.dataController = dataController;
-        self.managedObjContext = context;
     }
     
     public func setUp(name: String) -> Void {
@@ -123,8 +122,8 @@ class BluetoothController: ObservableObject {
     }
     
     
-    private func saveMessage(message: BTMessage, isSelf: Bool, sendStatus: Bool) {
-        dataController?.saveMessage(message: message, context: managedObjContext!, isSelf: isSelf, sendStatus: sendStatus)
+     func saveMessage(message: BTMessage, isSelf: Bool, sendStatus: Bool) {
+        dataController?.saveMessage(message: message, isSelf: isSelf, sendStatus: sendStatus)
     }
 }
 
@@ -132,295 +131,7 @@ class BluetoothController: ObservableObject {
  *  Methods to handle sending/receiving chat messages
  */
 
-extension BluetoothController {
-    
-    /// Used by ChatView to send a chat message
-    ///
-    /// The method checks if the message needs to be routed or if the target useris one of our neighbors.
-    /// If it needs to be routed, it is passed to the methiod sendRoutedMessage for processing; if not, it is coded and sent to
-    /// the sendData method
-    ///
-    /// - Parameters:
-    ///     - message: the string to be sent
-    ///     - name: the name (displayName + ID) of the target user
-    ///
-    public func sendChatMessage(send message: String, to name: String) {
-        
-        
-        /// check if the destination is a neighbor, else it passes the message to the routing method
-        if (self.adjList.isNeighbor(name) == false) {
-            return sendRoutedMessage(send: message, to: name)
-        }
-        
-        let codedMessage = BTMessage(sender: self.name!, message: message, receiver: name)
-        
-        guard let messageData = BTMessage.BTMessageEncoder(message: codedMessage) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        let successful = sendData(send: messageData, to: name, characteristic: BluetoothConstants.chatCharacteristicID)
-        saveMessage(message: codedMessage, isSelf: true, sendStatus: successful)
-    }
-    
-    /// Decodes chat message sent to this devices through the chat characteristic
-    ///
-    /// - parameters:
-    ///     - data: the data received by our peripheral/central
-    ///     - from: a reference to the device who sent the data which we use to update their last connection and invalidate ping, if any
-    ///
-    /// - note: the parameter from is not referencing the original sender of the message, but the device who sent the data
-    public func processIncomingChatMessage(_ data: Data, from ref: CBPeer){
-        
-        let receivedData = String(decoding: data, as: UTF8.self)
-        
-        guard let decodedMessage: BTMessage = BTMessage.BTMessageDecoder(message: receivedData) else {
-            print("unable to decode message")
-            return;
-        }
-        
-        updateLastConnectionAndInvalidateTimer(for: ref)
-        saveMessage(message: decodedMessage, isSelf: false, sendStatus: true)
-    
-    }
-    
-    /// Decodes routing message sent to this devices through the routing characteristic, searches for next node and sends it
-    ///
-    /// - parameters:
-    ///     - data: the data received by our peripheral/central
-    ///     - from: a reference to the device who sent the data which we use to update their last connection and invalidate ping, if any
-    ///
-    /// - note: the parameter from is not referencing the original sender of the message, but the device who sent the data
-    public func processIncomingRoutingMessage(_ data: Data, from ref: CBPeer){
-        
-        let receivedData = String(decoding: data, as: UTF8.self)
-        
-        guard let decodedMessage: BTRoutedMessage = BTRoutedMessage.BTRoutedMessageDecoder(message: receivedData) else {
-            print("unable to decode message")
-            return;
-        }
-        
-        // save message if we are the target
-        if(decodedMessage.targetUser == self.name) {
-            saveMessage(message: decodedMessage.BTmessage, isSelf: false, sendStatus: true)
-        } else {
-            routeMessage(messageToRoute: decodedMessage)
-        }
-        
-        updateLastConnectionAndInvalidateTimer(for: ref)
-    }
-    
-    func routeMessage(messageToRoute: BTRoutedMessage) {
-        
-        guard let targetVertex = self.adjList.findVertex(messageToRoute.targetUser) else {
-            return print("unable to find a vertex with this name")
-        }
-        
-        guard let nextHop = self.adjList.nextHop(targetVertex) else {
-            return print("unable to route the message, no known path to target")
-        }
-        
-        guard let messageData = BTRoutedMessage.BTRoutedMessageEncoder(message: messageToRoute) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        _ = sendData(send: messageData, to: nextHop, characteristic: BluetoothConstants.routingCharacteristicID)
-    }
-    
-    public func sendRoutedMessage(send message: String, to name: String){
-        
-        let btMessage = BTMessage(sender: self.name!, message: message, receiver: name)
-        let messageToRoute = BTRoutedMessage(targetUser: name, BTmessage: btMessage)
-        
-        routeMessage(messageToRoute: messageToRoute)
-        
-    }
-}
 
-// Methods to handle Handshake
-extension BluetoothController {
-    
-    // Send handshake to device using the passed CBPeer
-    func sendHandshake(_ sendTo: CBPeer){
-        let handshakeMessage = BTHandshake(name: self.name!)
-        
-        guard let messageData = BTHandshake.BTHandshakeEncoder(message: handshakeMessage) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        switch(sendTo) {
-        case is CBCentral:
-            self.peripheral?.sendData(messageData, central: sendTo as! CBCentral, characteristic: BluetoothConstants.handshakeCharacteristicID)
-        case is CBPeripheral:
-            self.central?.sendData(messageData, peripheral: sendTo as! CBPeripheral, characteristic: BluetoothConstants.handshakeCharacteristicID)
-        default:
-            print("unable to send handshale")
-        }
-    }
-    
-    func processHandshake(_ data: Data, from device: CBPeer){
-        
-        let receivedData = String(decoding: data, as: UTF8.self);
-        
-        guard let decodedBTHandshake: BTHandshake = BTHandshake.BTHandshakeDecoder(message: receivedData) else {
-            print("unable to decode handshake")
-            return;
-        }
-        
-        switch(device) {
-        case is CBPeripheral:
-           let vertex = self.adjList.processHandshake(from: decodedBTHandshake.name, peripheral: device as! CBPeripheral)
-            print("adding/updating vertex with peripheral")
-            sendAdjacencyRequest(to: vertex)
-            
-        case is CBCentral:
-            let vertex = self.adjList.processHandshake(from: decodedBTHandshake.name, central: device as! CBCentral)
-            print("adding/updating vertex with central")
-            sendAdjacencyRequest(to: vertex)
-        default:
-            print("unable to process")
-        }
-    }
-}
-
-// Methods to handle Pinging
-extension BluetoothController {
-    
-    @objc private func checkDevicesLastConnection() {
-        
-        let neighbors = self.adjList.getNeighbors()
-        
-        for (neighbor) in neighbors {
-            
-            // Check if its time to send a ping
-                if(Date.now.timeIntervalSince(neighbor.lastKnownPing!) > BluetoothConstants.LastConnectionInterval) {
-                   // Send a Ping to the device
-                    sendInitialPing(neighbor)
-                    
-                    // Set a timer to check if there was ever a response to the ping
-                    let context = ["name": neighbor.fullName]
-                    neighbor.setPingTimer(Timer.scheduledTimer(timeInterval: BluetoothConstants.TimeOutInterval,
-                                                                           target: self,
-                                                                           selector: #selector(pingTimeout),
-                                                                           userInfo: context,
-                                                                           repeats: false))
-                    
-                    print("sent a ping to \(neighbor.displayName), timer starting")
-                }
-            }
-    }
-    public func processReceivedPing(_ data: Data){
-        
-        let receivedData = String(decoding: data, as: UTF8.self)
-        
-        guard let decodedBTPing: BTPing = BTPing.BTPingDecoder(message: receivedData) else {
-            print("unable to decode message \(receivedData)")
-            return;
-        }
-        
-        switch(decodedBTPing.pingType) {
-            
-        // if a device ping us first, we respond to the ping
-        // and update the last connection which also invalidates any active timers
-        case .initialPing:
-            respondToPing(decodedBTPing)
-            if let vertex = findVertex(name: decodedBTPing.pingSender) {
-                // Update our lastconnection to this device/vertex
-                updateLastConnectionAndInvalidateTimer(for: vertex)
-                
-                print("received an initial ping from \(vertex.displayName)")
-            }
-            
-        // if we receive a response to a ping we update
-        // the last connection which also invalidates any active timers
-        case .responsePing:
-            if let vertex = findVertex(name: decodedBTPing.pingReceiver) {
-                // Update our lastconnection to this device/vertex
-                updateLastConnectionAndInvalidateTimer(for: vertex)
-                
-                print("received a response ping from \(vertex.displayName)")
-            }
-        }
-    }
-    public func sendInitialPing(_ vertex: Vertex){
-        
-        guard let sender = self.name else {
-            print("unable to ping, name not set")
-            return;
-        }
-        
-        let receiver = vertex.displayName + BluetoothConstants.NameIdentifierSeparator + vertex.id.uuidString
-        let codedMessage = BTPing(pingType: .initialPing, pingSender: sender, pingReceiver: receiver)
-        
-        guard let messageData = BTPing.BTPingEncoder(message: codedMessage) else {
-            print("could not enconde message")
-            return;
-        }
-        
-        _ = sendData(send: messageData, to: vertex, characteristic: BluetoothConstants.pingCharacteristicID)
-        
-    }
-    private func respondToPing(_ pingReceived: BTPing){
-        
-        var pingResponse = pingReceived;
-        pingResponse.pingType = .responsePing
-        
-        guard let messageData = BTPing.BTPingEncoder(message: pingResponse) else {
-            print("could not enconde message")
-            return;
-        }
-        
-       _ = sendData(send: messageData, to: pingReceived.pingSender, characteristic: BluetoothConstants.pingCharacteristicID)
-    }
-    
-    // If pingTimeout is triggered, we removed the device from the list
-    @objc public func pingTimeout(timer: Timer){
-        guard let context = timer.userInfo as? [String: String] else { return }
-            let name = context["name", default: "Anonymous"]
-        
-        if let vertexToRemove = findVertex(name: name) {
-            print("removing device \(vertexToRemove.displayName)")
-            
-            // removing central connection first, if there is one
-            if let peripheralToDisconnect = vertexToRemove.peripheral {
-                self.central?.removePeripheral(peripheralToDisconnect)
-            }
-            
-            // removing from published devices list
-            self.adjList.removeConnection(vertexToRemove)
-            
-        }
-    }
-    
-    public func updateLastConnectionAndInvalidateTimer(for vertex: Vertex) {
-        vertex.updateLastConnection();
-    }
-    
-    
-    public func updateLastConnectionAndInvalidateTimer(for ref: CBPeer) {
-        switch(ref) {
-        case is CBCentral:
-            guard let vertex = findVertex(central: ref as! CBCentral) else {
-                return;
-            }
-            vertex.updateLastConnection()
-        case is CBPeripheral:
-            guard let vertex = findVertex(peripheral: ref as! CBPeripheral) else {
-                return;
-            }
-            vertex.updateLastConnection()
-        default:
-            print("none of the above")
-        }
-    }
-}
-
-///  Methods to handle the exchange of Adjacency list
-extension BluetoothController {
-    
-}
 
 
 /*

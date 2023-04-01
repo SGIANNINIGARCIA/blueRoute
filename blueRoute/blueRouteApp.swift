@@ -20,7 +20,7 @@ struct blueRouteApp: App {
         self._dataController = StateObject(wrappedValue: dataController);
         
         // Initiate bluetoothManager and pass core data context and data manager
-        let bluetoothController = BluetoothController(dataController: dataController, context: dataController.container.viewContext)
+        let bluetoothController = BluetoothController(dataController: dataController)
         self._bluetoothController = StateObject(wrappedValue: bluetoothController);
         
         
