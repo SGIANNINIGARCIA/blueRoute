@@ -237,7 +237,10 @@ extension BluetoothController {
                     return;
                 }
                 
-                self.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                DispatchQueue.main.async { [weak self] in
+                    self?.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                }
+
                 self.pendingAdjacencyExchangesReceived.removeValue(forKey: sender)
             }
             
@@ -255,7 +258,10 @@ extension BluetoothController {
                     return;
                 }
                 
-                self.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                DispatchQueue.main.async { [weak self] in
+                    self?.adjList.processReceivedExchangedList(from: sender, compressedAdjList: rebuiltList)
+                }
+                
                 self.pendingAdjacencyExchangesReceived.removeValue(forKey: sender)
             }
         }

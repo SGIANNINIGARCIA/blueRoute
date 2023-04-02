@@ -110,8 +110,12 @@ extension BluetoothController {
                 self.central?.removePeripheral(peripheralToDisconnect)
             }
             
-            // removing from published devices list
-            self.adjList.removeConnection(vertexToRemove)
+            // removing from published devices list using main thread
+            DispatchQueue.main.async { [weak self] in
+                self?.adjList.removeConnection(vertexToRemove)
+            }
+            
+           // self.adjList.removeConnection(vertexToRemove)
             
         }
     }

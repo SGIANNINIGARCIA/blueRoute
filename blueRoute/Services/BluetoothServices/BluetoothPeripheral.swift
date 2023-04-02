@@ -77,6 +77,7 @@ class BluetoothPeripheralManager: NSObject {
     }
     
     func sendData(_ data: Data, central: CBCentral, characteristic: CBUUID) {
+        print("peripheral: sending data to central with characteristic \(characteristic)")
         switch (characteristic) {
         case BluetoothConstants.chatCharacteristicID:
             peripheral.updateValue(data, for: self.peripheralChatCharacteristic,

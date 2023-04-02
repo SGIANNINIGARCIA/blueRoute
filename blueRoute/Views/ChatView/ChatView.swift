@@ -53,9 +53,11 @@ struct ChatView: View {
                             Text("").id(bottomID)
                         }
                         
-                        /// Whenever there is a new message, trigger the toast message
+                        /// Whenever there is a new message , trigger the toast message
                         .onChange(of: messages.endIndex) { newValue in
-                            triggerToastMessage()
+                            if !messages[newValue - 1].senderIsSelf {
+                                triggerToastMessage()
+                            }
                         }
                         
                         .padding([.leading, .trailing], 8)

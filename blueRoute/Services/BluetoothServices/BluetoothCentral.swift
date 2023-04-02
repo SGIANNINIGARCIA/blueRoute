@@ -99,8 +99,9 @@ class BluetoothCentralManager: NSObject {
             return;
         }
         
+        
         peripheral.writeValue(data, for: characteristicToWrite, type: .withResponse)
-        print("central: message sent to peripheral")
+        print("central: message sent to peripheral using characteristic \(characteristic)")
     }
 }
 

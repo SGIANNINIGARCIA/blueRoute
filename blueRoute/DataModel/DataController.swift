@@ -59,9 +59,6 @@ extension DataController {
         messageToSave.sendStatus = sendStatus;
         messageToSave.seen = seen;
         
-        // change user lastmessage attribute to this new message
-        user.latestMessage = message.message;
-        
         save()
     }
     

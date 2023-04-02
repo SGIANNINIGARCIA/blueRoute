@@ -24,7 +24,8 @@ struct DiscoverView: View {
                 }
                 List {
                     Section(header: Text("Neighbors")) {
-                        ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.isNeighbor($0.id)})) { user in
+                       // ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.isNeighbor($0.id)})) { user in
+                        ForEach(adjacencyList.getNeighbors()) { user in
                             NavigationLink {
                                 ChatView(displayName: user.displayName, id: user.id)
                             } label: {
@@ -33,7 +34,8 @@ struct DiscoverView: View {
                         }
                     }
                     Section(header: Text("Reachable")) {
-                        ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.notANeighbor($0.id)})) { user in
+                       // ForEach(adjacencyList.adjacencies.filter({self.adjacencyList.notANeighbor($0.id)})) { user in
+                        ForEach(adjacencyList.getReachables()) { user in
                             NavigationLink {
                                 ChatView(displayName: user.displayName, id: user.id)
                             } label: {

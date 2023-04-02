@@ -60,6 +60,7 @@ class AdjacencyList: DeviceGraph, ObservableObject  {
     /// Creates a vertex with the given name and the reference to the central, adds it to adjacencies and returns the new vertex
     func createVertex(name: String, central: CBCentral) -> Vertex {
         let newVertex = Vertex(name: name, central: central)
+        
         adjacencies.append(newVertex)
         return newVertex;
         
@@ -498,6 +499,26 @@ extension AdjacencyList {
                 if(sharedVertexHasDate) {newVertex.setEdgesLastUpdated(vertex.lastUpdated!)}
             }
         }
+        
+    }
+}
+
+extension AdjacencyList {
+    
+    func getReachables() -> [Vertex] {
+        
+        var reachableList: [Vertex] = []
+        var neighbors = getNeighbors();
+        
+        for vertex in adjacencies {
+            var vertexIsNeighbor = neighbors.contains(where: {$0.id == vertex.id})
+            
+            if(vertexIsNeighbor == false && vertex.id != self.selfVertex.id) {
+                reachableList.append(vertex)
+            }
+        }
+        
+        return reachableList;
         
     }
 }
