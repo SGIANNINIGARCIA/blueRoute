@@ -35,7 +35,8 @@ struct ChatView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+
             ScrollViewReader { scrollViewProxy in
                 ZStack {
                     ScrollView {
@@ -81,7 +82,7 @@ struct ChatView: View {
             }
             TextInputView(displayName: displayName, id: id)
         }
-        .navigationBarTitle(Text(self.displayName), displayMode: .inline)
+        .navigationBarTitle(Text(self.displayName))
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }

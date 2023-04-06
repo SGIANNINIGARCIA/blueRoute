@@ -116,7 +116,39 @@ extension DataController {
         return user;
     }
     
+    public func deleteChat(_ chat: User) {
+        self.container.viewContext.delete(chat)
+        save()
+    }
+}
+
+extension DataController {
     
+    func createTestUser(username: String) -> User {
+        let user = User(context: container.viewContext)
+        
+        user.displayName = username;
+        user.identifier = UUID()
+        
+        save()
+        
+        return user
+    }
     
+    func createTestConversation(username: String) {
+        let user = createTestUser(username: username);
+        
+        var textMessage = Message(context: self.container.viewContext)
+        
+        textMessage.chat = user;
+        textMessage.content = "This is a test message"
+        textMessage.senderIsSelf = false;
+        textMessage.timestamp = Date();
+        textMessage.sendStatus = true;
+        textMessage.seen = true;
+        
+        save()
+        
+    }
 }
 

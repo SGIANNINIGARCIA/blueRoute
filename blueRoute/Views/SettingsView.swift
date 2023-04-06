@@ -8,45 +8,27 @@
 import SwiftUI
 
 struct SettingsView: View {
-    
     @State var username: String = "";
+    @EnvironmentObject var dataController: DataController;
+    @State var generatedUserInput: String = ""
     
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading) {
-                Text("Change Username")
-                    .font(Font.custom("KarlaRegular", size: 28))
-                    .padding(.horizontal)
-                TextField("Type here", text:$username)
-                    .font(Font.custom("KarlaRegular", size: 22))
-                    .padding(.horizontal)
-                Divider()
-                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.white/*@END_MENU_TOKEN@*/)
-                    .padding(.horizontal)
-                HStack {
-                    Spacer()
-                    Button("submit") {
-                        print("clicked")
-                    }
-                        .fontWeight(/*@START_MENU_TOKEN@*/.regular/*@END_MENU_TOKEN@*/)
-                        .font(Font.custom("KarlaBold", size: 24))
+        Form {
+            Section("Generate Test Chat") {
+                VStack {
+                    TextField("Type the Test Username here", text:$generatedUserInput)
+                        .foregroundColor(.black)
+                        .font(Font.custom("KarlaRegular", size: 16))
+                    Divider()
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.white/*@END_MENU_TOKEN@*/)
+                    Button("Create") {
+                        self.dataController.createTestConversation(username: generatedUserInput)
+                        generatedUserInput = ""
+                    }.padding(.top, 8).buttonStyle(.bordered)
                 }
-                .padding(.horizontal)
-            } .navigationTitle("Settings")
-                .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .principal) {
-                                HStack {
-                                    Text("Settings")
-                                        .font(Font.custom("LatoBold", size: 52))
-                                        .padding(.top, 32.0)
-                                    
-                                    Spacer()
-                                }
-                            }
-                        }
-            
+            }
         }
+        .scrollDismissesKeyboard(.immediately)
     }
 }
 

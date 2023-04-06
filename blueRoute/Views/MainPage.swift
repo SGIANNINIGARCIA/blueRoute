@@ -31,12 +31,11 @@ struct MainPage: View {
                 }
             
             // View for changing settings
-            /*SettingsView()
+            SettingsView()
             .tabItem {
                 Image(systemName: "gearshape.fill")
                 Text("Settings")
             }
-             */
         }
         .onAppear {
             // on appear, set up the name of the device to start advertising as online
