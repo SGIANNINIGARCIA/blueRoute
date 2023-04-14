@@ -3,13 +3,6 @@
 Working on a messaging app using a bluetooth mesh. 
 
 ## Currently working on
-- [ ] Work on sending data bigger than the max packet size (for sharing adj matrices)
-    - [ ] Rewrite everything to account for removal of matrix exchange from ping and handshake service
-    - [ ] Create new service for adjMatrix exchange
-    - [ ] Implement methods for sending data as multiple packages
-- [ ] Implement Explore View and clearly show who is a direct connection and who requires routing
-
-### Future:
 - [ ] Manage undelivered Messages
     - [ ] Implement send message retry on reconnection
         - [ ] Save undelivered messages for later delivery
@@ -19,6 +12,11 @@ Working on a messaging app using a bluetooth mesh.
 - [ ] Implement delivered message
 
 ### Done:
+- [x] Work on sending data bigger than the max packet size (for sharing adj matrices)
+    - [x] Rewrite everything to account for removal of matrix exchange from ping and handshake service
+    - [x] Create new service for adjMatrix exchange
+    - [x] Implement methods for sending data as multiple packages
+- [ ] Implement Explore View and clearly show who is a direct connection and who requires routing
 - [x] Rewrite addDevice to use Adjacency List
     - [x] Recognize when the device is a direct connection or a 2nd/3rd degree device based on reference to CBPeer 
 - [x] Rewrite sendChatMessage to recognize if a message should be routed or sent directly based on BFS 
@@ -39,6 +37,6 @@ Working on a messaging app using a bluetooth mesh.
     - [x] Decide whether to respond to peripheral or central, depending which one is available
     
 ### Known Issues:
-- AdjList exchange currently exceeds MTU max byte size, generating an error when decoding the message
+- ~AdjList exchange currently exceeds MTU max byte size, generating an error when decoding the message~
 - ~If device B closes the app or the bluetooth connection restarts, device A will continue to message the device using old references to its peripheral/central, resulting in a undelivered message~
     
